@@ -36,6 +36,9 @@
     <ClCompile Include="Engine\ResourceManager\ResourceRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Memory\StackAllocator.h">

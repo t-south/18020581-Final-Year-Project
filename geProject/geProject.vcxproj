@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\main.cpp" />
     <ClCompile Include="Engine\Memory\AlignAlloc.cpp" />
     <ClCompile Include="Engine\Memory\DeStackAllocator.cpp" />
     <ClCompile Include="Engine\Memory\DoubleBufferedAllocator.cpp" />
