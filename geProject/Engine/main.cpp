@@ -29,6 +29,54 @@ public:
 //DoubleBufferedAllocator g_doubleBuffAllocator;
 
 
+
+struct Object {
+	uint64_t data[2];
+	static StackAllocator allocator;
+
+	static void* operator new(size_t size) {
+		return allocator.alloc(size, sizeof(data));
+	}
+	static void operator delete(void* ptr) {		 
+		return allocator.dealloc();
+	}
+
+};
+constexpr int arraySize = 5;
+StackAllocator Object::allocator{400};
+
+int main() {
+
+	StackAllocator::Marker marker;
+
+	Object* objects[arraySize];
+	cout << "size(object) = " << sizeof(Object) << endl << endl;
+	cout << "About to allocate " << arraySize << " objects" << endl;
+	for (int i = 0; i < arraySize; ++i) {
+		if (i == 1) {
+			marker = objects[i]->allocator.getMarker();
+		}
+		objects[i] = new Object();
+		objects[i]->data[0] = i;
+		objects[i]->data[1] = i + 6;
+		cout << "new [" << i << "] = " << objects[i] << endl;
+	}
+	cout << endl;
+	
+	objects[0]->allocator.freeToMarker(marker);
+
+	/*
+	for (int i = arraySize - 1; i >= 0; --i) {
+		cout << "deallocate [" << i << "] = " << objects[i] << endl;
+		delete objects[i];
+	}
+	cout << endl;
+	*/
+	objects[4] = new Object();
+	cout << "new [0] = " << objects[4] << endl << endl;
+
+
+/*
 struct Object {
 	uint64_t data[2];
 	static PoolAllocator allocator;
@@ -39,8 +87,8 @@ struct Object {
 		return allocator.deAllocate(ptr);
 	}
 };
-constexpr int arraySize = 10;
-PoolAllocator Object::allocator{ arraySize, 32 };
+constexpr int arraySize = 4;
+PoolAllocator Object::allocator{ arraySize, 16 };
 
 int main() {
 
@@ -49,6 +97,8 @@ int main() {
 	cout << "About to allocate " << arraySize << " objects" << endl;
 	for (int i = 0; i < arraySize; ++i) {
 		objects[i] = new Object();
+		objects[i]->data[0] = i;
+		objects[i]->data[1] = i + 6;
 		cout << "new [" << i << "] = " << objects[i] << endl;
 	}
 	cout << endl;
@@ -62,7 +112,7 @@ int main() {
 	objects[0] = new Object();
 	cout << "new [0] = " << objects[0] << endl << endl;
 
-
+	*/
 	/*
 	mManager.startup();
 	mManager.shutdown();

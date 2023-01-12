@@ -11,11 +11,15 @@ StackAllocator::~StackAllocator() {
 }
 
 void* StackAllocator::alloc(size_t size, size_t align) {	
-	size = AlignAlloc::AlignAddress(size, align);
-	U8* previousAddress = current_pos;
+	//size = AlignAlloc::AlignAddress(size, align);
+	U8* previousAddress = current_pos;	
 	offSet = size;
 	current_pos += size;
 	return reinterpret_cast<void*>(previousAddress);
+}
+
+void StackAllocator::dealloc() {
+	current_pos -= offSet;
 }
 
 void StackAllocator::reset() {
@@ -27,6 +31,6 @@ void StackAllocator::freeToMarker(Marker old_address) {
 	current_pos = old_address.markerAddress;
 }
 
-StackAllocator::Marker StackAllocator::getMarker() {
-	return Marker{ current_pos };
+StackAllocator::Marker StackAllocator::getMarker() {	
+	return Marker{current_pos};
 }

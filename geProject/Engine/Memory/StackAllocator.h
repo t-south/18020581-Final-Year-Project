@@ -3,11 +3,12 @@
 #include "AlignAlloc.h"
 class StackAllocator {
 public:
-	typedef unsigned char U8;
+	typedef unsigned char U8;	
 	struct Marker { U8* markerAddress; };
-	explicit StackAllocator(size_t size);
+	StackAllocator(size_t size);
 	~StackAllocator();
 	void* alloc(size_t size, size_t align);
+	void dealloc();
 	void freeToMarker(Marker old_address);
 	Marker getMarker();	
 	void reset();

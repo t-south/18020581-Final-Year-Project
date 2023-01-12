@@ -133,7 +133,8 @@
     <ClCompile Include="Engine\Memory\DoubleBufferedAllocator.cpp" />
     <ClCompile Include="Engine\Memory\PoolAllocator.cpp" />
     <ClCompile Include="Engine\Memory\StackAllocator.cpp" />
-    <ClCompile Include="Engine\ResourceManager\ResourceRegistry.cpp" />
+    <ClCompile Include="Engine\ResourceManager\Resource.cpp" />
+    <ClCompile Include="Engine\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="Engine\Threading\Semaphore.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,7 +144,8 @@
     <ClInclude Include="Engine\Memory\memoryAllocator.h" />
     <ClInclude Include="Engine\Memory\PoolAllocator.h" />
     <ClInclude Include="Engine\Memory\StackAllocator.h" />
-    <ClInclude Include="Engine\ResourceManager\ResourceRegistry.h" />
+    <ClInclude Include="Engine\ResourceManager\Resource.h" />
+    <ClInclude Include="Engine\ResourceManager\ResourceManager.h" />
     <ClInclude Include="Engine\Threading\Semaphore.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
