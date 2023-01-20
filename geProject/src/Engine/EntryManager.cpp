@@ -1,3 +1,5 @@
+#ifdef GE_PLATFORM_WINDOWS
+
 #include <iostream>
 #include "memory/DoubleBufferedAllocator.h"
 #include "memory/StackAllocator.h"
@@ -24,7 +26,7 @@ public:
 
 };
 
-//MemoryManager mManager;
+MemoryManager mManager;
 //StackAllocator g_singleFrameAllocator;
 //DoubleBufferedAllocator g_doubleBuffAllocator;
 
@@ -45,8 +47,20 @@ struct Object {
 constexpr int arraySize = 5;
 StackAllocator Object::allocator{400};
 
-int main() {
 
+
+
+int main(int argc, char** argv) {
+	
+
+	mManager.startup();
+	mManager.shutdown();
+
+	//Game* game = new Game();
+	//game->Startup();
+	//delete game;
+	
+	
 	StackAllocator::Marker marker;
 
 	Object* objects[arraySize];
@@ -128,3 +142,5 @@ int main() {
 	//}
 	return 0;
 }
+
+#endif

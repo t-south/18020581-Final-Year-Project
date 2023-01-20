@@ -15,60 +15,78 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine\Memory\AlignAlloc.cpp">
+    <ClCompile Include="src\Engine\Memory\AlignAlloc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Memory\StackAllocator.cpp">
+    <ClCompile Include="src\Engine\Memory\StackAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Memory\PoolAllocator.cpp">
+    <ClCompile Include="src\Engine\Memory\PoolAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Memory\DoubleBufferedAllocator.cpp">
+    <ClCompile Include="src\Engine\Memory\DoubleBufferedAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Memory\DeStackAllocator.cpp">
+    <ClCompile Include="src\Engine\Memory\DeStackAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Threading\Semaphore.cpp">
+    <ClCompile Include="src\Engine\Threading\Semaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ResourceManager\ResourceManager.cpp">
+    <ClCompile Include="src\Engine\ResourceManager\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\main.cpp">
+    <ClCompile Include="src\Engine\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\ResourceManager\Resource.cpp">
+    <ClCompile Include="src\Engine\ResourceManager\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Render\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\Memory\StackAllocator.h">
+    <ClInclude Include="src\Engine\Memory\StackAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Memory\PoolAllocator.h">
+    <ClInclude Include="src\Engine\Memory\PoolAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Memory\memoryAllocator.h">
+    <ClInclude Include="src\Engine\Memory\memoryAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Memory\DoubleBufferedAllocator.h">
+    <ClInclude Include="src\Engine\Memory\DoubleBufferedAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Memory\DeStackAllocator.h">
+    <ClInclude Include="src\Engine\Memory\DeStackAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Memory\AlignAlloc.h">
+    <ClInclude Include="src\Engine\Memory\AlignAlloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Threading\Semaphore.h">
+    <ClInclude Include="src\Engine\Threading\Semaphore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ResourceManager\ResourceManager.h">
+    <ClInclude Include="src\Engine\ResourceManager\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\ResourceManager\Resource.h">
+    <ClInclude Include="src\Engine\ResourceManager\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Render\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geProject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,19 +13,19 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ec016283-fbd2-4ddf-abe0-6e33ddad5e42}</ProjectGuid>
-    <RootNamespace>geProject</RootNamespace>
+    <ProjectGuid>{35f5db31-a2f0-41f0-92b5-29f77651d1c6}</ProjectGuid>
+    <RootNamespace>Game</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -55,8 +55,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GE_PLATFORM_WINDOWS; GE_BUILD_DLL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GE_PLATFORM_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)geProject\src;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -69,8 +70,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GE_PLATFORM_WINDOWS; GE_BUILD_DLL;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GE_PLATFORM_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)geProject\src;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -80,32 +82,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\Application.cpp" />
-    <ClCompile Include="src\Engine\main.cpp" />
-    <ClCompile Include="src\Engine\Memory\AlignAlloc.cpp" />
-    <ClCompile Include="src\Engine\Memory\DeStackAllocator.cpp" />
-    <ClCompile Include="src\Engine\Memory\DoubleBufferedAllocator.cpp" />
-    <ClCompile Include="src\Engine\Memory\PoolAllocator.cpp" />
-    <ClCompile Include="src\Engine\Memory\StackAllocator.cpp" />
-    <ClCompile Include="src\Engine\Render\Renderer.cpp" />
-    <ClCompile Include="src\Engine\ResourceManager\Resource.cpp" />
-    <ClCompile Include="src\Engine\ResourceManager\ResourceManager.cpp" />
-    <ClCompile Include="src\Engine\Threading\Semaphore.cpp" />
+    <ProjectReference Include="..\geProject\geProject.vcxproj">
+      <Project>{ec016283-fbd2-4ddf-abe0-6e33ddad5e42}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Engine\Application.h" />
-    <ClInclude Include="src\Engine\Memory\AlignAlloc.h" />
-    <ClInclude Include="src\Engine\Memory\DeStackAllocator.h" />
-    <ClInclude Include="src\Engine\Memory\DoubleBufferedAllocator.h" />
-    <ClInclude Include="src\Engine\Memory\memoryAllocator.h" />
-    <ClInclude Include="src\Engine\Memory\PoolAllocator.h" />
-    <ClInclude Include="src\Engine\Memory\StackAllocator.h" />
-    <ClInclude Include="src\Engine\Render\Renderer.h" />
-    <ClInclude Include="src\Engine\ResourceManager\Resource.h" />
-    <ClInclude Include="src\Engine\ResourceManager\ResourceManager.h" />
-    <ClInclude Include="src\Engine\Threading\Semaphore.h" />
-    <ClInclude Include="src\Engine\Core.h" />
-    <ClInclude Include="src\geProject.h" />
+    <ClCompile Include="src\Game.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
