@@ -1,5 +1,5 @@
 #pragma once
-namespace GameEngine {
+namespace geProject {
 	class Renderer {
 	public:
 		static void Init();

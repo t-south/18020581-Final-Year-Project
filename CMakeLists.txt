@@ -2,8 +2,6 @@
 # and include sub-projects here.
 #
 cmake_minimum_required (VERSION 3.8)
-
-
 project(ge_cpp_dev_environment VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 add_compile_definitions(OPENCV_VERSION=${OpenCV_VERSION})

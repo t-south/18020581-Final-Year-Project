@@ -1,0 +1,242 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "Game",
+					"jsonFile" : "directory-Game-Debug-3fdc2a9f77bc10ae1a54.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "Game",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "Engine",
+					"childIndexes" : 
+					[
+						3,
+						5
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-Engine-Debug-e7cda9100e735d363573.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "Engine",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "Engine/External/GLFW",
+					"childIndexes" : 
+					[
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-Engine.External.GLFW-Debug-c0106b6db2ddd9ebe0ec.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.4"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 3,
+					"source" : "Engine/External/GLFW",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "Engine/External/GLFW/src",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-Engine.External.GLFW.src-Debug-bddc3468e81b8f2d13b8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.4"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 3,
+					"source" : "Engine/External/GLFW/src",
+					"targetIndexes" : 
+					[
+						2,
+						5
+					]
+				},
+				{
+					"build" : "Engine/External/spdlog",
+					"jsonFile" : "directory-Engine.External.spdlog-Debug-8d681271700e2d7b91fc.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 4,
+					"source" : "Engine/External/spdlog",
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "ge_cpp_dev_environment"
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "ge_cpp_application",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"childIndexes" : 
+					[
+						3,
+						4
+					],
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "ge_cpp_engine",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						3,
+						4
+					],
+					"name" : "GLFW",
+					"parentIndex" : 2,
+					"targetIndexes" : 
+					[
+						2,
+						4,
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						5
+					],
+					"name" : "spdlog",
+					"parentIndex" : 2,
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "ge_cpp_application::@971b28586fb25e7ff763",
+					"jsonFile" : "target-ge_cpp_application-Debug-be131f26c2a164dc976f.json",
+					"name" : "ge_cpp_application",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "ge_cpp_engine::@8f69bdd092c897d92c1e",
+					"jsonFile" : "target-ge_cpp_engine-Debug-faa19c9d4009ff659a48.json",
+					"name" : "ge_cpp_engine",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "glfw::@23f4a6a3e8324633ce56",
+					"jsonFile" : "target-glfw-Debug-d16bdc672b5ed4ea1968.json",
+					"name" : "glfw",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "spdlog::@4e1957530ade8bd3852a",
+					"jsonFile" : "target-spdlog-Debug-a2840c1320dd1f7bbdaf.json",
+					"name" : "spdlog",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "uninstall::@54246de7da55fe74de32",
+					"jsonFile" : "target-uninstall-Debug-1ae3d4e68d9e156ef00b.json",
+					"name" : "uninstall",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "update_mappings::@23f4a6a3e8324633ce56",
+					"jsonFile" : "target-update_mappings-Debug-decfc3a965076a34fa71.json",
+					"name" : "update_mappings",
+					"projectIndex" : 3
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/south/source/repos/18020581-Final-Year-Project/out/build/x64-debug",
+		"source" : "C:/Users/south/source/repos/18020581-Final-Year-Project"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

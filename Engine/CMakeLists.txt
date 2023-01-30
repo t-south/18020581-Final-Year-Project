@@ -1,11 +1,13 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 project(ge_cpp_engine VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
+
+
 find_package(OpenGL REQUIRED)
 add_subdirectory(External/GLFW)
 add_subdirectory(External/spdlog)
 
-file(GLOB SOURCES "src/*.cpp", "src/*/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_library(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} 
 	PUBLIC	
@@ -14,6 +16,7 @@ target_include_directories(${PROJECT_NAME}
 		spdlog
 		glfw
 		${OPENGL_LIBRARIES}
+		
 	PRIVATE
 		
 )
@@ -21,8 +24,8 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} 
 	PUBLIC 
 		spdlog
-		glfw
-		${OPENGL_LIBRARIES}
+		glfw		
+		${OPENGL_LIBRARIES}	
 	PRIVATE
 		
 )

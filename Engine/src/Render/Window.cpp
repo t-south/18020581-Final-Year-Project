@@ -2,7 +2,7 @@
 
 
 
-GameEngine::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height){
+geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height), mouse(MouseListener::getInstance()), keyboard(KeyboardListener::getInstance()){
 	//enable glfw errors
 	glfwSetErrorCallback(&glfwError);	
 	if (!glfwInit())
@@ -16,6 +16,13 @@ GameEngine::Window::Window(const char* m_title, int m_width, int m_height): titl
 	window = glfwCreateWindow(width, height, title, NULL, NULL);
 	if(window == NULL)
 		throw std::runtime_error("GLFW failed to create window.");
+	
+	glfwSetCursorPosCallback(window, mouse.cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse.mouse_button_callback);
+	glfwSetScrollCallback(window, mouse.scroll_callback);
+	glfwSetKeyCallback(window, keyboard.key_callback);
+
+
 	//current context
 	glfwMakeContextCurrent(window);
 	//v-sync enabled
@@ -23,28 +30,31 @@ GameEngine::Window::Window(const char* m_title, int m_width, int m_height): titl
 	glfwShowWindow(window);
 }
 
-GameEngine::Window::~Window() {
+geProject::Window::~Window() {
 	glfwDestroyWindow(window);
 	glfwTerminate();	
 }
 
-void GameEngine::Window::glfwError(int id, const char* description)
+
+
+void geProject::Window::glfwError(int id, const char* description)
 {
 	std::cout << description << std::endl;
 }
 
-void GameEngine::Window::loop(){
+void geProject::Window::loop(){
 	while (!glfwWindowShouldClose(window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glBegin(GL_TRIANGLES);
-		glVertex2f(-0.5f, -0.5f);
-		glVertex2f(0.0f, 0.5f);
-		glVertex2f(0.5f, -0.5f);
-		glEnd();
-
-		glfwSwapBuffers(window);
 		glfwPollEvents();
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		if (keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+			std::cout << "Space Key is pressed \n" << std::endl;
+		}
+		glfwSwapBuffers(window);
 	}
+	
+	glfwDestroyWindow(window);
+	glfwTerminate();
+	glfwSetErrorCallback(NULL);
 }

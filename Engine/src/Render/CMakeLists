@@ -1,0 +1,4 @@
+target_sources(render PRIVATE
+	Renderer.cpp	
+	Window.cpp	
+)

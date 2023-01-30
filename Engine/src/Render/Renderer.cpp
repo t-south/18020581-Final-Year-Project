@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-namespace GameEngine {
+namespace geProject {
 	struct Storage {
 
 	};

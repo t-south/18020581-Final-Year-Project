@@ -13,8 +13,13 @@
   },
   "ExpandedNodes": [
     "",
+    "\\Engine",
+    "\\Engine\\src",
+    "\\Engine\\src\\Events",
+    "\\Engine\\src\\Render",
+    "\\Game\\src",
     "\\out"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\Engine\\src\\Events\\EventDispatcher.h",
   "PreviewInSolutionExplorer": false
 }
