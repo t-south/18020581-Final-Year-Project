@@ -2,7 +2,7 @@
 
 
 
-geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height), mouse(MouseListener::getInstance()), keyboard(KeyboardListener::getInstance()){
+geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height){
 	//enable glfw errors
 	glfwSetErrorCallback(&glfwError);	
 	if (!glfwInit())
@@ -17,11 +17,14 @@ geProject::Window::Window(const char* m_title, int m_width, int m_height): title
 	if(window == NULL)
 		throw std::runtime_error("GLFW failed to create window.");
 	
-	glfwSetCursorPosCallback(window, mouse.cursor_position_callback);
-	glfwSetMouseButtonCallback(window, mouse.mouse_button_callback);
-	glfwSetScrollCallback(window, mouse.scroll_callback);
-	glfwSetKeyCallback(window, keyboard.key_callback);
-
+	mouse = new MouseListener();
+	keyboard = new KeyboardListener();
+	
+	glfwSetCursorPosCallback(window, mouse->cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse->mouse_button_callback);
+	glfwSetScrollCallback(window, mouse->scroll_callback);
+	glfwSetKeyCallback(window, keyboard->key_callback);
+	
 
 	//current context
 	glfwMakeContextCurrent(window);
@@ -48,9 +51,10 @@ void geProject::Window::loop(){
 		glfwPollEvents();
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		if (keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+		if (keyboard->isKeyPressed(GLFW_KEY_SPACE)) {
 			std::cout << "Space Key is pressed \n" << std::endl;
 		}
+		
 		glfwSwapBuffers(window);
 	}
 	

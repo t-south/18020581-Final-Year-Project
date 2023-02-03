@@ -1,9 +1,7 @@
 #include <ge_engine/KeyboardListener.h>
 
+geProject::KeyboardListener::KeyboardListener() {};
 
-geProject::KeyboardListener& geProject::KeyboardListener::getInstance() {
-    return instance;
-}
 
 void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -11,7 +9,7 @@ void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int 
         keyPressed[key] = true;
     }
     else if (action == GLFW_RELEASE) {
-        keyPressed[key] = false;        
+        keyPressed[key] = false;
     }
 }
 

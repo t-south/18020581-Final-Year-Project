@@ -2,11 +2,6 @@
 
 geProject::MouseListener::MouseListener() {};
 
-geProject::MouseListener& geProject::MouseListener::getInstance() {
-    return instance;
-}
-
-
 /* docs from https://www.glfw.org/docs/3.3/input_guide.html */
 
 void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
@@ -42,13 +37,13 @@ void geProject::MouseListener::endFrame() {
     yPrev = yPos;
 }
 
-float geProject::MouseListener::getXpos() { return xPos; };
-float geProject::MouseListener::getYpos() { return yPos; };
-float geProject::MouseListener::getXprev(){ return xPrev; };
-float geProject::MouseListener::getYprev() { return yPrev; };
-float geProject::MouseListener::getXscroll() { return xScroll; };
-float geProject::MouseListener::getYscroll() { return yScroll; };
-float geProject::MouseListener::getXdiff() { return xPos - xPrev; };
-float geProject::MouseListener::getYdiff() { return yPos - yPrev; };
+float geProject::MouseListener::getXpos() { return (float)xPos; };
+float geProject::MouseListener::getYpos() { return (float)yPos; };
+float geProject::MouseListener::getXprev(){ return (float)xPrev; };
+float geProject::MouseListener::getYprev() { return (float)yPrev; };
+float geProject::MouseListener::getXscroll() { return (float)xScroll; };
+float geProject::MouseListener::getYscroll() { return (float)yScroll; };
+float geProject::MouseListener::getXdiff() { return (float)(xPos - xPrev); };
+float geProject::MouseListener::getYdiff() { return (float)(yPos - yPrev); };
 bool geProject::MouseListener::isDrag() { return isDragging; };
 bool geProject::MouseListener::mouseButtonDown(int button) { return mouseButton[button]; };

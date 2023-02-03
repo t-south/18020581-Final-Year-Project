@@ -4,27 +4,26 @@
 namespace geProject {
 	class MouseListener {
 	public:
-		static MouseListener& getInstance();
+		MouseListener();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-		static void endFrame();
+		void endFrame();
 		//getters
-		static float getXpos();
-		static float getYpos();
-		static float getXprev();
-		static float getYprev();
-		static float getXscroll();
-		static float getYscroll();
-		static float getXdiff();
-		static float getYdiff();
-		static bool isDrag();
-		static bool mouseButtonDown(int button);
+		float getXpos();
+		float getYpos();
+		float getXprev();
+		float getYprev();
+		float getXscroll();
+		float getYscroll();
+		float getXdiff();
+		float getYdiff();
+		bool isDrag();
+		bool mouseButtonDown(int button);
 
-	private:
-		MouseListener();
-		~MouseListener();
-		static MouseListener instance;
+	private:		
+		
+		~MouseListener();		
 		static double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
 		static bool isDragging;
 		static bool mouseButton[3];

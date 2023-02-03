@@ -19,8 +19,8 @@ namespace geProject {
 		int width, height;
 		const char* title;
 		GLFWwindow* window;	
-		MouseListener& mouse;
-		KeyboardListener& keyboard;
+		MouseListener* mouse;
+		KeyboardListener* keyboard;
 		static void glfwError(int id, const char* description);
 		
 	};

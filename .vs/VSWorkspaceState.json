@@ -14,12 +14,16 @@
   "ExpandedNodes": [
     "",
     "\\Engine",
+    "\\Engine\\include",
+    "\\Engine\\include\\ge_engine",
     "\\Engine\\src",
-    "\\Engine\\src\\Events",
+    "\\Engine\\src\\Entry",
+    "\\Engine\\src\\Inputs",
     "\\Engine\\src\\Render",
-    "\\Game\\src",
-    "\\out"
+    "\\Engine\\src\\Threading",
+    "\\Game",
+    "\\Local settings (.vs)"
   ],
-  "SelectedNode": "\\Engine\\src\\Events\\EventDispatcher.h",
+  "SelectedNode": "\\Local settings (.vs)\\slnx.sqlite",
   "PreviewInSolutionExplorer": false
 }
