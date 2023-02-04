@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <system_error>
 #include <iostream>
-#include <ge_engine/KeyboardListener.h>
-#include <ge_engine/MouseListener.h>
+#include "../Inputs/MouseListener.h"
+#include "../Inputs/KeyboardListener.h"
 
 
 namespace geProject {

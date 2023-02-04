@@ -4,7 +4,8 @@
 namespace geProject {
 	class MouseListener {
 	public:
-		MouseListener();
+		
+		static MouseListener* getInstance();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -21,11 +22,13 @@ namespace geProject {
 		bool isDrag();
 		bool mouseButtonDown(int button);
 
-	private:		
-		
+	private:
+		MouseListener() {};
+		MouseListener(const MouseListener& obj) = delete;
+		static MouseListener* instance;
 		~MouseListener();		
-		static double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
-		static bool isDragging;
-		static bool mouseButton[3];
+		double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
+		bool isDragging;
+		bool mouseButton[3];
 	};
 }

@@ -1,33 +1,45 @@
-#include <ge_engine/MouseListener.h>
+#include "MouseListener.h"
 
-geProject::MouseListener::MouseListener() {};
-
+geProject::MouseListener* geProject::MouseListener::instance = nullptr;
 /* docs from https://www.glfw.org/docs/3.3/input_guide.html */
 
-void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+geProject::MouseListener* geProject::MouseListener::getInstance() {
+    if (instance == NULL)
+    {
+        instance = new MouseListener();
+        return instance;
+    }
+    else
+    {
+        return instance;
+    }
+}
+
+void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, double newX, double newY)
 {
-    xPrev = xPos;
-    yPrev = yPos;
-    xPos = xPos;
-    xPos = yPos;
-    isDragging = mouseButton[0] || mouseButton[1] || mouseButton[2];
+    geProject::MouseListener::getInstance()->xPrev = geProject::MouseListener::getInstance()->xPos;
+    geProject::MouseListener::getInstance()->yPrev = geProject::MouseListener::getInstance()->yPos;
+    geProject::MouseListener::getInstance()->xPos = newX;
+    geProject::MouseListener::getInstance()->xPos = newY;
+    geProject::MouseListener::getInstance()->isDragging = geProject::MouseListener::getInstance()->mouseButton[0] 
+        || geProject::MouseListener::getInstance()->mouseButton[1] || geProject::MouseListener::getInstance()->mouseButton[2];
 }
 
 void geProject::MouseListener::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
     if (action == GLFW_PRESS) {
-        mouseButton[button] = true;
+        geProject::MouseListener::getInstance()->mouseButton[button] = true;
     }
     else if (action == GLFW_RELEASE) {
-        mouseButton[button] = false;
-        isDragging = false;
+        geProject::MouseListener::getInstance()->mouseButton[button] = false;
+        geProject::MouseListener::getInstance()->isDragging = false;
     }
 }
 
 void geProject::MouseListener::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    xScroll = xoffset;
-    yScroll = yoffset;
+    geProject::MouseListener::getInstance()->xScroll = xoffset;
+    geProject::MouseListener::getInstance()->yScroll = yoffset;
 }
 
 void geProject::MouseListener::endFrame() {

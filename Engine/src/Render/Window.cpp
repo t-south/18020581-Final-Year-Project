@@ -2,7 +2,9 @@
 
 
 
-geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height){
+geProject::Window::Window(const char* m_title, int m_width, int m_height)
+							: title(m_title), width(m_width), height(m_height)
+{
 	//enable glfw errors
 	glfwSetErrorCallback(&glfwError);	
 	if (!glfwInit())
@@ -17,8 +19,8 @@ geProject::Window::Window(const char* m_title, int m_width, int m_height): title
 	if(window == NULL)
 		throw std::runtime_error("GLFW failed to create window.");
 	
-	mouse = new MouseListener();
-	keyboard = new KeyboardListener();
+	mouse = MouseListener::getInstance();
+	keyboard = KeyboardListener::getInstance();
 	
 	glfwSetCursorPosCallback(window, mouse->cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse->mouse_button_callback);
