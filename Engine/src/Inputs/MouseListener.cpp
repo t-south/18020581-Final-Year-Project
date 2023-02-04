@@ -1,7 +1,7 @@
 #include "MouseListener.h"
 
 geProject::MouseListener* geProject::MouseListener::instance = nullptr;
-/* docs from https://www.glfw.org/docs/3.3/input_guide.html */
+/* docs from https ://www.glfw.org/docs/3.3/input_guide.html */
 
 geProject::MouseListener* geProject::MouseListener::getInstance() {
     if (instance == NULL)

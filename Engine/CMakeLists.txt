@@ -7,8 +7,8 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(External/GLFW)
 add_subdirectory(External/spdlog)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_library(${PROJECT_NAME} ${SOURCES})
+file(GLOB_RECURSE sources "src/*.cpp")
+add_library(${PROJECT_NAME} ${sources})
 target_include_directories(${PROJECT_NAME} 
 	PUBLIC	
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
