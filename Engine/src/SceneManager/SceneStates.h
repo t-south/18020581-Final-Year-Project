@@ -11,6 +11,7 @@ namespace geProject {
 		int addScene(std::shared_ptr<Scene> scene);
 		void removeScene(int id);
 		void update(float deltaTime);
+		std::shared_ptr<Scene> getCurrentScene();
 	private:
 		//dictionary of scenes with key value int id's
 		std::unordered_map<int, std::shared_ptr<Scene>> scenes;

@@ -13,7 +13,7 @@ private:
 	size_t element_size;
 	size_t element_number;
 public:
-	PoolAllocator(size_t size, size_t element_size);
+	PoolAllocator(size_t elNumber, size_t elSize);
 	~PoolAllocator();
 	void* allocate(size_t size);
 	void deAllocate(void* node);

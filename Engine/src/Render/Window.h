@@ -1,12 +1,16 @@
 #pragma once
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <system_error>
 #include <iostream>
+#include <memory>
 #include "../Inputs/MouseListener.h"
 #include "../Inputs/KeyboardListener.h"
 #include "../Clock/Clock.h"
 #include "../SceneManager/SceneStates.h"
+#include "../SceneManager/LevelEditorScene.h"
+#include "../SceneManager/LevelScene.h"
 
 namespace geProject {
 	class Window
@@ -22,7 +26,7 @@ namespace geProject {
 		GLFWwindow* window;	
 		MouseListener* mouse;
 		KeyboardListener* keyboard;
-		SceneStates* sceneManager;
+		
 		//Time* clock;
 		static void glfwError(int id, const char* description);
 		

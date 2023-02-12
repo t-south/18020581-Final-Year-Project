@@ -5,4 +5,7 @@
 ### PRIVATE
 -GLFW
 -SPDLOG
+-GLAD
+-GLM
+-stb_image.h
 ### PUBLIC

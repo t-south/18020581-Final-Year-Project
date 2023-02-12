@@ -23,11 +23,11 @@ namespace geProject {
 		bool mouseButtonDown(int button);
 
 	private:
-		MouseListener() {};
+		MouseListener();
 		MouseListener(const MouseListener& obj) = delete;
 		static MouseListener* instance;
 		~MouseListener();		
-		double xPos, yPos, xPrev, yPrev, xScroll, yScroll = 0;
+		double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
 		bool isDragging = false;
 		bool mouseButton[3] = {false, false, false};
 	};

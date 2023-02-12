@@ -3,6 +3,8 @@
 geProject::MouseListener* geProject::MouseListener::instance = nullptr;
 /* docs from https ://www.glfw.org/docs/3.3/input_guide.html */
 
+geProject::MouseListener::MouseListener(): xPos(0), yPos(0), xPrev(0), yPrev(0), xScroll(0), yScroll(0){}
+
 geProject::MouseListener* geProject::MouseListener::getInstance() {
     if (instance == NULL)
     {

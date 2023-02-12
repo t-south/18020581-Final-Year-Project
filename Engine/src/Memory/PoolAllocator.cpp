@@ -1,7 +1,7 @@
 #include "PoolAllocator.h"
 
 
-PoolAllocator::PoolAllocator(size_t size, size_t element_size) : element_number(size), element_size(element_size), pool_size(element_size * size), poolAddress(nullptr) {
+PoolAllocator::PoolAllocator(size_t elNumber, size_t elSize) : element_number(elNumber), element_size(elSize), pool_size(elSize* elNumber), poolAddress(nullptr) {
 	U8* poolAddress = reinterpret_cast<U8*>(malloc(pool_size));	
 	Node* nodes = reinterpret_cast<Node*>(poolAddress);
 	head = nodes;
@@ -11,8 +11,8 @@ PoolAllocator::PoolAllocator(size_t size, size_t element_size) : element_number(
 		nodes = nodes->next;
 	}
 	nodes->next = nullptr;
-	
 }
+
 PoolAllocator::~PoolAllocator() {
 	free(poolAddress);
 }

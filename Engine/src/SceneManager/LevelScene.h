@@ -1,7 +1,12 @@
 #pragma once
 #include "Scene.h"
-
-class LevelScene : public Scene {
-	void update(float deltaTime);
-
-};
+namespace geProject {
+	class LevelScene : public Scene {
+	public:
+		LevelScene();
+		~LevelScene();
+		void update(float deltaTime);
+	private:
+		void init();
+	};
+}
