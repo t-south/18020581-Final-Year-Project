@@ -1,33 +1,30 @@
 #pragma once
+#include <glm/glm.hpp>
+#include "../src/Memory/PoolAllocator.h"
 namespace geProject {
+
+
+
 	struct Transform {
 		static const unsigned int id = 0x00000001;
-		float position{ 1.0f };
-		float rotation{ 2.0f };
-		static PoolAllocator transformallocator;
-		static void* operator new(size_t size) {
-			return transformallocator.allocate(size);
-		}
-		static void operator delete(void* ptr) {
-			return transformallocator.deAllocate(ptr);
-		}
+		glm::vec2 position{ 0 };
+		glm::vec2 scale{ 0 };
 	};
 
-	struct TestData {
+	struct SpriteRender {
 		static const unsigned int id = 0x00000002;
+		glm::vec4 color{ 0 };
+	};
+
+	struct FontRender {
+		static const unsigned int id = 0x00000004;
 		int x;
 		int y;
 		int z;
-		static PoolAllocator testallocator;
-		static void* operator new(size_t size) {
-			return testallocator.allocate(size);
-		}
-		static void operator delete(void* ptr) {
-			return testallocator.deAllocate(ptr);
-		}
-	};
 
+	};
 	
+
 }
 
 

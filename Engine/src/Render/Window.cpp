@@ -4,6 +4,7 @@
 
 geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height)
 {	
+	
 	//enable glfw errors
 	glfwSetErrorCallback(&glfwError);	
 	if (!glfwInit())
@@ -52,11 +53,13 @@ void geProject::Window::loop(){
 		return;
 	}
 	auto clock = Clock::getInstance();
-	auto scene = new SceneStates();
+	sceneManager = new SceneStates();
 	std::shared_ptr<Scene> levelEditorScene = std::make_shared<LevelEditorScene>();
 	std::shared_ptr<Scene> levelScene = std::make_shared<LevelScene>();
-	int editorSceneId = scene->addScene(levelEditorScene);
-    int levelSceneId = scene->addScene(levelScene);
+	int editorSceneId = sceneManager->addScene(levelEditorScene);
+    int levelSceneId = sceneManager->addScene(levelScene);
+	//SpriteSystems spriteManager = SpriteSystems();
+	//spriteManager.processSprites(sceneManager->getCurrentScene());
 	clock->updateTime();
 	//FPS variables
 	float timePerSec = 0;
@@ -74,7 +77,7 @@ void geProject::Window::loop(){
 			//scene->switchScene(levelSceneId);
 			
 		}
-		scene->getCurrentScene()->update(deltaTime);
+		sceneManager->getCurrentScene()->update(deltaTime);
 
 		if (loopCount > 0) {
 			//scene->getCurrentScene()->update(deltaTime);
@@ -102,5 +105,8 @@ void geProject::Window::loop(){
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	glfwSetErrorCallback(NULL);
+}
 
+std::shared_ptr<geProject::Scene> geProject::Window::getScene() {
+	return sceneManager->getCurrentScene();
 }

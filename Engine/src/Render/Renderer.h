@@ -1,12 +1,26 @@
 #pragma once
+#include <vector>
+#include "RenderBatch.h"
+#include "../EntityManager/EntityManager.h"
+#include <memory>
+#include "Camera.h"
+#include "../ResourceManager/ResourceManager.h"
+
+
 namespace geProject {
 	class Renderer {
 	public:
-		static void Init();
-		static void Shutdown();
+		Renderer(ResourceManager& resources);
+		~Renderer();
+		static void init();
+		static void shutdown();
 		//static void BeginScene(const OrthographicCamera& camera);
-		static void EndScene();
-		//static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
-		//static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+		void addSpriteToBatch(SpriteRender* sprite, Transform* transform);
+		static void render(Camera& camera);
+	private:
+		EntityManager* manager;		
+		ResourceManager* resourceManager;
+		static std::vector<RenderBatch> renderList;
+		static const unsigned int maxBatch{ 500 };
 	};
 }

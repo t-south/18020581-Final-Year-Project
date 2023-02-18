@@ -11,6 +11,8 @@
 #include "../SceneManager/SceneStates.h"
 #include "../SceneManager/LevelEditorScene.h"
 #include "../SceneManager/LevelScene.h"
+#include "../Systems/SpriteSystems.h"
+
 
 namespace geProject {
 	class Window
@@ -26,7 +28,8 @@ namespace geProject {
 		GLFWwindow* window;	
 		MouseListener* mouse;
 		KeyboardListener* keyboard;
-		
+		SceneStates* sceneManager;
+		std::shared_ptr<geProject::Scene> getScene();
 		//Time* clock;
 		static void glfwError(int id, const char* description);
 		

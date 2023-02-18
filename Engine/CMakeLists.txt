@@ -1,18 +1,11 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 project(ge_cpp_engine VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
-
-
 find_package(OpenGL REQUIRED)
-
 add_subdirectory(External/glm)
 add_subdirectory(External/GLFW)
 add_subdirectory(External/spdlog)
 add_subdirectory(External/GLAD)
-
-
-
-
 file(GLOB_RECURSE sources "src/*.cpp")
 add_library(${PROJECT_NAME} ${sources})
 target_include_directories(${PROJECT_NAME} 

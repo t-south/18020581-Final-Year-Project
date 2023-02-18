@@ -9,21 +9,39 @@
 //type of component. The entity ID will be used to access the index of each component to get each entities components.
 namespace geProject {
 	class EntityManager {
+		typedef unsigned int uInt;
 	public:
-		EntityManager();
+		EntityManager(uInt maxEntities);
 		~EntityManager();
-		unsigned int addEntity();
-		void assignComponent(unsigned int entityId, unsigned int componentId);
-		void deleteComponent(unsigned int entityId, unsigned int componentId);
-		
+		//Entities
+		uInt addEntity();
+		uInt getEntityNum();
+		Entity* getEntity(uInt entityId);
+		//Components
+		void assignTransform(uInt entityId, Transform transform);
+		void assignSpriteRender(uInt entityId, SpriteRender sprite);
+		void assignFontRender(uInt entityId, FontRender font);
+		void deleteComponent(uInt entityId, uInt componentId);
+		std::vector<Transform*> getTransformComponents();
+		std::vector<SpriteRender*> getSpriteComponents();
+		std::vector<FontRender*> getFontRenderComponents();		
+		Transform* getTransformComponent(uInt entityId);
+		SpriteRender* getSpriteComponent(uInt entityId);
+		FontRender* getFontRenderComponent(uInt entityId);
 
-	private:
-		unsigned int maxEntities;
-		unsigned int maxComponents;
-		Transform* componentTransforms[32]{nullptr};
-		TestData* componentTestData[32]{ nullptr };
-		std::vector<Entity> entities;
-		
-		void addComponent(unsigned int entityId, unsigned int componentId);
+		bool hasUpdate();
+		void endFrame();
+	private:		
+		bool entityUpdated;
+		uInt maxEntities;
+		std::vector<Transform*> componentTransforms{nullptr};
+		std::vector <SpriteRender*> componentSpriteRender{ nullptr };
+		std::vector <FontRender*> componentFontRender{ nullptr };
+		std::vector<Entity> entities;	
+		PoolAllocator transformpool;
+		PoolAllocator spritepool;
+		PoolAllocator fontpool;
+
+
 	};
 }

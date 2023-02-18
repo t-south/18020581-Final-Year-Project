@@ -1,16 +1,35 @@
 #include "Renderer.h"
 
-namespace geProject {
-	struct Storage {
+std::vector<geProject::RenderBatch> geProject::Renderer::renderList;;
 
-	};
-	void Renderer::Init() {
-		
+geProject::Renderer::Renderer(geProject::ResourceManager& resources){
+	resourceManager = &resources;
+	renderList.push_back(RenderBatch(maxBatch, *resourceManager));
+}
+
+geProject::Renderer::~Renderer(){}
 	
+void geProject::Renderer::init() {	
+	
+}
+void geProject::Renderer::shutdown() {}
+
+void geProject::Renderer::addSpriteToBatch(SpriteRender* sprite, Transform* transform) {
+	//auto rList = std::make_shared<RenderBatch>(RenderBatch(maxBatch));
+	//renderList.push_back(rList);
+	//if current batch is full start a new batch
+	if (renderList.back().isBatchFull()) {
+		renderList.push_back(RenderBatch(maxBatch, *resourceManager));
 	}
-	void Renderer::Shutdown() {}
-	//void Renderer::BeginScene(const OrthographicCamera& camera) {}
-	void Renderer::EndScene() {}
-	//void Renderer::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color) {}
-	//void Renderer::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color) {}
+	renderList.back().addSprite(sprite, transform);
+	
+}
+
+
+
+void geProject::Renderer::render(Camera& camera) {
+	//std::cout << "number of batches" << renderList.size() << std::endl;
+	for (int i = 0; i < renderList.size();i++) {
+		renderList[i].render(camera);
+	}
 }
