@@ -28,7 +28,7 @@ namespace geProject {
 		int collider{ 0 };
 		float friction{ 0.8 };
 		glm::vec3 velocity{ 0, 0.5, 0 };
-		glm::vec4 test{ 0,0,0,0 };
+
 		glm::vec3 dirtyFlag{ 0,0,0 }; // dirtyflag  -- renderbatch -- index
 	
 	};

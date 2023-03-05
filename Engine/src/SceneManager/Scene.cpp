@@ -147,7 +147,6 @@ void geProject::Scene::to_json(json& data, Rigidbody& comp) {
 				{"collider", comp.collider},
 				{"friction" , comp.friction},
 				{"velocityX", comp.velocity[0]}, {"velocityY", comp.velocity[1]}, {"velocityZ", comp.velocity[2]},
-				{"testX" , comp.test[0]}, {"testY" , comp.test[1]}, {"testZ" , comp.test[2]}, {"testW" , comp.test[3]},
 				{"dirtyFlag", comp.dirtyFlag[0]}, {"renderBuffer", comp.dirtyFlag[1]}, {"bufferIndex", comp.dirtyFlag[2]}
 			}
 		};
@@ -201,10 +200,6 @@ void geProject::Scene::from_json(json& data, Rigidbody& comp) {
 		data[1].at("velocityX").get_to(comp.velocity[0]);
 		data[1].at("velocityY").get_to(comp.velocity[1]);
 		data[1].at("velocityZ").get_to(comp.velocity[2]);
-		data[1].at("testX").get_to(comp.test[0]);
-		data[1].at("testY").get_to(comp.test[1]);
-		data[1].at("testZ").get_to(comp.test[2]);
-		data[1].at("testW").get_to(comp.test[3]);
 		data[1].at("dirtyFlag").get_to(comp.dirtyFlag[0]);
 		data[1].at("renderBuffer").get_to(comp.dirtyFlag[1]);
 		data[1].at("bufferIndex").get_to(comp.dirtyFlag[2]);

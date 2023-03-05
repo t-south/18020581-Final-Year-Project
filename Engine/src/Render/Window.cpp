@@ -90,13 +90,13 @@ void geProject::Window::loop(){
 			
 		}
 		sceneManager->getCurrentScene()->update(deltaTime);
+		imguiwindow->update(deltaTime, sceneManager->getCurrentScene());		
 		if (loopCount > 0) {
 			//scene->getCurrentScene()->update(deltaTime);
 		}
 		/*if (loopCount == 1) {
 
 		}*/
-		imguiwindow->update(deltaTime, sceneManager->getCurrentScene());		
 		//imguiwindow->render(width, height);
 		glfwSwapBuffers(window);
 		clock->updateTime();

@@ -281,14 +281,89 @@ void geProject::EntityManager::endFrame() {
 void geProject::EntityManager::updateImgui(uInt entityId) {
 	auto sprite  = getSpriteComponent(entityId);
 	auto transform = getTransformComponent(entityId);
-	if (getRigidBodyComponent(entityId)->id > 0) {
-		auto rigid = getRigidBodyComponent(entityId);
-		//if (ImGui::DragInt()) {
-
-		//}
+	auto rigid = getRigidBodyComponent(entityId);
+	auto font = getFontRenderComponent(entityId);
+	//TRANSFORM IMGUI updates
+	static float positionX = transform->position[0];
+	static float positionY = transform->position[1];
+	if (ImGui::DragFloat("positonX", &positionX)) {
+		if (positionX != transform->position[0]) {
+			transform->position[0] = positionX;
+			entityUpdated = true;
+		}
 	}
-	if (getFontRenderComponent(entityId)->id > 0) {
-		auto rigid = getFontRenderComponent(entityId);
+	if (ImGui::DragFloat("positonY", &positionY)) {
+		if (positionY != transform->position[1]) {
+			transform->position[1] = positionY;
+			entityUpdated = true;
+		}
+	}
+	static float scaleX = transform->scale[0];
+	static float scaleY = transform->scale[1];
+	if (ImGui::DragFloat("scaleX", &scaleX)) {
+		if (scaleX != transform->scale[0]) {
+			transform->scale[0] = scaleX;
+			entityUpdated = true;
+		}
+	}
+	if (ImGui::DragFloat("scaleY", &scaleY)) {
+		if (scaleY != transform->scale[1]) {
+			transform->scale[1] = scaleY;
+			entityUpdated = true;
+		}
+	}
+	if (entityUpdated == true) {
+		transform->dirtyFlag[0] = 1;
+	}
+	//SPRITE IMGUI updates
+	static int textureId = sprite->textureId;
+	if (ImGui::DragInt("textureId", &textureId)) {
+		if (textureId != sprite->textureId) {
+			sprite->textureId = textureId;
+			sprite->dirtyFlag[0] = 1;
+			entityUpdated = true;
+		}
+	}
+
+	static int zIndex = sprite->zIndex;
+	if (ImGui::DragInt("zIndex", &zIndex)) {
+		if (zIndex != sprite->zIndex) {
+			sprite->zIndex = zIndex;
+			sprite->dirtyFlag[0] = 1;
+			entityUpdated = true;
+		}
+	}
+	
+	//RIGIDBODY IMGUI updates
+	if (rigid->id > 0) {		
+		static int collider = rigid->collider;
+		static float friction = rigid->friction;
+		static float velocityX = rigid->velocity[0];
+		static float velocityY = rigid->velocity[1];
+		static float velocityZ = rigid->velocity[2];
+		if (ImGui::DragInt("rigidBody", &collider)) {
+			rigid->collider = collider;
+			entityUpdated = true;			
+		}
+		if (ImGui::DragFloat("friction", &friction)) {
+			rigid->friction = friction;
+			entityUpdated = true;			
+		}
+		if (ImGui::DragFloat("velocityX", &velocityX)) {
+			rigid->velocity[0] = velocityX;
+			entityUpdated = true;			
+		}
+		if (ImGui::DragFloat("velocityY", &velocityY)) {
+			rigid->velocity[1] = velocityY;
+			entityUpdated = true;
+		}
+		if (ImGui::DragFloat("velocityZ", &velocityZ)) {
+			rigid->velocity[2] = velocityZ;
+			entityUpdated = true;
+		}		
+	}
+	if (font->id > 0) {
+		
 	}
 	static ImVec4 color = ImVec4(sprite->color[0], sprite->color[1], sprite->color[2], sprite->color[3]);
 	ImGui::Text("MY CUSTOM COLOR PICKER WITH AN AMAZING PALETTE!");
