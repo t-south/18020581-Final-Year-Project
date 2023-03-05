@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <iostream>
 
+
 namespace geProject{
 	class Texture {
 	public:
@@ -10,8 +11,12 @@ namespace geProject{
 		~Texture();
 		void bindTexture();
 		void unbindTexture();
-	private:
+		float getWidth();
+		float getHeight();
+		unsigned int getTextureId();
+	protected:
 		unsigned int textureId;
+	    float textureWidth, textureHeight;
 		std::string filePath;
 	};
 }

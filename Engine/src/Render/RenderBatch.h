@@ -21,18 +21,23 @@ namespace geProject {
 
 	class RenderBatch {
 	public:
-		RenderBatch(int maxSize, ResourceManager& resources);
+		RenderBatch(int maxSize, unsigned int zIndex, ResourceManager& resources);
 		~RenderBatch();
 		bool isBatchFull();
+		bool isTextureFull(unsigned int id);
 		void addSprite(SpriteRender* sprite, Transform* transform);
+		void updateSprite(SpriteRender* sprite, Transform* transform);
 		void render(Camera& camera);
+		unsigned int getSpriteNum();
+		unsigned int getZindex();
 	private:
-		unsigned int vao, vbo, maxBatch, vertSize, spriteNum;
-		
+		unsigned int vao, vbo, maxBatch, vertSize, spriteNum, zIndex;
+		bool hasUpdate{ true };
 		ResourceManager* resourceManager;
 		std::vector<float> vertices;
-		
+		std::shared_ptr<geProject::Texture> textures[8]{nullptr};
 		std::vector<unsigned int> createIndexes();
+		void createVertices(SpriteRender* sprite, Transform* transform, unsigned int index);
 		void init();
 		
 	};

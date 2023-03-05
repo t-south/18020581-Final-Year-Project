@@ -8,10 +8,15 @@ geProject::LevelScene::~LevelScene(){}
 
 void geProject::LevelScene::init() {}
 
-void geProject::LevelScene::addEntityToScene(unsigned int entityId) {}
+size_t geProject::LevelScene::addEntityToScene(unsigned int entityId) { return 1; }
+void geProject::LevelScene::reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) {
 
+}
 geProject::Camera* geProject::LevelScene::getCamera() {
 	return camera;
 }
 
 void geProject::LevelScene::update(float deltaTime){}
+void geProject::LevelScene::updateImgui() {}
+void geProject::LevelScene::updateSceneImgui() {}
+std::vector<geProject::Entity*> geProject::LevelScene::getEntities() { return entities; }

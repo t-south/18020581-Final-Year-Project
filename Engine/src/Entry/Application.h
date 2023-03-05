@@ -1,8 +1,8 @@
 #pragma once
 #include <ge_engine/Core.h>
-#include "../../Engine/src/Render/Window.h"
 #include <stdio.h>
 #include <iostream>
+#include "../../Engine/src/Render/Window.h"
 
 namespace geProject {
 	class Application

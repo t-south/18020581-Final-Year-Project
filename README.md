@@ -8,4 +8,5 @@
 -GLAD
 -GLM
 -stb_image.h
+-nlohmann json
 ### PUBLIC

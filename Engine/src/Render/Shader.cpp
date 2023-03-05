@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+
 geProject::Shader::Shader(const char* vertexFile, const char* fragmentFile) {
 	vertexSrc = readFromFile(vertexFile);
 	fragmentSrc = readFromFile(fragmentFile);
@@ -122,6 +123,7 @@ void geProject::Shader::setFloat(const std::string& name, float value)
 	glUniform1f(glGetUniformLocation(shaderId, name.c_str()), value);
 }
 
+
 void geProject::Shader::setMat4f(const std::string& name, glm::mat4 value) 
 {
 	geProject::Shader::use();
@@ -134,6 +136,19 @@ void geProject::Shader::setTexture(const std::string& name, unsigned int value)
 	geProject::Shader::use();
 	glUniform1i(glGetUniformLocation(shaderId, name.c_str()), value);
 }
+
+void geProject::Shader::setFloatArray(const std::string& name, float value[])
+{
+	geProject::Shader::use();
+	glUniform1fv(glGetUniformLocation(shaderId, name.c_str()), sizeof(value), &value[0]);
+}
+
+void geProject::Shader::setIntArray(const std::string& name, int value[])
+{	
+	geProject::Shader::use();
+	glUniform1iv(glGetUniformLocation(shaderId, name.c_str()), sizeof(value), &value[0]);
+}
+
 
 void geProject::Shader::use() {
 	glUseProgram(shaderId);

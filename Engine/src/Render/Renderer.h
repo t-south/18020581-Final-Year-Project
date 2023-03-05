@@ -16,10 +16,11 @@ namespace geProject {
 		static void shutdown();
 		//static void BeginScene(const OrthographicCamera& camera);
 		void addSpriteToBatch(SpriteRender* sprite, Transform* transform);
+		void updateSprite(SpriteRender* sprite, Transform* transform);
 		static void render(Camera& camera);
+		void clear();
 	private:
-		EntityManager* manager;		
-		ResourceManager* resourceManager;
+		ResourceManager* resourceManager;		
 		static std::vector<RenderBatch> renderList;
 		static const unsigned int maxBatch{ 500 };
 	};

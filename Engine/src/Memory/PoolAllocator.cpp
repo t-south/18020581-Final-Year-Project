@@ -10,6 +10,7 @@ PoolAllocator::PoolAllocator(size_t elNumber, size_t elSize) : element_number(el
 		nodes->next = reinterpret_cast<Node*>(reinterpret_cast<char*>(nodes) + element_size);
 		nodes = nodes->next;
 	}
+
 	nodes->next = nullptr;
 }
 

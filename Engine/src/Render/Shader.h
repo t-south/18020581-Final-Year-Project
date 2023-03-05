@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+
 namespace geProject {
 	class Shader {
 	public:
@@ -18,6 +19,8 @@ namespace geProject {
 		void setFloat(const std::string& name, float value) ;
 		void setMat4f(const std::string& name, glm::mat4 value) ;
 		void setTexture(const std::string& name, unsigned int val) ;
+		void setFloatArray(const std::string& name, float value[]);
+		void setIntArray(const std::string& name, int value[]);
 	private:
 		unsigned int shaderId;
 		std::string vertexSrc;
@@ -26,6 +29,6 @@ namespace geProject {
 		bool checkCompile(int id);
 		bool checkLink(int id);
 		void configureShader();
-
+		
 	};
 }

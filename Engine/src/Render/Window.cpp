@@ -2,9 +2,8 @@
 
 
 
-geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height)
-{	
-	
+geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height), imguiwindow(nullptr), sceneManager(nullptr)
+{		
 	//enable glfw errors
 	glfwSetErrorCallback(&glfwError);	
 	if (!glfwInit())
@@ -25,6 +24,7 @@ geProject::Window::Window(const char* m_title, int m_width, int m_height): title
 	glfwSetMouseButtonCallback(window, mouse->mouse_button_callback);
 	glfwSetScrollCallback(window, mouse->scroll_callback);
 	glfwSetKeyCallback(window, keyboard->key_callback);
+	glfwSetWindowSizeCallback(window, window_size_callback);
 	
 
 	//current context
@@ -32,6 +32,19 @@ geProject::Window::Window(const char* m_title, int m_width, int m_height): title
 	//v-sync enabled
 	glfwSwapInterval(1);
 	glfwShowWindow(window);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return;
+	}
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	sceneManager = new SceneStates();
+	imguiwindow = new ImguiWindow(window);
+	imguiwindow->start(width, height, mouse->getXpos(), mouse->getYpos());
+
+
+
 }
 
 geProject::Window::~Window() {
@@ -46,15 +59,12 @@ void geProject::Window::glfwError(int id, const char* description)
 	std::cout << description << std::endl;
 }
 
-void geProject::Window::loop(){
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return;
-	}
+void geProject::Window::loop(){	
 	auto clock = Clock::getInstance();
 	sceneManager = new SceneStates();
 	std::shared_ptr<Scene> levelEditorScene = std::make_shared<LevelEditorScene>();
+	
+	//levelEditorScene->setSerializer(&serial);
 	std::shared_ptr<Scene> levelScene = std::make_shared<LevelScene>();
 	int editorSceneId = sceneManager->addScene(levelEditorScene);
     int levelSceneId = sceneManager->addScene(levelScene);
@@ -65,41 +75,43 @@ void geProject::Window::loop(){
 	float timePerSec = 0;
 	int loopCount = 0;
 	float deltaTime = 0;
+	
+	//SceneSerialize serial = SceneSerialize(sceneManager->getCurrentScene());
+	//serial.deserialize("jsonTest.json");
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
 		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		
+		glClear(GL_COLOR_BUFFER_BIT);		
 		if (keyboard->isKeyPressed(GLFW_KEY_SPACE)) {
 			std::cout << "Space Key is pressed \n" << std::endl;
-			//scene->switchScene(levelSceneId);
+			sceneManager->switchScene(levelSceneId);
+
 			
 		}
 		sceneManager->getCurrentScene()->update(deltaTime);
-
 		if (loopCount > 0) {
 			//scene->getCurrentScene()->update(deltaTime);
 		}
+		/*if (loopCount == 1) {
 
+		}*/
+		imguiwindow->update(deltaTime, sceneManager->getCurrentScene());		
+		//imguiwindow->render(width, height);
 		glfwSwapBuffers(window);
 		clock->updateTime();
 		deltaTime = clock->getTime();
 		timePerSec += deltaTime;
-		loopCount++;
-
+		loopCount++;		
 		//std::cout << "Frame time: " << deltaTime << std::endl;
 		if (timePerSec > 1) {
 			std::cout << "FPS1: " << loopCount << std::endl;
 			std::cout << "FPS2: " << 1 / deltaTime << std::endl;
 			timePerSec = 0;
 			loopCount = 0;
-		}
-		
+		}		
 		clock->endFrame();
-		clock->updateTime();
-		
+		clock->updateTime();		
 	}
 	
 	glfwDestroyWindow(window);
@@ -109,4 +121,10 @@ void geProject::Window::loop(){
 
 std::shared_ptr<geProject::Scene> geProject::Window::getScene() {
 	return sceneManager->getCurrentScene();
+}
+
+
+void geProject::Window::window_size_callback(GLFWwindow* window, int width, int height)
+{
+	glfwSetWindowSize(window, width, height);
 }

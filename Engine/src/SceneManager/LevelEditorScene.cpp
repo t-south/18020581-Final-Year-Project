@@ -4,6 +4,7 @@
 
 geProject::LevelEditorScene::LevelEditorScene() {
 	resourceManager = new ResourceManager();
+	resourceManager->loadLevel();
 	std::cout << "Editor Scene!" << std::endl;	
 	/*vertexArray = {  //vertices x,y,z           colors r,g,b,a             texture x,y
 					 100.5f,  100.5f, 0.0f,		1.0f, 0.0f, 0.0f, 1.0f,		1, 0, //top right
@@ -24,8 +25,10 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	camera = new geProject::Camera(glm::vec2(0.0f, 0.0f));
 	//testTexture = new Texture("../../../../Game/assets/images/container.jpg");
 	resourceManager->loadShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl", "../../../../Game/assets/shaders/FragmentShaderDefault.glsl");
-	resourceManager->loadTexture("../../../../Game/assets/images/container.jpg");
+	filePath = "../../../../Game/assets/levels/levelEditor.json";
+	
 	init();
+	
 	
 }
 
@@ -80,14 +83,77 @@ void geProject::LevelEditorScene::init() {
 		manager.assignComponent(i, 1);
 		manager.assignComponent(i, 2);
 	}
-	*/	
+	
+
+	*/
+	unsigned int crate = resourceManager->loadTexture("../../../../Game/assets/images/container2.jpg");
+	unsigned int mario = resourceManager->loadTexture("../../../../Game/assets/images/testImage.png");
+	unsigned int goomba = resourceManager->loadTexture("../../../../Game/assets/images/testImage2.png");
+	unsigned int blend1 = resourceManager->loadTexture("../../../../Game/assets/images/blendImage1.png");
+	unsigned int blend2 = resourceManager->loadTexture("../../../../Game/assets/images/blendImage2.png");
+	//unsigned int red = resourceManager->loadTexture("../../../../Game/assets/images/red.jpg");
+	sprites = resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheet.png", 26, 16, 16, 0, 3);
+	/*
+	unsigned int blen1 = manager->addEntity();	
+	manager->assignTransform(blen1, Transform{ .position = {100, 100}, .scale = {200, 200} });
+	manager->assignSpriteRender(blen1, SpriteRender{ .textureId{blend1}, .zIndex = 2 });
+	manager->assignRigidBody(manager->getEntity(0)->id, Rigidbody { .collider = 0 });
+	addEntityToScene(blen1);
+
+	unsigned int blen2 = manager->addEntity();
+	manager->assignTransform(blen2, Transform{ .position = {400, 100}, .scale = {200, 200} });
+	manager->assignSpriteRender(blen2, SpriteRender{ .textureId{blend2}, .zIndex = 3 });
+	addEntityToScene(blen2);
+
+	unsigned int blen3 = manager->addEntity();
+	manager->assignTransform(blen3, Transform{ .position = {700, 100}, .scale = {200, 200} });
+	manager->assignSpriteRender(blen3, SpriteRender{ .textureId{blend1}, .zIndex = 1 });
+	addEntityToScene(blen3);
+	
+	
+	*/
+
+
+	/*
+	
+	unsigned int blen4 = manager->addEntity();
+	manager->assignTransform(blen4, Transform{ .position = {400, 100}, .scale = {200, 200} });
+	manager->assignSpriteRender(blen4, SpriteRender{ .color = {0.2, 0.3, 0.4, 1.0}, .zIndex = 1 });
+	addEntityToScene(blen4);
+	
+	
+	
+	
+
+
+	
+	unsigned int blen5 = manager->addEntity();
+	manager->assignTransform(blen5, Transform{ .position = {100, 100}, .scale = {200, 200} });
+	manager->assignSpriteRender(blen5, SpriteRender{ .color = {0.2, 0.3, 0.4, 1.0}, .zIndex = 3 });
+	addEntityToScene(blen5);
+	
+	*/
+	/*
+	int x = 100;
+	
+	for (int i = 0; i < 25; i++) {
+		unsigned int entity = manager->addEntity();
+		addEntityToScene(entity);
+		auto cratetransform = Transform{ .position = {x, 200}, .scale = {50, 50} };
+		manager->assignTransform(entity, cratetransform);
+		x += 100;
+	}
+	*/
+
+	
+	/*
 	int xpos = 40;
 	int ypos = 50;
 	int scalex = 50;
 	int scaley = 50;
 	float r = 0.2;
 	float g = 0.2;
-    float b = 0.2;
+	float b = 0.2;
 	for (int i = 0; i < 25; i++) {
 		
 		unsigned int entityId = manager->addEntity();
@@ -105,13 +171,47 @@ void geProject::LevelEditorScene::init() {
 		scaley++;
 
 	}
+	*/
 	
+	
+	//auto tst = resourceManager->requestSpriteSheet(sprites);
+	
+	//entity = manager->addEntity();
+	
+	//auto cratesprite =  tst->getSprite(1);
+	//manager->assignSpriteRender(entity, cratesprite);
+	//unsigned int crateId = addEntityToScene(entity);
+	//auto cratetestsprite = SpriteRender{.textureId{crate} };
+	/*
+	unsigned int marioEntity = manager->addEntity();
+	auto mariotransform = Transform{ .position = {400, 100}, .scale = {256, 256} };
+	manager->assignTransform(marioEntity, mariotransform);
+	manager->assignSpriteRender(marioEntity, cratetestsprite);
+	//unsigned int marioId = addEntityToScene(marioEntity);
+	
+	unsigned int goombaEntity = manager->addEntity();
+	auto goombatransform = Transform{ .position = {800, 400}, .scale = {256, 256} };
+	manager->assignTransform(goombaEntity, goombatransform);
+	auto goombasprite = SpriteRender{.textureId{goomba} };
+	manager->assignSpriteRender(goombaEntity, goombasprite);
+	//unsigned int goombaId = addEntityToScene(goombaEntity);
+	*/
+	//manager->assignSpriteRender(entity, goombasprite);
+	//manager->assignSpriteRender(marioEntity, goombasprite);
+	//reAssignEntityToScene(crateId, entity);
+	
+	
+
 }
 
-void geProject::LevelEditorScene::addEntityToScene(unsigned int entityId){
+size_t geProject::LevelEditorScene::addEntityToScene(unsigned int entityId){
 	entities.push_back(manager->getEntity(entityId));
-	renderer->addSpriteToBatch(manager->getSpriteComponent(entityId), manager->getTransformComponent(entityId));
+	//renderer->addSpriteToBatch(manager->getSpriteComponent(entityId), manager->getTransformComponent(entityId));
+	return entities.size();
+}
 
+void geProject::LevelEditorScene::reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) {
+	//entities[entitySceneId] = manager->getEntity(entityId);
 }
 
 geProject::Camera* geProject::LevelEditorScene::getCamera() {
@@ -119,15 +219,48 @@ geProject::Camera* geProject::LevelEditorScene::getCamera() {
 }
 
 void geProject::LevelEditorScene::update(float deltaTime) {	
+	if (loopcount == 0) {
+		geProject::Scene::deserialize(filePath);
+	}
+	/*if (testSpritesheet == 18) {
+		testSpritesheet = 15;
+	}
+
+	
+	auto tst = resourceManager->requestSpriteSheet(sprites);
+	auto cratesprite = tst->getSprite(testSpritesheet);
+	if (loopcount % 25 == 0) {
+		testSpritesheet++;
+	}
+	loopcount++;
+	
+	for (int i = 1; i < manager->getEntityNum(); i++) {
+		manager->assignSpriteRender(i, cratesprite);
+	}
+	*/
 	if (manager->hasUpdate()) {
 		entities.clear();
 		for (int i = 0; i < manager->getEntityNum(); i++) {
-			entities.push_back(manager->getEntity(i));
-		}		
-	}	
+			entities.push_back(manager->getEntity(i));			
+			// only sprites that have not been added to the renderer previously will be set to 0
+			if (manager->getSpriteComponent(i)->dirtyFlag[2] == 0) {
+				renderer->addSpriteToBatch(manager->getSpriteComponent(i), manager->getTransformComponent(i));
+			}
+			else if (manager->getSpriteComponent(i)->dirtyFlag[0] > 0 || manager->getTransformComponent(i)->dirtyFlag[0] > 0) {
+				renderer->updateSprite(manager->getSpriteComponent(i), manager->getTransformComponent(i));
+			}
 
+		}
+		
+		
+		activatedEntity = manager->getEntity(0)->id;
+		geProject::Scene::serialize(filePath);
+	}	
+	
 	renderer->render(*(camera));
+	
 	manager->endFrame();
+	loopcount++;
 	/*
 	camera->position.x -= deltaTime * 50.0f;
 	camera->position.y -= deltaTime * 20.0f;
@@ -154,3 +287,24 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	glUseProgram(0);
 	*/
 }
+
+
+void geProject::LevelEditorScene::updateSceneImgui() {
+	if (activatedEntity > -1) {
+		ImGui::Begin("Inspector");
+		manager->updateImgui(activatedEntity);
+		ImGui::End();
+	}
+	updateImgui();
+}
+
+void geProject::LevelEditorScene::updateImgui() {
+	ImGui::Begin("Editor Window");
+	ImGui::Text("Some random text");
+	ImGui::End();
+}
+
+std::vector<geProject::Entity*> geProject::LevelEditorScene::getEntities() {
+	return entities;
+}
+

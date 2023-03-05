@@ -1,13 +1,10 @@
 #include "RenderBatch.h"
 
 
-geProject::RenderBatch::RenderBatch(int maxSize, ResourceManager& resources) : maxBatch(maxSize), vertSize(6), vao(0), vbo(0), spriteNum(0) {
-	resourceManager = &resources;
-	
-	
+geProject::RenderBatch::RenderBatch(int maxSize, unsigned int zIndex, ResourceManager& resources) : zIndex(zIndex),maxBatch(maxSize), vertSize(9), vao(0), vbo(0), spriteNum(0) {
+	resourceManager = &resources;	
 	// vector size will be the size of a quad of vertices multiplied by the max size of the batch
-	int vectorSize = maxBatch * vertSize * 4;
-	
+	int vectorSize = maxBatch * vertSize * 4;	
 	//initialise vector for later use
 	for (int i = 0; i < vectorSize; i++) {		
 		vertices.push_back(0);
@@ -20,7 +17,23 @@ bool geProject::RenderBatch::isBatchFull() {
 	return spriteNum == maxBatch;
 }
 
+bool geProject::RenderBatch::isTextureFull(unsigned int id) {
+	if (textures[7] == nullptr) {
+		return false;
+	}
+	else {
+		auto tex = resourceManager->requestTexture(id);
+		for (auto const& i : textures) {
+			if (i == tex) {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+
 void geProject::RenderBatch::init() {
+
 	//generate buffers for VAO, VBO and EBO
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -44,48 +57,81 @@ void geProject::RenderBatch::init() {
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, vertSize * sizeof(float), (void*)(2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	//set texture pointers
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
-	//glEnableVertexAttribArray(2);
-	
-	
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertSize * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	//texture ID
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, vertSize * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 
 }
 
 void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transform) {
-	if (spriteNum <= maxBatch) {
+	if (spriteNum <= maxBatch && sprite->zIndex == zIndex) {
 		int index = spriteNum * 4 * vertSize;
-	
-		for (int i = 0; i < 4; i++) {
-			switch (i) {
-			case 0:
-				vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
-				vertices[index + 1] = transform->position[1] + (1 * transform->scale.y); //y
-				break;
-			case 1:
-				vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
-				vertices[index + 1] = transform->position[1] + (0 * transform->scale.y); //y
-				break;
-
-			case 2:
-				vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
-				vertices[index + 1] = transform->position[1] + (0 * transform->scale.y); //y
-				break;
-
-			case 3:
-				vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
-				vertices[index + 1] = transform->position[1] + (1 * transform->scale.y); //y
-				break;
-
-			}
-			vertices[index + 2] = sprite->color[0]; //r
-			vertices[index + 3] = sprite->color[1]; //g
-			vertices[index + 4] = sprite->color[2]; //b
-			vertices[index + 5] = sprite->color[3]; //a
-			index += vertSize;
+		
+		//load in new texture into texture array if not present, leave 0th element for normal colors
+		
+		if (sprite->spriteSheetId == 0 && sprite->textureId > 0 && textures[sprite->textureId] == nullptr) {
+			textures[sprite->textureId] = resourceManager->requestTexture(sprite->textureId);
 		}
+		else if (sprite->spriteSheetId > 0) {
+			textures[sprite->textureId] = resourceManager->requestSpriteSheet(sprite->textureId);
+		}		
+		transform->dirtyFlag[2] = index;
+		sprite->dirtyFlag[2] = index + 2;
+		transform->dirtyFlag[0] = 0;
+		sprite->dirtyFlag[0] = 0;
+		createVertices(sprite, transform, index);
 		spriteNum++;
 	}
 }
+
+void geProject::RenderBatch::updateSprite(SpriteRender* sprite, Transform* transform) {
+	if (sprite->zIndex == zIndex) {
+		createVertices(sprite, transform, transform->dirtyFlag[2]);
+		transform->dirtyFlag[0] = 0;
+		sprite->dirtyFlag[0] = 0;
+		hasUpdate = true;
+	}
+}
+
+
+void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* transform, unsigned int index) {
+	for (int i = 0; i < 4; i++) {
+		switch (i) {
+		case 0:
+			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (1 * transform->scale.y); //y
+			break;
+		case 1:
+			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0 * transform->scale.y); //y
+			break;
+
+		case 2:
+			vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0 * transform->scale.y); //y
+			break;
+
+		case 3:
+			vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (1 * transform->scale.y); //y
+			break;
+
+		}
+
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = sprite->color[0]; //r
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = sprite->color[1]; //g
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = sprite->color[2]; //b
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 5] = sprite->color[3]; //a
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 6] = sprite->texturePos[i][0]; //texture coord x
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 7] = sprite->texturePos[i][1]; //texture coord y
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 8] = (float)sprite->textureId; // texture id
+
+		index += vertSize;
+	}
+}
+
 
 std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 	std::vector<unsigned int> elementOrder;
@@ -93,7 +139,7 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 	for (int i = 0; i < maxBatch; i++) {
 		//First triangle indices order
 		unsigned int offset = i * 4;
-		elementOrder.push_back(offset);			// 0
+		elementOrder.push_back(offset);		// 0
 		elementOrder.push_back(offset + 1);	// 1
 		elementOrder.push_back(offset + 3);	// 3
 		//Second triangle indices order
@@ -105,20 +151,65 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 }
 
 void geProject::RenderBatch::render(Camera& camera) {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
+	if (hasUpdate) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
+		hasUpdate = false;
+	}
 	auto shader = resourceManager->requestShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 	shader->setMat4f("uProjMat", camera.getProjection());
 	shader->setMat4f("uViewMat", camera.getViewMatrix());
+	
+	unsigned int count = 0;
+	//go through each texture and bind to a seperate texture unit -- set for up to 8 texture units
+	for (auto const& i : textures) {
+		if ( i != nullptr) {
+			glActiveTexture(GL_TEXTURE0 + count);
+			textures[count]->bindTexture();
+			//slots[count] = count;
+			std::string name = "texture" + std::to_string(count);
+			shader->setTexture(name, count);
+		}
+		count++;
+	}
+
+	/*
+	int index = 0;
+	for (auto const& i : vertices) {
+		if (index % 9 == 0) {
+			std::cout << std::endl;
+		}
+		std::cout << i << " ";
+		index++;
+	
+	}
+	*/
+	//shader->setIntArray("textures", slots);
+	
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glDrawElements(GL_TRIANGLES, (spriteNum * vertSize) * sizeof(float), GL_UNSIGNED_INT, 0);
-	glDisableVertexAttribArray(1);
+	glDrawElements(GL_TRIANGLES, spriteNum * 9 * sizeof(float), GL_UNSIGNED_INT, 0);
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 	glBindVertexArray(0);
+	count = 1;
+	//unbind each texture previously bound
+	for (auto const& i : textures) {
+		if (i != nullptr) {
+			textures[count]->unbindTexture();
+			count++;
+		}
+	}	
 	shader->detach();
 }
 
 
 
+unsigned int geProject::RenderBatch::getSpriteNum() {
+	return spriteNum;
+}
+
+unsigned int geProject::RenderBatch::getZindex() {
+	return zIndex;
+}

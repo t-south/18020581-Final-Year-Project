@@ -6,10 +6,15 @@ namespace geProject {
 		LevelScene();
 		~LevelScene();
 		void update(float deltaTime);
-		void addEntityToScene(unsigned int entityId);
+		size_t addEntityToScene(unsigned int entityId);
+		void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId);
 		Camera* getCamera();
+		virtual void updateImgui() override;
+		virtual void updateSceneImgui() override;
+		virtual std::vector<Entity*> getEntities() override;
 	private:
-		geProject::Camera* camera;
+		geProject::Camera* camera{nullptr};
 		void init();
+
 	};
 }

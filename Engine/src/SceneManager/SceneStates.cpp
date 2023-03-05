@@ -4,6 +4,9 @@
 geProject::SceneStates::SceneStates(): currentSceneId(0), sceneCount(0){
 }
 
+geProject::SceneStates::~SceneStates() {
+}
+
 int geProject::SceneStates::addScene(std::shared_ptr<Scene> scene) {
 	sceneCount++;
 	scenes.emplace(sceneCount, scene);

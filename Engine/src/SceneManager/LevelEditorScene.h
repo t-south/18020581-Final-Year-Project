@@ -1,7 +1,6 @@
 #pragma once
 #include "Scene.h"
-#include "../EntityManager/EntityManager.h"
-#include "../ResourceManager/ResourceManager.h"
+
 
 namespace geProject {
 	class LevelEditorScene : public Scene {
@@ -9,14 +8,20 @@ namespace geProject {
 		LevelEditorScene();
 		~LevelEditorScene();		
 		virtual void update(float deltaTime) override;	
-		virtual void addEntityToScene(unsigned int entityId) override;
+		virtual size_t addEntityToScene(unsigned int entityId) override;
+		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) override;
 		virtual Camera* getCamera() override;
+		virtual void updateImgui() override;
+		virtual void updateSceneImgui() override;
+		virtual std::vector<Entity*> getEntities() override;
+
 	private:
-		std::vector<float> vertexArray;
-		std::vector<unsigned int> elementOrder;		
-		unsigned int vao, vbo, ebo;
-		Camera* camera;
-		ResourceManager* resourceManager;
+		Camera* camera{ nullptr };		
+		unsigned int sprites;
+		unsigned int testSpritesheet{ 14 };
+		unsigned int loopcount{ 0 };
+		unsigned int entity;
 		virtual void init() override;
+
 	};
 }
