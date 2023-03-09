@@ -44,7 +44,7 @@ geProject::Texture::~Texture() {
 
 }
 
-unsigned int geProject::Texture::getTextureId() {
+GLuint geProject::Texture::getTextureId() {
 	return textureId;
 }
 

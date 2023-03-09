@@ -4,14 +4,11 @@
 //PoolAllocator geProject::SpriteRender::pool{ 1000000, sizeof(SpriteRender) };
 //PoolAllocator geProject::FontRender::pool{ 1000000, sizeof(FontRender) };
 
-geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntities), entityUpdated(false) 
-{
-
+geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntities), entityUpdated(false){
 	PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
 	PoolAllocator spritepool{ maxEntities, sizeof(SpriteRender) };
 	PoolAllocator fontpool{ maxEntities, sizeof(FontRender) };
 	PoolAllocator rigidpool{ maxEntities, sizeof(Rigidbody) };
-
 	for (int i = 0; i < maxEntities - 1; ++i) {
 		componentTransforms.push_back(reinterpret_cast<Transform*>(transformpool.allocate(sizeof(Transform))));
 		componentTransforms[i]->id = 0;
@@ -20,12 +17,8 @@ geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntiti
 		componentSpriteRender.push_back(reinterpret_cast<SpriteRender*>(spritepool.allocate(sizeof(SpriteRender))));
 		componentSpriteRender[i]->id = 0;
 		componentRigidBody.push_back(reinterpret_cast<Rigidbody*>(rigidpool.allocate(sizeof(Rigidbody))));
-		componentRigidBody[i]->id = 0;
-		
+		componentRigidBody[i]->id = 0;		
 	}
-
-	
-
 	std::cout << "Transform size : " << sizeof(Transform) << std::endl;
 	std::cout << "SpriteRender size : " << sizeof(SpriteRender) << std::endl;
 	std::cout << "FontRender size : " << sizeof(FontRender) << std::endl;
@@ -49,35 +42,18 @@ bool geProject::EntityManager::hasUpdate() {
 }
 
 void geProject::EntityManager::assignTransform(uInt entityId, Transform transform) {
-	/*if (entityId < maxEntities && entityId >= 0) {
-		auto trans = (Transform*)transformpool.allocate(sizeof(Transform));
-		std::memcpy(trans, &transform, sizeof(Transform));
-		trans->dirtyFlag[0] = 1;
-		if (componentTransforms[entityId] != NULL) {
-			trans->dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
-			trans->dirtyFlag[2] = componentTransforms[entityId]->dirtyFlag[2];
-		}
-		componentTransforms[entityId] = trans;
-		entityUpdated = true;
-		//std::cout << "new [entity " << entityId << "][TransformArray] = " << componentTransforms[entityId] << std::endl;
-	}
-	else {
-		//std::cout << "unable to assign transform" << std::endl;
-		delete(&transform);
-	}*/
 	if (entityId < maxEntities && entityId >= 0) {
-		if (componentTransforms[entityId]->id == 0) {
+		if (componentTransforms[entityId]->id > 0) {
+			transform.dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
+			transform.dirtyFlag[2] = componentTransforms[entityId]->dirtyFlag[2];		
+		}
+		else if (componentTransforms[entityId]->id == 0) {
 			transform.dirtyFlag[1] = 0;
 			transform.dirtyFlag[2] = 0;
 		}
-		else {
-			transform.dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
-			transform.dirtyFlag[2] = componentTransforms[entityId]->dirtyFlag[2];
-		}
-		transform.dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
-		transform.dirtyFlag[2] = componentTransforms[entityId]->dirtyFlag[2];
+		transform.dirtyFlag[0] = 1;
 		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));
-		componentTransforms[entityId]->dirtyFlag[0] = 1;
+		
 		entityUpdated = true;
 	}
 	else{
@@ -140,6 +116,8 @@ void geProject::EntityManager::assignSpriteRender(uInt entityId, SpriteRender sp
 	}
 	*/
 	if (entityId < maxEntities && entityId >= 0) {
+		sprite.dirtyFlag[0] = 1;
+		/*
 		if (componentSpriteRender[entityId]->id == 0) {
 			sprite.dirtyFlag[1] = 0;
 			sprite.dirtyFlag[2] = 0;
@@ -149,8 +127,8 @@ void geProject::EntityManager::assignSpriteRender(uInt entityId, SpriteRender sp
 			sprite.dirtyFlag[1] = componentSpriteRender[entityId]->dirtyFlag[1];
 			sprite.dirtyFlag[2] = componentSpriteRender[entityId]->dirtyFlag[2];
 		}
-		std::memcpy(componentSpriteRender[entityId], &sprite, sizeof(SpriteRender));
-		componentSpriteRender[entityId]->dirtyFlag[0] = 1;
+		*/
+		std::memcpy(componentSpriteRender[entityId], &sprite, sizeof(SpriteRender));		
 		entityUpdated = true;
 	}
 	else {
@@ -195,6 +173,12 @@ void geProject::EntityManager::assignFontRender(uInt entityId, FontRender font) 
 	}
 	
 }
+
+
+
+
+
+
 
 void geProject::EntityManager::deleteComponent(uInt entityId, uInt componentId) {
 	if(entityId < maxEntities && entityId >= 0){
@@ -284,39 +268,42 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 	auto rigid = getRigidBodyComponent(entityId);
 	auto font = getFontRenderComponent(entityId);
 	//TRANSFORM IMGUI updates
-	static float positionX = transform->position[0];
-	static float positionY = transform->position[1];
+	float positionX = transform->position[0];
+	float positionY = transform->position[1];
 	if (ImGui::DragFloat("positonX", &positionX)) {
 		if (positionX != transform->position[0]) {
 			transform->position[0] = positionX;
 			entityUpdated = true;
+			transform->dirtyFlag[0] = 1;
 		}
 	}
+	
 	if (ImGui::DragFloat("positonY", &positionY)) {
 		if (positionY != transform->position[1]) {
 			transform->position[1] = positionY;
 			entityUpdated = true;
+			transform->dirtyFlag[0] = 1;
 		}
 	}
-	static float scaleX = transform->scale[0];
-	static float scaleY = transform->scale[1];
+	float scaleX = transform->scale[0];
+	float scaleY = transform->scale[1];
 	if (ImGui::DragFloat("scaleX", &scaleX)) {
 		if (scaleX != transform->scale[0]) {
 			transform->scale[0] = scaleX;
 			entityUpdated = true;
+			transform->dirtyFlag[0] = 1;
 		}
 	}
 	if (ImGui::DragFloat("scaleY", &scaleY)) {
 		if (scaleY != transform->scale[1]) {
 			transform->scale[1] = scaleY;
 			entityUpdated = true;
+			transform->dirtyFlag[0] = 1;
 		}
 	}
-	if (entityUpdated == true) {
-		transform->dirtyFlag[0] = 1;
-	}
+	
 	//SPRITE IMGUI updates
-	static int textureId = sprite->textureId;
+	int textureId = sprite->textureId;
 	if (ImGui::DragInt("textureId", &textureId)) {
 		if (textureId != sprite->textureId) {
 			sprite->textureId = textureId;
@@ -325,7 +312,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 		}
 	}
 
-	static int zIndex = sprite->zIndex;
+	int zIndex = sprite->zIndex;
 	if (ImGui::DragInt("zIndex", &zIndex)) {
 		if (zIndex != sprite->zIndex) {
 			sprite->zIndex = zIndex;
@@ -336,11 +323,11 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 	
 	//RIGIDBODY IMGUI updates
 	if (rigid->id > 0) {		
-		static int collider = rigid->collider;
-		static float friction = rigid->friction;
-		static float velocityX = rigid->velocity[0];
-		static float velocityY = rigid->velocity[1];
-		static float velocityZ = rigid->velocity[2];
+		int collider = rigid->collider;
+		float friction = rigid->friction;
+		float velocityX = rigid->velocity[0];
+		float velocityY = rigid->velocity[1];
+		float velocityZ = rigid->velocity[2];
 		if (ImGui::DragInt("rigidBody", &collider)) {
 			rigid->collider = collider;
 			entityUpdated = true;			

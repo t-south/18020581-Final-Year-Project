@@ -1,6 +1,6 @@
 #include "LevelScene.h"
 
-geProject::LevelScene::LevelScene(){
+geProject::LevelScene::LevelScene(){	
 	std::cout << "Level Scene!" << std::endl;
 }
 

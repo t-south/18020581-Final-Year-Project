@@ -86,9 +86,7 @@ void geProject::Scene::deserialize(std::string filepath) {
 				if (rigid.id > 0) {
 					manager->assignRigidBody(entityId, rigid);
 				}
-				else {
-					free(&rigid);
-				}
+
 				addEntityToScene(entityId);
 			}
 			iFile.close();
@@ -192,7 +190,7 @@ void geProject::Scene::from_json(json& data, Transform& comp) {
 void geProject::Scene::from_json(json& data, Rigidbody& comp) {
 
 	if (data[1] == 0) {
-		comp.id == 0;
+		comp.id = 0;
 	}
 	else {
 		data[1].at("collider").get_to(comp.collider);
@@ -205,3 +203,29 @@ void geProject::Scene::from_json(json& data, Rigidbody& comp) {
 		data[1].at("bufferIndex").get_to(comp.dirtyFlag[2]);
 	}
 }
+
+
+
+
+void geProject::Scene::setWindow(Window* window){
+	gameWindow = window;
+	setKeyboardListener();
+	setMouseListener();
+}
+
+void geProject::Scene::setKeyboardListener(){
+	keyboard = KeyboardListener::getInstance();
+	glfwSetKeyCallback(gameWindow->getWindow(), keyboard->key_callback);	
+}
+
+void geProject::Scene::setMouseListener(){
+	mouse = MouseListener::getInstance();
+	mouse->setWindowDimensions(gameWindow->getWidth(), gameWindow->getHeight());
+	glfwSetCursorPosCallback(gameWindow->getWindow(), mouse->cursor_position_callback);
+	glfwSetMouseButtonCallback(gameWindow->getWindow(), mouse->mouse_button_callback);
+	glfwSetScrollCallback(gameWindow->getWindow(), mouse->scroll_callback);
+}
+
+float geProject::Scene::getMouseX() { return mouse->getYpos(); }
+
+float geProject::Scene::getMouseY() { return mouse->getYpos(); }

@@ -1,5 +1,8 @@
 #pragma once
 
+
+
+
 #ifdef GE_PLATFORM_WINDOWS
 	#ifdef GE_BUILD_DLL
 		#define GE_API __declspec(dllexport)

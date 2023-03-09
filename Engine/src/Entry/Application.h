@@ -2,7 +2,14 @@
 #include <ge_engine/Core.h>
 #include <stdio.h>
 #include <iostream>
-#include "../../Engine/src/Render/Window.h"
+#include <glad/glad.h>
+#include "../IMGui/ImguiWindow.h"
+#include "../Render/Window.h"
+
+#include "../SceneManager/SceneStates.h"
+#include "../SceneManager/LevelEditorScene.h"
+#include "../SceneManager/LevelScene.h"
+#include "../Clock/Clock.h"
 
 namespace geProject {
 	class Application
@@ -11,8 +18,14 @@ namespace geProject {
 		Application();
 		virtual ~Application();
 		void Startup();
+		void loop();
+	private:
+		SceneStates* sceneManager;
+		Window* gameWindow;
+		Clock* gameClock;
+		ImguiWindow* imguiWindow;
 	};
-
+	
 	Application* CreateApplication();
 
 	

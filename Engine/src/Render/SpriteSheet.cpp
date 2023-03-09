@@ -1,6 +1,6 @@
 #include "SpriteSheet.h"
 
-geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex) : Texture(filePath), spriteNum(spriteNum), spriteWidth(spriteWidth), spriteHeight(spriteHeight){
+geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex) : Texture(filePath), spriteNum(spriteNum), spriteWidth(spriteWidth), spriteHeight(spriteHeight), border(borderspacing){
 	//currently only designed for uniform sprites in a spritesheet
 	//UV tex coords for sprite within spritesheet
 	
@@ -16,15 +16,15 @@ geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum
 		textureUv.texturePos[3] = glm::vec2(x , y);																		//topLeft
 		//move along x coordinate until it reaches end of row
 		if (i == 13){
-			float test = x + spriteWidth + borderspacing;
+			float test = x + spriteWidth + border;
 		}
-		if (x + (spriteWidth / textureWidth) + borderspacing >= 1) {
+		if (x + (spriteWidth / textureWidth) + border >= 1) {
 			//set x back to beginning of spritesheet and move y down to next row
 			x = 0;
-			y -= ((spriteHeight / textureHeight ) + borderspacing);
+			y -= ((spriteHeight / textureHeight ) + border);
 		}
 		else {
-			x += (spriteWidth / textureWidth) + borderspacing;
+			x += (spriteWidth / textureWidth) + border;
 		}
 		textureUv.textureId = getTextureId();
 		textureUv.spriteSheetId = sprites.size() + 1;
@@ -53,3 +53,12 @@ geProject::SpriteSheet::~SpriteSheet() {
 geProject::SpriteRender geProject::SpriteSheet::getSprite(unsigned int atlasId){
 	return sprites[static_cast<std::vector<geProject::SpriteRender, std::allocator<geProject::SpriteRender>>::size_type>(atlasId) - 1];
 }
+
+unsigned int geProject::SpriteSheet::getSpriteSize() {
+	return sprites.size();
+}
+
+unsigned int geProject::SpriteSheet::getSpriteWidth() { return spriteWidth; }
+unsigned int geProject::SpriteSheet::getSpriteHeight() { return spriteHeight; }
+unsigned int geProject::SpriteSheet::getSpriteSheetHeight() { return (spriteHeight + border) * spriteNum; }
+unsigned int geProject::SpriteSheet::getSpriteSheetWidth() { return (spriteWidth + border) * spriteNum; }

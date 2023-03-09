@@ -3,96 +3,40 @@
 
 
 geProject::LevelEditorScene::LevelEditorScene() {
+	gridWidth = 32;
+	gridHeight = 32;
 	resourceManager = new ResourceManager();
 	resourceManager->loadLevel();
+
 	std::cout << "Editor Scene!" << std::endl;	
-	/*vertexArray = {  //vertices x,y,z           colors r,g,b,a             texture x,y
-					 100.5f,  100.5f, 0.0f,		1.0f, 0.0f, 0.0f, 1.0f,		1, 0, //top right
-					 100.5f, -100.5f, 0.0f,		0.0f, 1.0f, 0.0f, 1.0f,		1, 1, //bottom right
-					-100.5f, -100.5f, 0.0f,		1.0f, 0.0f, 1.0f, 1.0f,		0, 0, //bottom left
-					-100.5f,  100.5f, 0.0f,		1.0f, 1.0f, 0.0f, 1.0f,		0, 1  //top left
-	};*/
-	/*vertexArray = {
-					0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   // 1.0f, 1.0f,   // top right
-		            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   // 1.0f, 0.0f,   // bottom right
-				   -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   // 0.0f, 0.0f,   // bottom left
-				   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f   // 0.0f, 1.0f    // top left 
-	};*/
-	//elementOrder = {0,1,3,1,2,3};
 	manager = new EntityManager(10000);
 	renderer = new Renderer(*(resourceManager));
 	//shader = new geProject::Shader("../../../../Game/assets/shaders/defaultVertexShader.glsl", );
-	camera = new geProject::Camera(glm::vec2(0.0f, 0.0f));
+	camera = new geProject::Camera(glm::vec2(-250.0f, 0.0f));
 	//testTexture = new Texture("../../../../Game/assets/images/container.jpg");
 	resourceManager->loadShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl", "../../../../Game/assets/shaders/FragmentShaderDefault.glsl");
-	filePath = "../../../../Game/assets/levels/levelEditor.json";
-	
-	init();
-	
-	
+	resourceManager->loadShader("../../../../Game/assets/shaders/LineVertexShader.glsl", "../../../../Game/assets/shaders/LineFragmentShader.glsl");
+	filePath = "../../../../Game/assets/levels/levelEditor.json";	
+	editor = new EditorRender(*(resourceManager));
+	init();	
 }
 
-geProject::LevelEditorScene::~LevelEditorScene(){
-	
-}
 
+geProject::LevelEditorScene::~LevelEditorScene(){}
 
 
 void geProject::LevelEditorScene::init() {	
-	/*//generate buffers for VAO, VBO and EBO
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertexArray.size() * sizeof(float), &vertexArray[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementOrder.size() * sizeof(unsigned int), &elementOrder[0], GL_STATIC_DRAW);
-	//set vertices pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	//set color pointers
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	//set texture pointers
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	manager = EntityManager();
-	
-	
-	//instantiate game objects and add to level editor list
-	for (int i = 0; i < 32; i++) {
-		int entityId = manager.addEntity();
-		manager.assignComponent(entityId, 1);
-		manager.assignComponent(entityId, 2);
-	}
-	entities = manager.getEntities();
-	std::vector<Transform*> test;
-	test = manager.getTransformComponents();*/
-	/*
-	for (int i = 31; i >= 0; i--) {
-		manager.deleteComponent(i, 2);
-		manager.deleteComponent(i, 1);
-	}
-	for (int i = 0; i < 32; i++) {		
-		manager.assignComponent(i, 1);
-		manager.assignComponent(i, 2);
-	}
-	
-
-	*/
 	unsigned int crate = resourceManager->loadTexture("../../../../Game/assets/images/container2.jpg");
 	unsigned int mario = resourceManager->loadTexture("../../../../Game/assets/images/testImage.png");
 	unsigned int goomba = resourceManager->loadTexture("../../../../Game/assets/images/testImage2.png");
 	unsigned int blend1 = resourceManager->loadTexture("../../../../Game/assets/images/blendImage1.png");
 	unsigned int blend2 = resourceManager->loadTexture("../../../../Game/assets/images/blendImage2.png");
 	//unsigned int red = resourceManager->loadTexture("../../../../Game/assets/images/red.jpg");
-	sprites = resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheet.png", 26, 16, 16, 0, 3);
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/decorationsAndBlocks.png", 81, 16, 16, 0, 3));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/icons.png", 16, 32, 32, 0, 3));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/spritesheet.png", 26, 16, 16, 0, 3));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 3));
+	
 	/*
 	unsigned int blen1 = manager->addEntity();	
 	manager->assignTransform(blen1, Transform{ .position = {100, 100}, .scale = {200, 200} });
@@ -112,7 +56,7 @@ void geProject::LevelEditorScene::init() {
 	
 	
 	*/
-
+	
 
 	/*
 	
@@ -219,9 +163,16 @@ geProject::Camera* geProject::LevelEditorScene::getCamera() {
 }
 
 void geProject::LevelEditorScene::update(float deltaTime) {	
-	if (loopcount == 0) {
+	setGridLines();
+	/*float x = ((float)sin(t) * 200.0f) + 600;
+	float y = ((float)cos(t) * 200.0f) + 400;
+	t += 0.05f;
+	editor->addLine(glm::vec2(600, 400), glm::vec2(x, y), glm::vec3(0.0f, 0.0f, 1.0f), 1);
+	*/
+	if (deltaTime == 0) {
 		geProject::Scene::deserialize(filePath);
 	}
+
 	/*if (testSpritesheet == 18) {
 		testSpritesheet = 15;
 	}
@@ -229,42 +180,53 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	
 	auto tst = resourceManager->requestSpriteSheet(sprites);
 	auto cratesprite = tst->getSprite(testSpritesheet);
-	if (loopcount % 25 == 0) {
-		testSpritesheet++;
-	}
+
 	loopcount++;
 	
 	for (int i = 1; i < manager->getEntityNum(); i++) {
 		manager->assignSpriteRender(i, cratesprite);
 	}
 	*/
+
+	//DRAG AND DROP
+	if (entityDrag == true) {
+		auto transform = manager->getTransformComponent(activatedEntity);		
+		transform->position[0] = (int)(mouse->getCameraXpos() / gridWidth) * gridWidth;		
+		transform->position[1] = (int)(mouse->getCameraYpos() / gridHeight) * gridHeight;
+		manager->assignTransform(activatedEntity, *transform);		
+		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+			entityDrag = false;
+		}
+	}
+	
 	if (manager->hasUpdate()) {
 		entities.clear();
 		for (int i = 0; i < manager->getEntityNum(); i++) {
 			entities.push_back(manager->getEntity(i));			
 			// only sprites that have not been added to the renderer previously will be set to 0
-			if (manager->getSpriteComponent(i)->dirtyFlag[2] == 0) {
+			auto trans = manager->getTransformComponent(i);
+			if (trans->dirtyFlag[2] == 0) {
 				renderer->addSpriteToBatch(manager->getSpriteComponent(i), manager->getTransformComponent(i));
+				trans->dirtyFlag[0] = 0;
 			}
-			else if (manager->getSpriteComponent(i)->dirtyFlag[0] > 0 || manager->getTransformComponent(i)->dirtyFlag[0] > 0) {
+			else if (trans->dirtyFlag[0] > 0) {
 				renderer->updateSprite(manager->getSpriteComponent(i), manager->getTransformComponent(i));
 			}
-
 		}
+		manager->endFrame();
 		
 		
-		activatedEntity = manager->getEntity(0)->id;
+		
 		geProject::Scene::serialize(filePath);
 	}	
-	
+	editor->render(*(camera));
 	renderer->render(*(camera));
 	
-	manager->endFrame();
 	loopcount++;
-	/*
-	camera->position.x -= deltaTime * 50.0f;
-	camera->position.y -= deltaTime * 20.0f;
-	shader->setTexture("textureSampler", 0);
+	
+	//camera->position.x -= deltaTime * 2.0f;
+	//camera->position.y -= deltaTime * 2.0f;
+	/*shader->setTexture("textureSampler", 0);
 	glActiveTexture(GL_TEXTURE0);
 	testTexture->bindTexture();
 	shader->setMat4f("uProjMat", camera->getProjection());
@@ -300,7 +262,33 @@ void geProject::LevelEditorScene::updateSceneImgui() {
 
 void geProject::LevelEditorScene::updateImgui() {
 	ImGui::Begin("Editor Window");
-	ImGui::Text("Some random text");
+	//credit to https ://github.com/ocornut/imgui/issues/1977
+
+	ImGui::Text("Manually wrapping:");
+	ImGuiStyle& style = ImGui::GetStyle();
+	
+	float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+	auto spriteSheet = resourceManager->requestSpriteSheet(sprites[0]);
+	unsigned int spriteSize = spriteSheet->getSpriteSize();
+	for (int i = 1; i < spriteSize + 1; i++){
+		auto newSprite = spriteSheet->getSprite(i);
+		// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+		ImVec2 spriteDimensions(32, 32);
+		ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
+		ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);
+		ImGui::PushID(i);
+		if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (entityDrag == false) {				
+				createEditorBlock(&newSprite, spriteDimensions[0], spriteDimensions[1]);
+			}
+		}
+		ImGui::PopID();
+		float last_button_x2 = ImGui::GetItemRectMax().x;
+		float next_button_x2 = last_button_x2 + style.ItemSpacing.x; 
+		if (i < spriteSize && next_button_x2 < window_visible_x2)
+			ImGui::SameLine();
+	}
+
 	ImGui::End();
 }
 
@@ -308,3 +296,43 @@ std::vector<geProject::Entity*> geProject::LevelEditorScene::getEntities() {
 	return entities;
 }
 
+unsigned int geProject::LevelEditorScene::createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY) {
+	unsigned int entity = manager->addEntity();
+	//float y = camera->getCameraY();
+	mouse->setInverses(getCamera()->getProjectionInverse(), getCamera()->getViewMatrixInverse());
+	manager->assignTransform(entity, Transform{ .position = {mouse->getCameraXpos(), mouse->getCameraYpos()}, .scale = {sizeX, sizeY}});
+	manager->assignSpriteRender(entity, *sprite);
+	//entities.push_back(manager->getEntity(entity));
+	entityDrag = true;
+	activatedEntity = entity;	
+	return entity;
+}
+
+
+void geProject::LevelEditorScene::setGridLines() {
+	glm::vec3 pos = camera->getPosition();
+	glm::vec2 projSize = camera->getProjSize();
+	int x, y, vLine, hLine, maxLine;
+	x = ((int)(pos.x / gridWidth) - 1) * gridWidth;
+	y = ((int)(pos.y / gridHeight) - 1) * gridHeight;
+	vLine = (int)(projSize.x / gridWidth) + 2;
+	hLine = (int)(projSize.y / gridHeight) + 2;
+	maxLine = 0;
+	if (hLine >= vLine) {
+		maxLine = hLine;
+	}
+	else {
+		maxLine = vLine;
+	}
+	for (int i = 0; i < maxLine; i++) {
+		int newX = x +(gridWidth * i);
+		int newY = y + (gridHeight * i);
+		if (i < vLine) {
+			editor->addLine(glm::vec2(newX, y), glm::vec2(newX, y +(int)projSize.y + gridHeight * 2),glm::vec3(0.2f, 0.2f, 0.2f), 1);
+		}
+		if (i < hLine) {
+			editor->addLine(glm::vec2(x, newY), glm::vec2(x + (int)projSize.x + gridWidth * 2, newY), glm::vec3(0.2f, 0.2f, 0.2f), 1);
+		}
+	}
+
+}

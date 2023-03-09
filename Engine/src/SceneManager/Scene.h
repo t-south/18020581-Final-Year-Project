@@ -1,27 +1,20 @@
 #pragma once
-#include <iostream>
-#include <imgui.h>
-#include <vector>
-#include <string>
+#include <ge_engine/Components.h>
 #include <fstream>
-#include <glm/glm.hpp>
-#include <ge_engine/Entity.h>
-#include "../Render/Shader.h"
-#include "../Render/Camera.h"
-#include "../Render/Texture.h"
-#include "../Render/Renderer.h"
-#include "../EntityManager/EntityManager.h"
-#include "../ResourceManager/ResourceManager.h"
-//#include "SceneSerialize.h"
+#include <iostream>
 #include "json.hpp"
-//#include "SceneSerialize.h"
+#include "../Inputs/KeyboardListener.h"
+#include "../Inputs/MouseListener.h"
+#include "../Render/Window.h"
+#include "../Render/Renderer.h"
+
+
 
 using json = nlohmann::json;
 namespace geProject {
 //abstract scene class
 	class Scene {
 	public:
-
 		virtual void update(float deltaTime) = 0;
 		virtual void init() = 0;
 		virtual size_t addEntityToScene(unsigned int entityId) = 0;
@@ -29,11 +22,18 @@ namespace geProject {
 		virtual Camera* getCamera() = 0;
 		virtual void updateImgui() = 0 ;
 		virtual void updateSceneImgui() = 0;
+		float getMouseX();
+		float getMouseY();
 		virtual std::vector<Entity*> getEntities() = 0;
+		void setWindow(Window* window);
 		//friend class SceneSerialize;
 	protected:		
-		int activatedEntity{-1};
+		void setMouseListener();
+		void setKeyboardListener();
 		std::vector<Entity*> entities;
+		Window* gameWindow;
+		MouseListener* mouse;
+		KeyboardListener* keyboard;
 		ResourceManager* resourceManager{ nullptr };
 		EntityManager* manager{ nullptr };
 		Renderer* renderer{ nullptr };	
@@ -52,5 +52,7 @@ namespace geProject {
 		void from_json(json& data, SpriteRender& comp);
 		void from_json(json& data, Transform& comp);
 		void from_json(json& data, Rigidbody& comp);
+		
+
 	};
 }

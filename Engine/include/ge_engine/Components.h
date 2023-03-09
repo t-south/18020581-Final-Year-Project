@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <glad/glad.h>
 #include "../src/Memory/PoolAllocator.h"
 
 namespace geProject {
@@ -17,7 +18,7 @@ namespace geProject {
 		unsigned int id = 0x00000002;
 		glm::vec4 color{ 0, 0, 0, 0 };
 		glm::vec2 texturePos[4] = { glm::vec2{1.0f, 1.0f}, glm::vec2{1.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 1.0f} };
-		unsigned int textureId{ 0 };
+		GLuint textureId{ 0 };
 		unsigned int spriteSheetId{ 0 }; // 0 == no spritesheet
 		unsigned int zIndex {0};
 		glm::vec3 dirtyFlag{ 0,0,0 }; // dirtyflag  -- renderbatch -- index
@@ -28,10 +29,11 @@ namespace geProject {
 		int collider{ 0 };
 		float friction{ 0.8 };
 		glm::vec3 velocity{ 0, 0.5, 0 };
-
 		glm::vec3 dirtyFlag{ 0,0,0 }; // dirtyflag  -- renderbatch -- index
 	
 	};
+
+
 
 	struct FontRender {
 		unsigned int id = 0x00000008;

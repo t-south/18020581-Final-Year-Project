@@ -12,8 +12,7 @@ geProject::ImguiWindow::ImguiWindow(GLFWwindow* m_window){
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.IniFilename = "../../../gui_default_layout.ini";
-	
+	io.IniFilename = "../../../gui_default_layout.ini";	
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
@@ -43,8 +42,8 @@ void geProject::ImguiWindow::update(float deltaTime, std::shared_ptr<Scene> scen
 	ImGui::NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	scene->updateSceneImgui();
-	ImGui::ShowDemoWindow(&show_demo_window);
-	ImGui::Text("io.WantCaptureMouse = %d", io.WantCaptureMouse);
+	//ImGui::ShowDemoWindow(&show_demo_window);
+	//ImGui::Text("io.WantCaptureMouse = %d", io.WantCaptureMouse);
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

@@ -14,19 +14,24 @@ namespace geProject {
 		void projectionUpdate();
 		glm::mat4 getViewMatrix();
 		glm::mat4 getProjection();
+		glm::mat4 getViewMatrixInverse();
+		glm::mat4 getProjectionInverse();
 		//position of objects on screen
-		glm::vec3 position;
+		float getCameraY();
+		glm::vec2 getProjSize();
+		glm::vec3 getPosition();
 	private:
 		//camera facing direction
+		glm::vec3 position;
 		glm::vec3 direction;
 		//x axis
 		glm::vec3 right;
 		//y axis is upward direction
 		glm::vec3 up;
-		
+		glm::vec2 projSize;
 		//where is the camera in relation to world
-		glm::mat4 view;
+		glm::mat4 view, viewInv;
 		//maps to screen size
-		glm::mat4 projection;
+		glm::mat4 projection, projInv;
 	};
 }

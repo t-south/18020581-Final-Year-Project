@@ -1,5 +1,8 @@
 #pragma once
+#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
+//#include <glm/mat4x4.hpp>
+#include <memory>
 
 namespace geProject {
 	class MouseListener {
@@ -19,16 +22,22 @@ namespace geProject {
 		float getYscroll();
 		float getXdiff();
 		float getYdiff();
+		float getCameraXpos();
+		float getCameraYpos();
 		bool isDrag();
 		bool mouseButtonDown(int button);
+		void setWindowDimensions(int windowW, int windowH);
+		void setInverses(glm::mat4 inverseProj, glm::mat4 inverseView);
 
 	private:
 		MouseListener();
 		MouseListener(const MouseListener& obj) = delete;
-		static MouseListener* instance;
 		~MouseListener();		
+		static MouseListener* instance;
 		double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
 		bool isDragging = false;
+		int windowWidth, windowHeight;		
 		bool mouseButton[3] = {false, false, false};
+		glm::mat4 projectionInv, viewInv;
 	};
 }

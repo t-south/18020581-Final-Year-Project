@@ -82,6 +82,7 @@ void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transfor
 		transform->dirtyFlag[0] = 0;
 		sprite->dirtyFlag[0] = 0;
 		createVertices(sprite, transform, index);
+		hasUpdate = true;
 		spriteNum++;
 	}
 }
@@ -151,15 +152,14 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 }
 
 void geProject::RenderBatch::render(Camera& camera) {
-	if (hasUpdate) {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-		hasUpdate = false;
-	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
+
+	
 	auto shader = resourceManager->requestShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 	shader->setMat4f("uProjMat", camera.getProjection());
-	shader->setMat4f("uViewMat", camera.getViewMatrix());
-	
+	shader->setMat4f("uViewMat", camera.getViewMatrix());	
 	unsigned int count = 0;
 	//go through each texture and bind to a seperate texture unit -- set for up to 8 texture units
 	for (auto const& i : textures) {

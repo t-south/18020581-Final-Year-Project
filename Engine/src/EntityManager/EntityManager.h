@@ -23,15 +23,18 @@ namespace geProject {
 		void assignSpriteRender(uInt entityId, SpriteRender sprite);
 		void assignRigidBody(uInt entityId, Rigidbody rBody);
 		void assignFontRender(uInt entityId, FontRender font);
+
 		void deleteComponent(uInt entityId, uInt componentId);
 		std::vector<Transform*> getTransformComponents();
 		std::vector<SpriteRender*> getSpriteComponents();
 		std::vector <Rigidbody*> getRigidBodyComponents();
-		std::vector<FontRender*> getFontRenderComponents();		
+		std::vector<FontRender*> getFontRenderComponents();	
+
 		Transform* getTransformComponent(uInt entityId);
 		SpriteRender* getSpriteComponent(uInt entityId);
 		Rigidbody* getRigidBodyComponent(uInt entityId);
 		FontRender* getFontRenderComponent(uInt entityId);
+
 		void updateImgui(uInt entityId);
 		bool hasUpdate();
 		void endFrame();
@@ -42,6 +45,7 @@ namespace geProject {
 		std::vector <SpriteRender*> componentSpriteRender;
 		std::vector <Rigidbody*> componentRigidBody;
 		std::vector <FontRender*> componentFontRender;
+		unsigned int playerId;
 		std::vector<Entity> entities;	
 	};
 }

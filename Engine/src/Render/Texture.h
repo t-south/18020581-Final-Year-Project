@@ -13,9 +13,9 @@ namespace geProject{
 		void unbindTexture();
 		float getWidth();
 		float getHeight();
-		unsigned int getTextureId();
+		GLuint getTextureId();
 	protected:
-		unsigned int textureId;
+		GLuint textureId;
 	    float textureWidth, textureHeight;
 		std::string filePath;
 	};

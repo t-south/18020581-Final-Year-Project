@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "RenderBatch.h"
 #include "../EntityManager/EntityManager.h"
-#include <memory>
-#include "Camera.h"
 #include "../ResourceManager/ResourceManager.h"
+#include "Camera.h"
 
 
 namespace geProject {

@@ -49,12 +49,10 @@ void geProject::Renderer::addSpriteToBatch(SpriteRender* sprite, Transform* tran
 	}
 	sprite->dirtyFlag[1] = count;
 	transform->dirtyFlag[1] = count;
-	renderList[count].addSprite(sprite, transform);
-
-	
+	renderList[count].addSprite(sprite, transform);	
 }
 
-void geProject::Renderer::updateSprite(SpriteRender* sprite, Transform* transform) {
+void geProject::Renderer::updateSprite(SpriteRender* sprite, Transform* transform) {	
 	renderList[transform->dirtyFlag[1]].updateSprite(sprite, transform);
 }
 
