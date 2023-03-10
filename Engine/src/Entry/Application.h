@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include "../IMGui/ImguiWindow.h"
 #include "../Render/Window.h"
-
+#include "../Render/FrameBuffer.h"
 #include "../SceneManager/SceneStates.h"
 #include "../SceneManager/LevelEditorScene.h"
 #include "../SceneManager/LevelScene.h"
@@ -24,6 +24,7 @@ namespace geProject {
 		Window* gameWindow;
 		Clock* gameClock;
 		ImguiWindow* imguiWindow;
+		FrameBuffer* frameBuffer;
 	};
 	
 	Application* CreateApplication();

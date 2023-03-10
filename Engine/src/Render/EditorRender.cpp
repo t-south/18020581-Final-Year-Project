@@ -1,12 +1,12 @@
 #include "EditorRender.h"
+#define PI 3.14159265
 
 geProject::EditorRender::EditorRender(ResourceManager& resources) {
 	index = 0;
 	vertSize = 6;
 	for (int i = 0; i < 500 * vertSize; i++) {
 		vertices.push_back(0);
-	}
-	
+	}	
 	resourceManager = &resources;	
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -34,6 +34,52 @@ void geProject::EditorRender::lineCheck() {
 void geProject::EditorRender::addLine(glm::vec2 origin, glm::vec2 destination, glm::vec3 color, unsigned int life) {
 	lines.push_back(new Line(origin, destination, color, life));
 	createVertices();
+}
+
+
+void geProject::EditorRender::addBox(glm::vec2 centre, glm::vec2 dim, glm::vec3 color, float rotation, unsigned int life) {
+	glm::vec2 min = centre - dim * 0.5f;
+	glm::vec2 max = centre + dim * 0.5f;
+	std::vector<glm::vec2> verts;
+	verts.push_back(glm::vec2(min.x, min.y));
+	verts.push_back(glm::vec2(min.x, max.y));
+	verts.push_back(glm::vec2(max.x, max.y));
+	verts.push_back(glm::vec2(max.x, min.y));
+	if (rotation != 0.0f) {
+		for (int i = 0; i < verts.size(); i++) {
+			verts[i] = rotate(verts[i], centre, rotation);
+		}
+	}
+	addLine(verts[0], verts[1], color, life);
+	addLine(verts[0], verts[3], color, life);
+	addLine(verts[1], verts[2], color, life);
+	addLine(verts[2], verts[3], color, life);
+}
+
+
+glm::vec2 geProject::EditorRender::rotate(glm::vec2 vert, glm::vec2 centre, float rotation) {
+	//return glm::vec2(centre.x + (vert.x - centre.x) * cos(rotation) - (vert.y - centre.y) * sin(rotation), centre.y + (vert.x - centre.x) * sin(rotation) + (vert.y - centre.y) * cos(rotation));
+	//convert from degrees to radians
+	rotation = rotation * PI / 180.0;
+	return glm::vec2((cos(rotation) * (vert.x - centre.x) - sin(rotation) * (vert.y - centre.y) + centre.x), (sin(rotation) * (vert.x - centre.x) + cos(rotation) * (vert.y - centre.y) + centre.y));
+}
+
+
+void geProject::EditorRender::addCircle(glm::vec2 centre, glm::vec3 color, float radius, unsigned int segments, unsigned int life) {
+	std::vector<glm::vec2> verts;
+	int increment = 360 / segments;
+	float angle = 0;
+	for (int i = 0; i < segments; i++) {
+		glm::vec2 point = glm::vec2(radius, 0);
+		point = rotate(point, glm::vec2(0,0), angle);
+		verts.push_back(point + centre);
+		if (i > 0) {
+			addLine(verts[i - 1], verts[i], color, life);
+		}
+		angle += increment;
+	}
+	addLine(verts[verts.size() - 1], verts[0], color, life);
+
 }
 
 void geProject::EditorRender::createVertices() {

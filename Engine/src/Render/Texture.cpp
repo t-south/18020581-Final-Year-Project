@@ -6,7 +6,12 @@
 
 
 
-
+geProject::Texture::Texture(unsigned int width, unsigned int height) {
+	filePath = "frameBuffer";
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+}
 
 
 

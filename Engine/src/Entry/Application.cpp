@@ -24,6 +24,7 @@ namespace geProject {
 		int levelSceneId = sceneManager->addScene(levelScene);
 		sceneManager->getCurrentScene()->setWindow(gameWindow);
 		//mouse = MouseListener::getInstance();
+		frameBuffer = new FrameBuffer(1920, 1080);
 		imguiWindow = new ImguiWindow(gameWindow->getWindow());
 		imguiWindow->start(gameWindow->getWidth(), gameWindow->getHeight(), sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());
 		loop();
@@ -52,9 +53,11 @@ namespace geProject {
 			}*/
 			//SCENE UPDATES
 			auto scene = sceneManager->getCurrentScene();
+
+			//frameBuffer->bind();
 			scene->update(deltaTime);
 			//inverse for view has to be taken after render
-			
+			frameBuffer->unBind();
 			
 			//IMGUI UPDATES
 			imguiWindow->update(deltaTime, scene);

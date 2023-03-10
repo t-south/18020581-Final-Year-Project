@@ -6,6 +6,7 @@
 #include "../ResourceManager/ResourceManager.h"
 #include "Camera.h"
 
+
 namespace geProject {
 	class EditorRender {
 	public:
@@ -15,6 +16,9 @@ namespace geProject {
 		void lineCheck();
 		void createVertices();
 		void addLine(glm::vec2 origin, glm::vec2 destination, glm::vec3 color, unsigned int life);
+		void addBox(glm::vec2 centre, glm::vec2 dim, glm::vec3 color, float rotation, unsigned int life);
+		void addCircle(glm::vec2 centre, glm::vec3 color, float radius, unsigned int segments, unsigned int life);
+		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);
 	private:
 		unsigned int vao, vbo, vertSize, index;
 		std::vector<Line*> lines;

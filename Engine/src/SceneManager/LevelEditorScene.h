@@ -23,7 +23,8 @@ namespace geProject {
 		std::vector<unsigned int> sprites;
 		unsigned int testSpritesheet{ 14 };
 		unsigned int loopcount{ 0 };
-		float t{ 0.0f };
+		float x{ 0.0f };
+		float y{ 0.0f };
 		unsigned int entity;
 		virtual void init() override;
 		unsigned int createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY);

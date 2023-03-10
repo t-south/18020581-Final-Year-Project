@@ -11,7 +11,7 @@ geProject::ImguiWindow::ImguiWindow(GLFWwindow* m_window){
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfig;
 	io.IniFilename = "../../../gui_default_layout.ini";	
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 450");
@@ -44,6 +44,7 @@ void geProject::ImguiWindow::update(float deltaTime, std::shared_ptr<Scene> scen
 	scene->updateSceneImgui();
 	//ImGui::ShowDemoWindow(&show_demo_window);
 	//ImGui::Text("io.WantCaptureMouse = %d", io.WantCaptureMouse);
+	ImGui::End;
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -52,4 +53,18 @@ void geProject::ImguiWindow::destroyWindow() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void geProject::ImguiWindow::dockWindow(int width, int height){
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
+
+
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(width, height));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, ImVec2(0.0f, 0.0f));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, ImVec2(0.0f, 0.0f));
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNavFocus;
+	ImGui::Begin("docker window", (bool*)true, window_flags);
+	ImGui::PopStyleVar(2);
+
 }

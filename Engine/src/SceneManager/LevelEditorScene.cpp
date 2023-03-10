@@ -172,7 +172,10 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	if (deltaTime == 0) {
 		geProject::Scene::deserialize(filePath);
 	}
-
+	//editor->addBox(glm::vec2(400.0f, 200.0f), glm::vec2(64.0f, 32.0f), glm::vec3(0.0f, 1.0f, 0.0f), t, 1);
+	editor->addCircle(glm::vec2(x, y), glm::vec3(0.0f, 1.0f, 0.0f), 64.0f, 20, 1);
+	x += 50.0f * deltaTime;
+	y += 50.0f * deltaTime;
 	/*if (testSpritesheet == 18) {
 		testSpritesheet = 15;
 	}

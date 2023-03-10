@@ -1,7 +1,5 @@
 #pragma once
 #include <memory>
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_glfw.h"
 #include <imgui.h>
 #include "../SceneManager/Scene.h"
 #include <GLFW/glfw3.h>
@@ -19,6 +17,6 @@ namespace geProject {
 		void onEvent();
 	private:
 		GLFWwindow* window;
-	
+		void dockWindow(int width, int height);
 	};
 }
