@@ -12,7 +12,7 @@ namespace geProject {
 
 
 	}
-	void Application::Startup() {		
+	void Application::Startup() {
 		gameWindow = new geProject::Window("game", 1920, 1080);
 		gameClock = Clock::getInstance();
 		sceneManager = new SceneStates();
@@ -24,6 +24,7 @@ namespace geProject {
 		int levelSceneId = sceneManager->addScene(levelScene);
 		//add window to scene, also add mouse listener and keyboard listener
 		sceneManager->getCurrentScene()->setWindow(gameWindow);
+		sceneManager->getCurrentScene()->setCameraControlLayout();
 		//mouse = MouseListener::getInstance();
 		frameBuffer = new FrameBuffer(1920, 1080);
 		selectionTextures = new FrameBuffer(1920, 1080, true);
@@ -35,21 +36,20 @@ namespace geProject {
 		loop();
 
 		//game_window->loop();       
-       
+
 	}
 
-	void Application::loop() {			
+	void Application::loop() {
 		gameClock->updateTime();
 		//FPS variables
 		float timePerSec = 0;
 		int loopCount = 0;
 		float deltaTime = 0;
-		
+
 		//SceneSerialize serial = SceneSerialize(sceneManager->getCurrentScene());
 		//serial.deserialize("jsonTest.json");
 		while (!glfwWindowShouldClose(gameWindow->getWindow())) {
 			glfwPollEvents();
-
 			glDisable(GL_BLEND);
 			selectionTextures->bindPicking();
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -61,9 +61,17 @@ namespace geProject {
 				int x = (int)mouse->getScreenXpos();
 				int y = (int)mouse->getScreenYpos();
 				int entityId = selectionTextures->getPixel(x, y);
+				std::cout << "entity: " << entityId << std::endl;
+				int activatedId = scene->getActiveEntity();
 				if (entityId > -1) {
-					scene->setActiveEntity(entityId);
+					if (activatedId != entityId) {
+						scene->setActiveEntity(entityId);
+						
+					}
+
+
 				}
+
 				//scene->updateImgui();
 			}
 
@@ -80,7 +88,7 @@ namespace geProject {
 
 
 			//SCENE UPDATES
-			
+
 			//add the view size and position of imgui game window to scene
 			auto viewPos = imguiWindow->getViewPos();
 			auto viewSize = imguiWindow->getViewSize();
@@ -91,7 +99,7 @@ namespace geProject {
 
 			frameBuffer->unBind();
 			//inverse for view has to be taken after render
-			
+
 			//IMGUI UPDATES
 			imguiWindow->update(deltaTime, scene);
 			if (loopCount > 0) {
@@ -100,6 +108,7 @@ namespace geProject {
 
 			//imguiwindow->render(width, height);
 			glfwSwapBuffers(gameWindow->getWindow());
+			mouse->endFrame();
 			gameClock->updateTime();
 			deltaTime = gameClock->getTime();
 			timePerSec += deltaTime;
@@ -118,7 +127,6 @@ namespace geProject {
 		glfwTerminate();
 		glfwSetErrorCallback(NULL);
 	}
-	
-
-
 }
+
+

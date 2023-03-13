@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "../Render/EditorRender.h"
+#include "../Cameras/EditorCamera.h"
 
 namespace geProject {
 	class LevelEditorScene : public Scene {
@@ -16,11 +17,15 @@ namespace geProject {
 		virtual std::vector<Entity*> getEntities() override;
 		virtual void render(std::string shaderPath) override;
 		virtual void setActiveEntity(int entityId) override;
+		virtual void setCameraControlLayout() override;
+		virtual unsigned int getActiveEntity() override;
+		virtual void setEntityDrag(bool drag) override;
+		virtual bool getEntityDrag() override;
 	private:
 		int activatedEntity{ -1 };
 		int gridWidth, gridHeight;
-		bool entityDrag{ false };
-		Camera* camera{ nullptr };	
+		bool entityDrag{ false };		
+		EditorCamera* editorCam;
 		EditorRender* editor;
 		std::vector<unsigned int> sprites;
 		unsigned int testSpritesheet{ 14 };

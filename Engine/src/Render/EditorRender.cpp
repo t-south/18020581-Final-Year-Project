@@ -2,9 +2,10 @@
 #define PI 3.14159265
 
 geProject::EditorRender::EditorRender(ResourceManager& resources) {
+	renderSize = 50000;
 	index = 0;
 	vertSize = 6;
-	for (int i = 0; i < 500 * vertSize; i++) {
+	for (int i = 0; i < renderSize * vertSize; i++) {
 		vertices.push_back(0);
 	}	
 	resourceManager = &resources;	
@@ -97,16 +98,16 @@ void geProject::EditorRender::createVertices() {
 				case 1:
 					pos = line->getDestination();
 					vertices[index] = pos[0];
-					vertices[index + 1] = pos[1];
+					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];
 					break;
 				default:
 					break;
 				}
 				glm::vec3 color = line->getColor();
-				vertices[index + 2] = 0.0f;
-				vertices[index + 3] = color[0];
-				vertices[index + 4] = color[1];
-				vertices[index + 5] = color[2];
+				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = 0.0f;
+				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = color[0];
+				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = color[1];
+				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 5] = color[2];
 				index += vertSize;
 			}
 
@@ -132,3 +133,4 @@ void geProject::EditorRender::render(Camera& camera){
 	glBindVertexArray(0);
 	shader->detach();
 }
+

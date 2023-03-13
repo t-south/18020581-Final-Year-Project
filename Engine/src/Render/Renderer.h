@@ -4,7 +4,7 @@
 #include "RenderBatch.h"
 #include "../EntityManager/EntityManager.h"
 #include "../ResourceManager/ResourceManager.h"
-#include "Camera.h"
+#include "../Cameras/Camera.h"
 
 
 namespace geProject {

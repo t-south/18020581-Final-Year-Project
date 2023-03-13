@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include <ge_engine/Components.h>
 #include <glm/glm.hpp>
-#include "Camera.h"
+#include "../Cameras/Camera.h"
 #include "../ResourceManager/ResourceManager.h"
 
 namespace geProject {

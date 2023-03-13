@@ -31,6 +31,10 @@ namespace geProject {
 		void setViewPos(float x, float y);
 		void setViewSize(float x, float y);
 		virtual void setActiveEntity(int entityId) = 0;
+		virtual unsigned int getActiveEntity() = 0;
+		virtual void setCameraControlLayout() =0;
+		virtual void setEntityDrag(bool drag) = 0;
+		virtual bool getEntityDrag() = 0;
 		//friend class SceneSerialize;
 	protected:		
 		void setMouseListener();

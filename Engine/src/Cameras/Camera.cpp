@@ -2,7 +2,7 @@
 
 
 
-geProject::Camera::Camera(glm::vec2 pos): direction(glm::vec3(0.0f, 0.0f, -1.0f)), up(glm::vec3(0.0f, 1.0f, 0.0f)), position(glm::vec3(pos, 0.0f)), projSize(glm::vec2(1280.0f, 672.0f)) {	
+geProject::Camera::Camera(glm::vec2 pos): direction(glm::vec3(0.0f, 0.0f, -1.0f)), up(glm::vec3(0.0f, 1.0f, 0.0f)), position(glm::vec3(pos, 0.0f)), projSize(glm::vec2(1280.0f, 672.0f)), scroll(1.0f) {	
 	projectionUpdate();
 }
 
@@ -18,7 +18,7 @@ glm::mat4 geProject::Camera::getViewMatrix(){
 void geProject::Camera::projectionUpdate() {
 	projection = glm::mat4(1.0f);	
 	//NEED TO UPDATE -- CURRENTLY SET TO 1080 BY 672
-	projection = glm::ortho(0.0f, projSize[0], 0.0f, projSize[1]);
+	projection = glm::ortho(0.0f, projSize[0] * scroll, 0.0f, projSize[1] * scroll);
 	projInv = glm::inverse(projection);	
 }
 
@@ -34,8 +34,14 @@ glm::mat4 geProject::Camera::getProjectionInverse() {
 	return projInv; 
 }
 
-float geProject::Camera::getCameraY() { return position.y; }
 
 glm::vec2 geProject::Camera::getProjSize() { return projSize; }
 
-glm::vec3 geProject::Camera::getPosition() {	return position;}
+glm::vec2 geProject::Camera::getPosition() {
+	return glm::vec2(position[0], position[1]);
+}
+
+void geProject::Camera::setPosition(glm::vec2 pos) { position = position - glm::vec3(pos, 0.0f); }
+
+void geProject::Camera::setScroll(float scale) { scroll += scale; }
+float geProject::Camera::getScroll() { return scroll; }

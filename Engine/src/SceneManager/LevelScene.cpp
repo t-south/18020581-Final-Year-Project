@@ -22,3 +22,7 @@ void geProject::LevelScene::updateImgui() {}
 void geProject::LevelScene::updateSceneImgui() {}
 std::vector<geProject::Entity*> geProject::LevelScene::getEntities() { return entities; }
 void geProject::LevelScene::setActiveEntity(int entityId){}
+void geProject::LevelScene::setCameraControlLayout() {}
+unsigned int geProject::LevelScene::getActiveEntity() { return 0; }
+void geProject::LevelScene::setEntityDrag(bool drag) {}
+bool geProject::LevelScene::getEntityDrag() { return false; }

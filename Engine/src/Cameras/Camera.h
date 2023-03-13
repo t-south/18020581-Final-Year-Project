@@ -4,6 +4,8 @@
 #include <glm/mat4x4.hpp>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
+#include "../Inputs/MouseListener.h"
+
 //orthographic camera for 2d games
 //converts from world coordinates to normalised device coordinates
 namespace geProject {
@@ -17,11 +19,13 @@ namespace geProject {
 		glm::mat4 getViewMatrixInverse();
 		glm::mat4 getProjectionInverse();
 		//position of objects on screen
-		float getCameraY();
 		glm::vec2 getProjSize();
-		glm::vec3 getPosition();
-	private:
-		//camera facing direction
+		glm::vec2 getPosition();
+		void setPosition(glm::vec2 pos);
+		void setScroll(float scale);
+		float getScroll();
+	private:		
+		//camera facing direction		
 		glm::vec3 position;
 		glm::vec3 direction;
 		//x axis
@@ -33,5 +37,7 @@ namespace geProject {
 		glm::mat4 view, viewInv;
 		//maps to screen size
 		glm::mat4 projection, projInv;
+		float scroll;
+	
 	};
 }

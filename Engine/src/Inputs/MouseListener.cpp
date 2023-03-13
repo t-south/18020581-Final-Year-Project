@@ -1,4 +1,5 @@
 #include "MouseListener.h"
+#include <iostream>
 
 geProject::MouseListener* geProject::MouseListener::instance = nullptr;
 /* docs from https ://www.glfw.org/docs/3.3/input_guide.html */
@@ -44,14 +45,13 @@ void geProject::MouseListener::scroll_callback(GLFWwindow* window, double xoffse
 }
 
 void geProject::MouseListener::endFrame() {
-    xPos = 0;
-    xPos = 0;
-    xPrev = xPos;
-    yPrev = yPos;
+    geProject::MouseListener::getInstance()->yScroll = 0;
+    geProject::MouseListener::getInstance()->xPrev = geProject::MouseListener::getInstance()->xPos;
+    geProject::MouseListener::getInstance()->yPrev = geProject::MouseListener::getInstance()->yPos;
 }
 
-float geProject::MouseListener::getXpos() { return (float)geProject::MouseListener::getInstance()->xPos - geProject::MouseListener::getInstance()->viewPos.x; };
-float geProject::MouseListener::getYpos() { return (float)geProject::MouseListener::getInstance()->viewPos.y - geProject::MouseListener::getInstance()->yPos; };
+float geProject::MouseListener::getXpos() { return (float)geProject::MouseListener::getInstance()->xPos; };
+float geProject::MouseListener::getYpos() { return (float)geProject::MouseListener::getInstance()->yPos; };
 float geProject::MouseListener::getXprev(){ return (float)geProject::MouseListener::getInstance()->xPrev; };
 float geProject::MouseListener::getYprev() { return (float)geProject::MouseListener::getInstance()->yPrev; };
 float geProject::MouseListener::getXscroll() { return (float)geProject::MouseListener::getInstance()->xScroll; };
@@ -60,26 +60,27 @@ float geProject::MouseListener::getXdiff() { return (float)(geProject::MouseList
 float geProject::MouseListener::getYdiff() { return (float)(geProject::MouseListener::getInstance()->yPos - geProject::MouseListener::getInstance()->yPrev); };
 bool geProject::MouseListener::isDrag() { return geProject::MouseListener::getInstance()->isDragging; };
 bool geProject::MouseListener::mouseButtonDown(int button) { return geProject::MouseListener::getInstance()->mouseButton[button]; };
-
+void geProject::MouseListener::releaseMouseButton(int button){ geProject::MouseListener::getInstance()->mouseButton[button] = false; }
 float geProject::MouseListener::getScreenXpos(){
-    float x = (getXpos() / (float)geProject::MouseListener::getInstance()->viewSize.x) * 1920.0f;
+    float x = ((getXpos() - viewPos[0]) / getViewXsize()) * 1920.0f;
     return x;
 }
 float geProject::MouseListener::getScreenYpos(){
-    float y = (getYpos() / (float)geProject::MouseListener::getInstance()->viewSize.y) * 1080.0f;
+    float y = ((viewPos[1] - getYpos()) / getViewYsize()) * 1080.0f;
+   
     return y;
 }
 
 float geProject::MouseListener::getCameraXpos(){
-    glm::vec4 worldCoordX = glm::vec4((getXpos() / (float)geProject::MouseListener::getInstance()->viewSize.x) * 2 - 1, 0.0f, 0.0f, 1.0f);
-    //glm matrices are non commutative so order of operation is reversed
+    float x = getXpos() - viewPos[0];
+    glm::vec4 worldCoordX = glm::vec4((x / getViewXsize()) * 2.0f - 1.0f, 0.0f, 0.0f, 1.0f);
     worldCoordX = viewInv * projectionInv *  worldCoordX;
     return worldCoordX.x;
 }
 
-float geProject::MouseListener::getCameraYpos(){
-    float yPos = getYpos();
-    glm::vec4 worldCoordY = glm::vec4(0.0f, (yPos / (float)geProject::MouseListener::getInstance()->viewSize.y) * 2 - 1, 0.0f, 1.0f);
+float geProject::MouseListener::getCameraYpos(){    
+    float y = viewPos[1] - getYpos();
+    glm::vec4 worldCoordY = glm::vec4(0.0f, (y / getViewYsize()) * 2.0f - 1.0f, 0.0f, 1.0f);
     worldCoordY = viewInv * projectionInv *  worldCoordY;
     return worldCoordY.y;
     //return yPos;
@@ -104,4 +105,5 @@ void geProject::MouseListener::setViewSize(float x, float y) {
     geProject::MouseListener::getInstance()->viewSize = glm::vec2(x, y);
 }
 
-
+float geProject::MouseListener::getViewXsize() { return (float)geProject::MouseListener::getInstance()->viewSize.x; }
+float geProject::MouseListener::getViewYsize() { return (float)geProject::MouseListener::getInstance()->viewSize.y; }
