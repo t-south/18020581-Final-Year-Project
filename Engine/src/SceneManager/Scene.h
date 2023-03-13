@@ -5,7 +5,7 @@
 #include "json.hpp"
 #include "../Inputs/KeyboardListener.h"
 #include "../Inputs/MouseListener.h"
-#include "../Render/Window.h"
+#include "../Windows/Window.h"
 #include "../Render/Renderer.h"
 
 
@@ -22,10 +22,15 @@ namespace geProject {
 		virtual Camera* getCamera() = 0;
 		virtual void updateImgui() = 0 ;
 		virtual void updateSceneImgui() = 0;
+		virtual void render(std::string shaderPath) = 0;
 		float getMouseX();
 		float getMouseY();
+		MouseListener* getMouseListener();
 		virtual std::vector<Entity*> getEntities() = 0;
 		void setWindow(Window* window);
+		void setViewPos(float x, float y);
+		void setViewSize(float x, float y);
+		virtual void setActiveEntity(int entityId) = 0;
 		//friend class SceneSerialize;
 	protected:		
 		void setMouseListener();

@@ -50,8 +50,8 @@ void geProject::MouseListener::endFrame() {
     yPrev = yPos;
 }
 
-float geProject::MouseListener::getXpos() { return (float)geProject::MouseListener::getInstance()->xPos; };
-float geProject::MouseListener::getYpos() { return (float)geProject::MouseListener::getInstance()->yPos; };
+float geProject::MouseListener::getXpos() { return (float)geProject::MouseListener::getInstance()->xPos - geProject::MouseListener::getInstance()->viewPos.x; };
+float geProject::MouseListener::getYpos() { return (float)geProject::MouseListener::getInstance()->viewPos.y - geProject::MouseListener::getInstance()->yPos; };
 float geProject::MouseListener::getXprev(){ return (float)geProject::MouseListener::getInstance()->xPrev; };
 float geProject::MouseListener::getYprev() { return (float)geProject::MouseListener::getInstance()->yPrev; };
 float geProject::MouseListener::getXscroll() { return (float)geProject::MouseListener::getInstance()->xScroll; };
@@ -60,16 +60,26 @@ float geProject::MouseListener::getXdiff() { return (float)(geProject::MouseList
 float geProject::MouseListener::getYdiff() { return (float)(geProject::MouseListener::getInstance()->yPos - geProject::MouseListener::getInstance()->yPrev); };
 bool geProject::MouseListener::isDrag() { return geProject::MouseListener::getInstance()->isDragging; };
 bool geProject::MouseListener::mouseButtonDown(int button) { return geProject::MouseListener::getInstance()->mouseButton[button]; };
+
+float geProject::MouseListener::getScreenXpos(){
+    float x = (getXpos() / (float)geProject::MouseListener::getInstance()->viewSize.x) * 1920.0f;
+    return x;
+}
+float geProject::MouseListener::getScreenYpos(){
+    float y = (getYpos() / (float)geProject::MouseListener::getInstance()->viewSize.y) * 1080.0f;
+    return y;
+}
+
 float geProject::MouseListener::getCameraXpos(){
-    glm::vec4 worldCoordX = glm::vec4((getXpos() / (float)windowWidth) * 2 - 1, 0.0f, 0.0f, 1.0f);
+    glm::vec4 worldCoordX = glm::vec4((getXpos() / (float)geProject::MouseListener::getInstance()->viewSize.x) * 2 - 1, 0.0f, 0.0f, 1.0f);
     //glm matrices are non commutative so order of operation is reversed
     worldCoordX = viewInv * projectionInv *  worldCoordX;
     return worldCoordX.x;
 }
 
 float geProject::MouseListener::getCameraYpos(){
-    float yPos = windowHeight - getYpos();
-    glm::vec4 worldCoordY = glm::vec4(0.0f, (yPos / (float)windowHeight) * 2 - 1, 0.0f, 1.0f);
+    float yPos = getYpos();
+    glm::vec4 worldCoordY = glm::vec4(0.0f, (yPos / (float)geProject::MouseListener::getInstance()->viewSize.y) * 2 - 1, 0.0f, 1.0f);
     worldCoordY = viewInv * projectionInv *  worldCoordY;
     return worldCoordY.y;
     //return yPos;
@@ -82,8 +92,16 @@ void geProject::MouseListener::setWindowDimensions(int windowW, int windowH) {
 
 
 void geProject::MouseListener::setInverses(glm::mat4 inverseProj, glm::mat4 inverseView) {
-    projectionInv = inverseProj;
-    viewInv = inverseView;
+    geProject::MouseListener::getInstance()->projectionInv = inverseProj;
+    geProject::MouseListener::getInstance()->viewInv = inverseView;
+}
+
+void geProject::MouseListener::setViewPos(float x, float y){
+    geProject::MouseListener::getInstance()->viewPos = glm::vec2(x, y);
+}
+
+void geProject::MouseListener::setViewSize(float x, float y) {
+    geProject::MouseListener::getInstance()->viewSize = glm::vec2(x, y);
 }
 
 

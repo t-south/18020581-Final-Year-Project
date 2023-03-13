@@ -1,7 +1,7 @@
 #include "RenderBatch.h"
 
 
-geProject::RenderBatch::RenderBatch(int maxSize, unsigned int zIndex, ResourceManager& resources) : zIndex(zIndex),maxBatch(maxSize), vertSize(9), vao(0), vbo(0), spriteNum(0) {
+geProject::RenderBatch::RenderBatch(int maxSize, unsigned int zIndex, ResourceManager& resources) : zIndex(zIndex),maxBatch(maxSize), vertSize(10), vao(0), vbo(0), spriteNum(0) {
 	resourceManager = &resources;	
 	// vector size will be the size of a quad of vertices multiplied by the max size of the batch
 	int vectorSize = maxBatch * vertSize * 4;	
@@ -63,6 +63,9 @@ void geProject::RenderBatch::init() {
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, vertSize * sizeof(float), (void*)(8 * sizeof(float)));
 	glEnableVertexAttribArray(3);
 
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, vertSize * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(4);
+
 }
 
 void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transform) {
@@ -102,33 +105,33 @@ void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* tra
 		switch (i) {
 		case 0:
 			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (1 * transform->scale.y); //y
+			vertices[index + 1] = transform->position[1] + (1 * transform->scale.y); //y
 			break;
 		case 1:
 			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0 * transform->scale.y); //y
+			vertices[index + 1] = transform->position[1] + (0 * transform->scale.y); //y
 			break;
 
 		case 2:
 			vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0 * transform->scale.y); //y
+			vertices[index + 1] = transform->position[1] + (0 * transform->scale.y); //y
 			break;
 
 		case 3:
 			vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (1 * transform->scale.y); //y
+			vertices[index + 1] = transform->position[1] + (1 * transform->scale.y); //y
 			break;
 
 		}
 
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = sprite->color[0]; //r
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = sprite->color[1]; //g
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = sprite->color[2]; //b
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 5] = sprite->color[3]; //a
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 6] = sprite->texturePos[i][0]; //texture coord x
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 7] = sprite->texturePos[i][1]; //texture coord y
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 8] = (float)sprite->textureId; // texture id
-
+		vertices[index + 2] = sprite->color[0]; //r
+		vertices[index + 3] = sprite->color[1]; //g
+		vertices[index + 4] = sprite->color[2]; //b
+		vertices[index + 5] = sprite->color[3]; //a
+		vertices[index + 6] = sprite->texturePos[i][0]; //texture coord x
+		vertices[index + 7] = sprite->texturePos[i][1]; //texture coord y
+		vertices[index + 8] = (float)sprite->textureId; // texture id
+		vertices[index + 9] = (float)sprite->entityId + 1;
 		index += vertSize;
 	}
 }
@@ -151,13 +154,11 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 	return elementOrder;
 }
 
-void geProject::RenderBatch::render(Camera& camera) {
+void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 	
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-
-	
-	auto shader = resourceManager->requestShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
+	auto shader = resourceManager->requestShader(shaderPath);
 	shader->setMat4f("uProjMat", camera.getProjection());
 	shader->setMat4f("uViewMat", camera.getViewMatrix());	
 	unsigned int count = 0;

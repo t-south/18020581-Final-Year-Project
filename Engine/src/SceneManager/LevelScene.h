@@ -12,6 +12,8 @@ namespace geProject {
 		virtual void updateImgui() override;
 		virtual void updateSceneImgui() override;
 		virtual std::vector<Entity*> getEntities() override;
+		virtual void render(std::string shaderPath) override;
+		virtual void setActiveEntity(int entityId) override;
 	private:
 		geProject::Camera* camera{nullptr};
 		void init();

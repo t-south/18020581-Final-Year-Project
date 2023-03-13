@@ -17,6 +17,8 @@ geProject::Camera* geProject::LevelScene::getCamera() {
 }
 
 void geProject::LevelScene::update(float deltaTime){}
+void geProject::LevelScene::render(std::string shaderPath){}
 void geProject::LevelScene::updateImgui() {}
 void geProject::LevelScene::updateSceneImgui() {}
 std::vector<geProject::Entity*> geProject::LevelScene::getEntities() { return entities; }
+void geProject::LevelScene::setActiveEntity(int entityId){}

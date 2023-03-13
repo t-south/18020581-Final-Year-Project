@@ -117,6 +117,7 @@ void geProject::EntityManager::assignSpriteRender(uInt entityId, SpriteRender sp
 	*/
 	if (entityId < maxEntities && entityId >= 0) {
 		sprite.dirtyFlag[0] = 1;
+		sprite.entityId = entityId;
 		/*
 		if (componentSpriteRender[entityId]->id == 0) {
 			sprite.dirtyFlag[1] = 0;
@@ -132,7 +133,7 @@ void geProject::EntityManager::assignSpriteRender(uInt entityId, SpriteRender sp
 		entityUpdated = true;
 	}
 	else {
-		std::cout << "unable to assign transform" << std::endl;
+		std::cout << "unable to assign sprite" << std::endl;
 		delete(&sprite);
 	}
 }
@@ -168,7 +169,7 @@ void geProject::EntityManager::assignFontRender(uInt entityId, FontRender font) 
 		entityUpdated = true;
 	}
 	else {
-		std::cout << "unable to assign transform" << std::endl;
+		std::cout << "unable to assign font" << std::endl;
 		delete(&font);
 	}
 	

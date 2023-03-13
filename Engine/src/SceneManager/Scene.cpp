@@ -108,7 +108,7 @@ void geProject::Scene::to_json(json& data, FontRender& comp) {}
 
 void geProject::Scene::to_json(json& data, SpriteRender& comp) {
 	data = json{
-		"SpriteRender", {
+		"SpriteRender", {		
 		{"colorR", comp.color[0]}, {"colorG", comp.color[1]}, {"colorB", comp.color[2]}, {"colorA", comp.color[3]},
 		{"texturePosX1",comp.texturePos[0][0]}, {"texturePosY1", comp.texturePos[0][1]},
 		{"texturePosX2",comp.texturePos[1][0]}, {"texturePosY2", comp.texturePos[1][1]},
@@ -156,6 +156,7 @@ void geProject::Scene::from_json(json& data, FontRender& comp) {}
 
 
 void geProject::Scene::from_json(json& data, SpriteRender& comp) {
+
 	data[1].at("colorR").get_to(comp.color[0]);
 	data[1].at("colorG").get_to(comp.color[1]);
 	data[1].at("colorB").get_to(comp.color[2]);
@@ -229,3 +230,15 @@ void geProject::Scene::setMouseListener(){
 float geProject::Scene::getMouseX() { return mouse->getYpos(); }
 
 float geProject::Scene::getMouseY() { return mouse->getYpos(); }
+
+void geProject::Scene::setViewPos(float x, float y) {
+	mouse->setViewPos(x, y);
+}
+
+void geProject::Scene::setViewSize(float x, float y) {
+	mouse->setViewSize(x, y);
+}
+
+geProject::MouseListener* geProject::Scene::getMouseListener() {
+	return mouse;
+}

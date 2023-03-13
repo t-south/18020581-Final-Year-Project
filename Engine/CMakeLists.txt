@@ -2,6 +2,7 @@
 project(ge_cpp_engine VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 find_package(OpenGL REQUIRED)
+
 add_subdirectory(External/glm)
 add_subdirectory(External/GLFW)
 add_subdirectory(External/spdlog)
@@ -18,11 +19,12 @@ target_include_directories(${PROJECT_NAME}
 		glad
 		glm
 		${OPENGL_LIBRARIES}
-		
+		ImGui
 	PRIVATE
 		
 )
 set(IMGUI_PATH  "External/imgui")
+set(IMGUI_BACKENDS "External/imgui/backends")
 file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
 add_library("ImGui" STATIC ${IMGUI_SOURCES})
 target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})

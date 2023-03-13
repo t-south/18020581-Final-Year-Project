@@ -22,11 +22,16 @@ namespace geProject {
 		std::shared_ptr<Scene> levelScene = std::make_shared<LevelScene>();
 		int editorSceneId = sceneManager->addScene(levelEditorScene);
 		int levelSceneId = sceneManager->addScene(levelScene);
+		//add window to scene, also add mouse listener and keyboard listener
 		sceneManager->getCurrentScene()->setWindow(gameWindow);
 		//mouse = MouseListener::getInstance();
 		frameBuffer = new FrameBuffer(1920, 1080);
-		imguiWindow = new ImguiWindow(gameWindow->getWindow());
-		imguiWindow->start(gameWindow->getWidth(), gameWindow->getHeight(), sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());
+		selectionTextures = new FrameBuffer(1920, 1080, true);
+		int width = gameWindow->getWidth();
+		int height = gameWindow->getHeight();
+		auto window = gameWindow->getWindow();
+		imguiWindow = new ImguiWindow(window, width, height, frameBuffer);
+		imguiWindow->start(width, height, sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());
 		loop();
 
 		//game_window->loop();       
@@ -44,20 +49,48 @@ namespace geProject {
 		//serial.deserialize("jsonTest.json");
 		while (!glfwWindowShouldClose(gameWindow->getWindow())) {
 			glfwPollEvents();
-			
+
+			glDisable(GL_BLEND);
+			selectionTextures->bindPicking();
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			auto scene = sceneManager->getCurrentScene();
+			scene->render("../../../../Game/assets/shaders/SelectionVertexShader.glsl");
+			auto mouse = scene->getMouseListener();
+			if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+				int x = (int)mouse->getScreenXpos();
+				int y = (int)mouse->getScreenYpos();
+				int entityId = selectionTextures->getPixel(x, y);
+				if (entityId > -1) {
+					scene->setActiveEntity(entityId);
+				}
+				//scene->updateImgui();
+			}
+
+			selectionTextures->unBindPicking();
+			glEnable(GL_BLEND);
+
+			frameBuffer->bind();
 			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			/*if (keyboard->isKeyPressed(GLFW_KEY_SPACE)) {
 				std::cout << "Space Key is pressed \n" << std::endl;
 				sceneManager->switchScene(levelSceneId);
 			}*/
-			//SCENE UPDATES
-			auto scene = sceneManager->getCurrentScene();
 
-			//frameBuffer->bind();
+
+			//SCENE UPDATES
+			
+			//add the view size and position of imgui game window to scene
+			auto viewPos = imguiWindow->getViewPos();
+			auto viewSize = imguiWindow->getViewSize();
+			scene->setViewPos(viewPos.x, viewPos.y);
+			scene->setViewSize(viewSize.x, viewSize.y);
 			scene->update(deltaTime);
-			//inverse for view has to be taken after render
+			scene->render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
+
 			frameBuffer->unBind();
+			//inverse for view has to be taken after render
 			
 			//IMGUI UPDATES
 			imguiWindow->update(deltaTime, scene);

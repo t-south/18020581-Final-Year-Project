@@ -56,14 +56,17 @@ void geProject::Renderer::updateSprite(SpriteRender* sprite, Transform* transfor
 	renderList[transform->dirtyFlag[1]].updateSprite(sprite, transform);
 }
 
-void geProject::Renderer::render(Camera& camera) {
+
+
+
+void geProject::Renderer::render(Camera& camera, std::string shaderPath) {
 	//std::cout << "number of batches" << renderList.size() << std::endl;
 	for (int i = 0; i < renderList.size();i++) {
-		renderList[i].render(camera);
+		renderList[i].render(camera, shaderPath);
 	}
 }
 
-void geProject::Renderer::clear() {
+void geProject::Renderer::clear() {	
 	//std::cout << "number of batches" << renderList.size() << std::endl;
 	if (renderList[0].getSpriteNum() > 0) {
 		renderList.clear();

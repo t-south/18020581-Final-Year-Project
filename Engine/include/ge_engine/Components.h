@@ -16,6 +16,7 @@ namespace geProject {
 
 	struct SpriteRender {
 		unsigned int id = 0x00000002;
+		unsigned int entityId;
 		glm::vec4 color{ 0, 0, 0, 0 };
 		glm::vec2 texturePos[4] = { glm::vec2{1.0f, 1.0f}, glm::vec2{1.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 1.0f} };
 		GLuint textureId{ 0 };

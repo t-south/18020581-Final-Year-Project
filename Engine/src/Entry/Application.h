@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <glad/glad.h>
-#include "../IMGui/ImguiWindow.h"
-#include "../Render/Window.h"
+#include "../Windows/ImguiWindow.h"
+#include "../Windows/Window.h"
 #include "../Render/FrameBuffer.h"
 #include "../SceneManager/SceneStates.h"
 #include "../SceneManager/LevelEditorScene.h"
@@ -25,6 +25,7 @@ namespace geProject {
 		Clock* gameClock;
 		ImguiWindow* imguiWindow;
 		FrameBuffer* frameBuffer;
+		FrameBuffer* selectionTextures;
 	};
 	
 	Application* CreateApplication();

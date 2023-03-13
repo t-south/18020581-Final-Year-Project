@@ -22,13 +22,16 @@ namespace geProject {
 		float getYscroll();
 		float getXdiff();
 		float getYdiff();
+		float getScreenXpos();
+		float getScreenYpos();
 		float getCameraXpos();
 		float getCameraYpos();
 		bool isDrag();
 		bool mouseButtonDown(int button);
 		void setWindowDimensions(int windowW, int windowH);
 		void setInverses(glm::mat4 inverseProj, glm::mat4 inverseView);
-
+		void setViewSize(float x, float y);
+		void setViewPos(float x, float y);
 	private:
 		MouseListener();
 		MouseListener(const MouseListener& obj) = delete;
@@ -38,6 +41,7 @@ namespace geProject {
 		bool isDragging = false;
 		int windowWidth, windowHeight;		
 		bool mouseButton[3] = {false, false, false};
+		glm::vec2 viewSize, viewPos;
 		glm::mat4 projectionInv, viewInv;
 	};
 }

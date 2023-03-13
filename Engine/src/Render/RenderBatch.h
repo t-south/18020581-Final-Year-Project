@@ -27,7 +27,7 @@ namespace geProject {
 		bool isTextureFull(unsigned int id);
 		void addSprite(SpriteRender* sprite, Transform* transform);
 		void updateSprite(SpriteRender* sprite, Transform* transform);
-		void render(Camera& camera);
+		void render(Camera& camera, std::string shaderPath);
 		unsigned int getSpriteNum();
 		unsigned int getZindex();
 	private:

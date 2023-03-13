@@ -16,6 +16,7 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	//testTexture = new Texture("../../../../Game/assets/images/container.jpg");
 	resourceManager->loadShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl", "../../../../Game/assets/shaders/FragmentShaderDefault.glsl");
 	resourceManager->loadShader("../../../../Game/assets/shaders/LineVertexShader.glsl", "../../../../Game/assets/shaders/LineFragmentShader.glsl");
+	resourceManager->loadShader("../../../../Game/assets/shaders/SelectionVertexShader.glsl", "../../../../Game/assets/shaders/SelectionFragmentShader.glsl");
 	filePath = "../../../../Game/assets/levels/levelEditor.json";	
 	editor = new EditorRender(*(resourceManager));
 	init();	
@@ -163,7 +164,9 @@ geProject::Camera* geProject::LevelEditorScene::getCamera() {
 }
 
 void geProject::LevelEditorScene::update(float deltaTime) {	
+
 	setGridLines();
+
 	/*float x = ((float)sin(t) * 200.0f) + 600;
 	float y = ((float)cos(t) * 200.0f) + 400;
 	t += 0.05f;
@@ -223,7 +226,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		geProject::Scene::serialize(filePath);
 	}	
 	editor->render(*(camera));
-	renderer->render(*(camera));
+	
 	
 	loopcount++;
 	
@@ -253,6 +256,14 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	*/
 }
 
+
+void geProject::LevelEditorScene::render(std::string shaderPath) {	
+	renderer->render(*(camera), shaderPath);
+}
+
+void geProject::LevelEditorScene::setActiveEntity(int entityId) {
+	activatedEntity = entityId;
+}
 
 void geProject::LevelEditorScene::updateSceneImgui() {
 	if (activatedEntity > -1) {
