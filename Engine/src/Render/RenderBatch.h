@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include "../Cameras/Camera.h"
 #include "../ResourceManager/ResourceManager.h"
-
+#define PI 3.14159265
 namespace geProject {
 	//credit to https: //stackoverflow.com/questions/23031674/3d-vertices-class-or-struct
 	/*
@@ -39,6 +39,7 @@ namespace geProject {
 		std::vector<unsigned int> createIndexes();
 		void createVertices(SpriteRender* sprite, Transform* transform, unsigned int index);
 		void init();
-		
+		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);
+		glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
 	};
 }

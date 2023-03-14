@@ -61,15 +61,13 @@ namespace geProject {
 				int x = (int)mouse->getScreenXpos();
 				int y = (int)mouse->getScreenYpos();
 				int entityId = selectionTextures->getPixel(x, y);
-				std::cout << "entity: " << entityId << std::endl;
+				//std::cout << "entity: " << entityId << std::endl;
 				int activatedId = scene->getActiveEntity();
 				if (entityId > -1) {
 					if (activatedId != entityId) {
 						scene->setActiveEntity(entityId);
 						
 					}
-
-
 				}
 
 				//scene->updateImgui();

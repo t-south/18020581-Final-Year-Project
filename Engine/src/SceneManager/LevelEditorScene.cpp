@@ -230,8 +230,8 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 			entities.push_back(manager->getEntity(i));			
 			// only sprites that have not been added to the renderer previously will be set to 0
 			auto trans = manager->getTransformComponent(i);
-			if (trans->dirtyFlag[2] == 0) {
-				renderer->addSpriteToBatch(manager->getSpriteComponent(i), manager->getTransformComponent(i));
+			if (trans->dirtyFlag[2] == -1) {				
+				renderer->addSpriteToBatch(manager->getSpriteComponent(i), manager->getTransformComponent(i));				
 				trans->dirtyFlag[0] = 0;
 			}
 			else if (trans->dirtyFlag[0] > 0) {

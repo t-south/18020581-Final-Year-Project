@@ -49,11 +49,10 @@ void geProject::EntityManager::assignTransform(uInt entityId, Transform transfor
 		}
 		else if (componentTransforms[entityId]->id == 0) {
 			transform.dirtyFlag[1] = 0;
-			transform.dirtyFlag[2] = 0;
+			transform.dirtyFlag[2] = -1;
 		}
 		transform.dirtyFlag[0] = 1;
-		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));
-		
+		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));		
 		entityUpdated = true;
 	}
 	else{
@@ -303,6 +302,21 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 		}
 	}
 	
+	int rotation = transform->rotation;
+	if (ImGui::DragInt("rotation", &rotation)) {
+		if (rotation >= 0) {
+			rotation = rotation % 360;
+		}
+		else if (rotation < 0) {
+			rotation = rotation % -360;
+		}
+		if (rotation != transform->rotation) {
+			transform->rotation = rotation;
+			entityUpdated = true;
+			transform->dirtyFlag[0] = 1;
+		}
+	}
+
 	//SPRITE IMGUI updates
 	int textureId = sprite->textureId;
 	if (ImGui::DragInt("textureId", &textureId)) {

@@ -75,7 +75,7 @@ void geProject::EditorRender::addCircle(glm::vec2 centre, glm::vec3 color, float
 		point = rotate(point, glm::vec2(0,0), angle);
 		verts.push_back(point + centre);
 		if (i > 0) {
-			addLine(verts[i - 1], verts[i], color, life);
+			addLine(verts[static_cast<std::vector<glm::vec2, std::allocator<glm::vec2>>::size_type>(i) - 1], verts[i], color, life);
 		}
 		angle += increment;
 	}

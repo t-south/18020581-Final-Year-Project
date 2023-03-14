@@ -127,6 +127,7 @@ void geProject::Scene::to_json(json& data, Transform& comp) {
 		"Transform", {
 			{"positionX", comp.position[0]}, {"positionY", comp.position[1]},
 			{"scaleX", comp.scale[0]}, {"scaleY", comp.scale[1]},
+			{"rotation", comp.rotation},
 			{"dirtyFlag", comp.dirtyFlag[0]}, {"renderBuffer", comp.dirtyFlag[1]}, {"bufferIndex", comp.dirtyFlag[2]}
 		}
 	};
@@ -183,6 +184,7 @@ void geProject::Scene::from_json(json& data, Transform& comp) {
 	data[1].at("positionY").get_to(comp.position[1]);
 	data[1].at("scaleX").get_to(comp.scale[0]);
 	data[1].at("scaleY").get_to(comp.scale[1]);
+	data[1].at("rotation").get_to(comp.rotation);
 	data[1].at("dirtyFlag").get_to(comp.dirtyFlag[0]);
 	data[1].at("renderBuffer").get_to(comp.dirtyFlag[1]);
 	data[1].at("bufferIndex").get_to(comp.dirtyFlag[2]);
