@@ -13,3 +13,6 @@
 [submodule "Engine/External/imgui"]
 	path = Engine/External/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "Engine/External/box2d"]
+	path = Engine/External/box2d
+	url = https://github.com/erincatto/box2d.git
