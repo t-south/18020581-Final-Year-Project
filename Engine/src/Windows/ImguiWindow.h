@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../IMGui/imgui_impl_opengl3.h"
 #include "../IMGui/imgui_impl_glfw.h"
 #include <imgui.h>
@@ -7,6 +6,9 @@
 #include "../SceneManager/Scene.h"
 #include "../Render/FrameBuffer.h"
 #include <GLFW/glfw3.h>
+
+
+
 //#include "../Render/Window.h"
 
 
@@ -20,13 +22,14 @@ namespace geProject {
 		void destroyWindow();
 		void onEvent();
 		ImVec2 getViewPos();
-		ImVec2 getViewSize();
+		ImVec2 getViewSize();		
 	private:
 		GLFWwindow* window;
 		FrameBuffer* frameBuffer;
 		int windowWidth, windowHeight;
 		ImVec2 viewPos, viewSize;
 		void dockWindow();
+		bool windowRunning{ false };
 		void gameViewWindow();
 	};
 }

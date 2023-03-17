@@ -26,3 +26,5 @@ void geProject::LevelScene::setCameraControlLayout() {}
 unsigned int geProject::LevelScene::getActiveEntity() { return 0; }
 void geProject::LevelScene::setEntityDrag(bool drag) {}
 bool geProject::LevelScene::getEntityDrag() { return false; }
+
+void geProject::LevelScene::setPicking(){}

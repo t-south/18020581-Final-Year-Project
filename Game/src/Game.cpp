@@ -1,5 +1,6 @@
 #include <ge_engine/geProject.h>
 #include <iostream>
+
 class Game : public geProject::Application {
 public:
 	Game() {
@@ -15,8 +16,7 @@ geProject::Application* geProject::CreateApplication() {
 
 
 
-int main(int argc, char** argv) {
-	
+int main(int argc, char** argv) {	
 	std::cout << "Test" << std::endl;
 	Game* game =  new Game();
 	game->Startup();

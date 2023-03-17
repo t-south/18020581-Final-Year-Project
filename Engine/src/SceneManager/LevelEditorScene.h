@@ -21,10 +21,12 @@ namespace geProject {
 		virtual unsigned int getActiveEntity() override;
 		virtual void setEntityDrag(bool drag) override;
 		virtual bool getEntityDrag() override;
+		virtual void setPicking() override;
 	private:
 		int activatedEntity{ -1 };
 		int gridWidth, gridHeight;
-		bool entityDrag{ false };		
+		bool entityDrag{ false };	
+		bool entityClicked{ false };
 		EditorCamera* editorCam;
 		EditorRender* editor;
 		std::vector<unsigned int> sprites;

@@ -18,8 +18,9 @@ namespace geProject {
 		virtual unsigned int getActiveEntity() override;
 		virtual void setEntityDrag(bool drag) override;
 		virtual bool getEntityDrag() override;
+		virtual void setPicking() override;
 	private:
-		geProject::Camera* camera{nullptr};
+		Camera* camera{nullptr};
 		void init();
 
 	};

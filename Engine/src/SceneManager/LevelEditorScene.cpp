@@ -1,7 +1,5 @@
 #include "LevelEditorScene.h"
 
-
-
 geProject::LevelEditorScene::LevelEditorScene() {
 	gridWidth = 32;
 	gridHeight = 32;
@@ -33,6 +31,7 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/icons.png", 16, 32, 32, 0, 3));
 	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/spritesheet.png", 26, 16, 16, 0, 3));
 	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 3));
+	selectionTextures = new FrameBuffer(1920, 1080, true);
 }
 
 
@@ -40,48 +39,8 @@ geProject::LevelEditorScene::~LevelEditorScene(){}
 
 
 void geProject::LevelEditorScene::init() {	
-
-	
-	/*
-	unsigned int blen1 = manager->addEntity();	
-	manager->assignTransform(blen1, Transform{ .position = {100, 100}, .scale = {200, 200} });
-	manager->assignSpriteRender(blen1, SpriteRender{ .textureId{blend1}, .zIndex = 2 });
-	manager->assignRigidBody(manager->getEntity(0)->id, Rigidbody { .collider = 0 });
-	addEntityToScene(blen1);
-
-	unsigned int blen2 = manager->addEntity();
-	manager->assignTransform(blen2, Transform{ .position = {400, 100}, .scale = {200, 200} });
-	manager->assignSpriteRender(blen2, SpriteRender{ .textureId{blend2}, .zIndex = 3 });
-	addEntityToScene(blen2);
-
-	unsigned int blen3 = manager->addEntity();
-	manager->assignTransform(blen3, Transform{ .position = {700, 100}, .scale = {200, 200} });
-	manager->assignSpriteRender(blen3, SpriteRender{ .textureId{blend1}, .zIndex = 1 });
-	addEntityToScene(blen3);
 	
 	
-	*/
-	
-
-	/*
-	
-	unsigned int blen4 = manager->addEntity();
-	manager->assignTransform(blen4, Transform{ .position = {400, 100}, .scale = {200, 200} });
-	manager->assignSpriteRender(blen4, SpriteRender{ .color = {0.2, 0.3, 0.4, 1.0}, .zIndex = 1 });
-	addEntityToScene(blen4);
-	
-	
-	
-	
-
-
-	
-	unsigned int blen5 = manager->addEntity();
-	manager->assignTransform(blen5, Transform{ .position = {100, 100}, .scale = {200, 200} });
-	manager->assignSpriteRender(blen5, SpriteRender{ .color = {0.2, 0.3, 0.4, 1.0}, .zIndex = 3 });
-	addEntityToScene(blen5);
-	
-	*/
 	/*
 	int x = 100;
 	
@@ -168,7 +127,6 @@ geProject::Camera* geProject::LevelEditorScene::getCamera() {
 }
 
 void geProject::LevelEditorScene::update(float deltaTime) {		
-	
 	setGridLines();
 	editorCam->update(deltaTime);
 	editorCam->getCamera()->projectionUpdate();
@@ -180,6 +138,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		std::cout << "Camera X: " << mouse->getCameraXpos() << " Camera Y: " << mouse->getCameraYpos() << std::endl;
 	}
 	*/
+	
 	/*float x = ((float)sin(t) * 200.0f) + 600;
 	float y = ((float)cos(t) * 200.0f) + 400;
 	t += 0.05f;
@@ -188,10 +147,17 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	if (deltaTime == 0) {
 		geProject::Scene::deserialize(filePath);
 	}
-	//editor->addBox(glm::vec2(400.0f, 200.0f), glm::vec2(64.0f, 32.0f), glm::vec3(0.0f, 1.0f, 0.0f), t, 1);
+	//editor->addBox(glm::vec2(400.0f, 200.0f), glm::vec2(64.0f, 32.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0, 1);
+	
+
+	
+	
 	editor->addCircle(glm::vec2(x, y), glm::vec3(0.0f, 1.0f, 0.0f), 64.0f, 20, 1);
 	x += 50.0f * deltaTime;
 	y += 50.0f * deltaTime;
+	
+
+
 	/*if (testSpritesheet == 18) {
 		testSpritesheet = 15;
 	}
@@ -208,79 +174,46 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	*/
 
 	//DRAG AND DROP
-
-	
-
-
 	if (entityDrag == true) {
-		auto transform = manager->getTransformComponent(activatedEntity);		
-		transform->position[0] = (int)(mouse->getCameraXpos() / gridWidth) * gridWidth;		
-		transform->position[1] = (int)(mouse->getCameraYpos() / gridHeight) * gridHeight;
+		auto transform = manager->getTransformComponent(activatedEntity);
+		float scroll = editorCam->getCamera()->getScroll();		
+		transform->position[0] = (int)((float)(mouse->getCameraXpos() * scroll) / gridWidth) * (int)(gridWidth) ;
+		transform->position[1] = (int)((float)(mouse->getCameraYpos() * scroll) / gridHeight) * (int)(gridHeight);
 		manager->assignTransform(activatedEntity, *transform);		
-		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-			entityDrag = false;			
-		}
-		
+		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && entityDrag == true) {
+			entityDrag = false;	
+			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+		}		
 	}
-	
-	
+
+	//UPDATES TO RENDERING
 	if (manager->hasUpdate()) {
 		entities.clear();
 		for (int i = 0; i < manager->getEntityNum(); i++) {
 			entities.push_back(manager->getEntity(i));			
 			// only sprites that have not been added to the renderer previously will be set to 0
 			auto trans = manager->getTransformComponent(i);
+			auto sprite = manager->getSpriteComponent(i);
 			if (trans->dirtyFlag[2] == -1) {				
-				renderer->addSpriteToBatch(manager->getSpriteComponent(i), manager->getTransformComponent(i));				
+				renderer->addSpriteToBatch(sprite, trans);				
 				trans->dirtyFlag[0] = 0;
 			}
 			else if (trans->dirtyFlag[0] > 0) {
-				renderer->updateSprite(manager->getSpriteComponent(i), manager->getTransformComponent(i));
+				renderer->updateSprite(sprite, trans);
 			}
 		}
-		manager->endFrame();
-		
-		
-		
-		geProject::Scene::serialize(filePath);
-	}	
-	
+		manager->endFrame();		
+		Scene::serialize(filePath);
+	}		
 	editor->render(*(editorCam->getCamera()));
-	
-	
+	mouse->endFrame();
+	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 	loopcount++;
-	
-	//camera->position.x -= deltaTime * 2.0f;
-	//camera->position.y -= deltaTime * 2.0f;
-	//editorCam->getCamera()->setPosition(glm::vec2(deltaTime *5.0f, deltaTime * 5.0f));
-	/*shader->setTexture("textureSampler", 0);
-	glActiveTexture(GL_TEXTURE0);
-	testTexture->bindTexture();
-	shader->setMat4f("uProjMat", camera->getProjection());
-	shader->setMat4f("uViewMat", camera->getViewMatrix());
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, 9 * sizeof(float), GL_UNSIGNED_INT, 0);
-
-	*/
-
-	/*glUseProgram(shaderProgram);
-	glBindVertexArray(vao);
-	//glEnableVertexAttribArray(1);
-	//glDrawElements(GL_TRIANGLES, sizeof(vertexArray), GL_UNSIGNED_INT, 0);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	//glDeleteShader(vertexShader);
-	//glDeleteShader(fragmentShader);
-	glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
-	glBindVertexArray(0);
-	glUseProgram(0);
-	*/
 }
 
 
 void geProject::LevelEditorScene::render(std::string shaderPath) {	
 	renderer->render(*(editorCam->getCamera()), shaderPath);
-
 }
 
 
@@ -307,10 +240,8 @@ void geProject::LevelEditorScene::updateSceneImgui() {
 void geProject::LevelEditorScene::updateImgui() {
 	ImGui::Begin("Editor Window");
 	//credit to https ://github.com/ocornut/imgui/issues/1977
-
 	ImGui::Text("Manually wrapping:");
-	ImGuiStyle& style = ImGui::GetStyle();
-	
+	ImGuiStyle& style = ImGui::GetStyle();	
 	float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
 	auto spriteSheet = resourceManager->requestSpriteSheet(sprites[0]);
 	unsigned int spriteSize = spriteSheet->getSpriteSize();
@@ -332,7 +263,6 @@ void geProject::LevelEditorScene::updateImgui() {
 		if (i < spriteSize && next_button_x2 < window_visible_x2)
 			ImGui::SameLine();
 	}
-
 	ImGui::End();
 }
 
@@ -347,7 +277,7 @@ unsigned int geProject::LevelEditorScene::createEditorBlock(SpriteRender* sprite
 	manager->assignTransform(entity, Transform{ .position = {mouse->getCameraXpos(), mouse->getCameraYpos()}, .scale = {sizeX, sizeY}});
 	manager->assignSpriteRender(entity, *sprite);
 	//entities.push_back(manager->getEntity(entity));
-	entityDrag = true;
+	entityDrag = true;	
 	activatedEntity = entity;	
 	return entity;
 }
@@ -391,3 +321,31 @@ void geProject::LevelEditorScene::setEntityDrag(bool drag) {
 }
 
 bool geProject::LevelEditorScene::getEntityDrag() { return entityDrag; }
+
+void geProject::LevelEditorScene::setPicking() {	
+	selectionTextures->bindPicking();	
+	render("../../../../Game/assets/shaders/SelectionVertexShader.glsl");	
+	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+		int x = (int)mouse->getScreenXpos();
+		int y = (int)mouse->getScreenYpos();
+		int entityId = selectionTextures->getPixel(x, y);
+		//std::cout << "entity: " << entityId << std::endl;	
+		if (activatedEntity == entityId && entityClicked == true) {
+			entityDrag = true;	
+			entityClicked = false;
+			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+		}
+		else if (entityId > -1 && entityClicked == false && entityDrag == false) {			
+			activatedEntity = entityId;		
+			entityClicked = true;
+			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);		
+		}
+		else if (entityId > -1 && entityId != activatedEntity) {
+			activatedEntity = entityId;
+			entityClicked = true;
+			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+		}
+		//scene->updateImgui();
+	}
+	selectionTextures->unBindPicking();	
+}

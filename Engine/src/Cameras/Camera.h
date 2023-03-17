@@ -1,6 +1,7 @@
 #pragma once
 //using GLM library --- https: //github.com/g-truc/glm ---
 #include <glm/vec2.hpp>
+#include <examples/libs/glfw/include/GLFW/glfw3.h>
 #include <glm/mat4x4.hpp>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"

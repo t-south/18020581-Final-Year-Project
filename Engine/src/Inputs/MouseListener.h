@@ -7,7 +7,7 @@
 namespace geProject {
 	class MouseListener {
 	public:
-		
+
 		static MouseListener* getInstance();
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
@@ -28,6 +28,7 @@ namespace geProject {
 		float getCameraYpos();
 		float getViewXsize();
 		float getViewYsize();
+		bool isMouseButtonDown(int button);
 		bool isDrag();
 		bool mouseButtonDown(int button);
 		void releaseMouseButton(int button);
@@ -39,12 +40,12 @@ namespace geProject {
 	private:
 		MouseListener();
 		MouseListener(const MouseListener& obj) = delete;
-		~MouseListener();		
+		~MouseListener();
 		static MouseListener* instance;
 		double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
 		bool isDragging = false;
-		int windowWidth, windowHeight;		
-		bool mouseButton[3] = {false, false, false};
+		int windowWidth, windowHeight;
+		bool mouseButton[3] = { false, false, false };
 		glm::vec2 viewSize, viewPos;
 		glm::mat4 projectionInv, viewInv;
 	};

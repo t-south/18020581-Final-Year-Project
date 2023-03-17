@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-geProject::EditorCamera::EditorCamera(Camera& cam) {	
+geProject::EditorCamera::EditorCamera(Camera& cam) {
 	camera = &cam;
 
 }
@@ -10,13 +10,13 @@ geProject::EditorCamera::EditorCamera(Camera& cam) {
 geProject::EditorCamera::~EditorCamera() {}
 
 
-void geProject::EditorCamera::update(float deltaTime){
-	if (mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE) && drag > 0){
+void geProject::EditorCamera::update(float deltaTime) {
+	if (mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE) && drag > 0) {
 		prevClick = glm::vec2(mouseListen->getCameraXpos(), mouseListen->getCameraYpos());
 		drag -= deltaTime;
-		
+
 	}
-	else if (mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {	
+	else if (mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
 		glm::vec2 cameraPos = glm::vec2(mouseListen->getCameraXpos(), mouseListen->getCameraYpos());
 		cameraPos = (prevClick - cameraPos);
 		cameraPos = camera->getPosition() - cameraPos * (deltaTime * 10.0f);
@@ -28,12 +28,15 @@ void geProject::EditorCamera::update(float deltaTime){
 	if (drag <= 0 && !mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
 		drag = 0.1f;
 	}
-	if (mouseListen->getYscroll() != 0.0f) {	
+	float mouseX = mouseListen->getScreenXpos();
+	float mouseY = mouseListen->getScreenYpos();
+
+	if (mouseListen->getYscroll() != 0.0f && (mouseX >= 0.0f && mouseX <= 1920.0f) && (mouseY >= 0.0f && mouseY <= 1080.0f)) {
 		auto scrollval = mouseListen->getYscroll();
-		int signum = (0 < scrollval) - (scrollval < 0);		
-		camera->setScroll(pow(abs(mouseListen->getYscroll()), 1 / camera->getScroll()) * 0.2f * -signum);		
+		int signum = (0 < scrollval) - (scrollval < 0);
+		camera->setScroll(pow(abs(mouseListen->getYscroll()), 1 / camera->getScroll()) * 0.2f * -signum);
 	}
-	
+
 
 }
 

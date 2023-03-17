@@ -21,25 +21,25 @@ void main()
 		FragColor = ourColor;
 	}
 	if(id == 1){
-		FragColor = texture(texture1, oTexCoords);
+		FragColor = texture(texture1, oTexCoords) * ourColor;
 	}
 	if(id == 2){
-		FragColor = texture(texture2, oTexCoords);
+		FragColor = texture(texture2, oTexCoords) * ourColor;
 	}
 	if(id == 3){
-		FragColor = texture(texture3, oTexCoords);
+		FragColor = texture(texture3, oTexCoords) * ourColor;
 	}
 	if(id == 4){
-		FragColor = texture(texture4, oTexCoords);
+		FragColor = texture(texture4, oTexCoords) * ourColor;
 	}
 	if(id == 5){
-		FragColor = texture(texture5, oTexCoords);
+		FragColor = texture(texture5, oTexCoords) * ourColor;
 	}
 	if(id == 6){
-		FragColor = texture(texture6, oTexCoords);
+		FragColor = texture(texture6, oTexCoords) * ourColor;
 	}
 	if(id == 7){
-		FragColor = texture(texture7, oTexCoords);
+		FragColor = texture(texture7, oTexCoords) * ourColor;
 		
 	}
 	

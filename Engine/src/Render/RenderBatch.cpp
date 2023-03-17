@@ -194,7 +194,7 @@ void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glDrawElements(GL_TRIANGLES, spriteNum * 9 * sizeof(float), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, spriteNum * vertSize * sizeof(float), GL_UNSIGNED_INT, 0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glBindVertexArray(0);

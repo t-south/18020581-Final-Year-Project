@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <iostream>
 
-
 namespace geProject {
 	class Window
 	{

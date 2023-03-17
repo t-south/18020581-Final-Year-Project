@@ -14,22 +14,16 @@ geProject::ImguiWindow::ImguiWindow(GLFWwindow* m_window, int windowWidth, int w
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
-geProject::ImguiWindow::~ImguiWindow() {
-
-}
-
+geProject::ImguiWindow::~ImguiWindow() {}
 
 
 void geProject::ImguiWindow::start(int display_w, int display_h, float mouse_x, float mouse_y) {
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2(display_w, display_h);
 	io.MousePos = ImVec2(mouse_x, mouse_y);
-	//glfwGetFramebufferSize(window, &display_w, &display_h);
-	//glViewport(0, 0, display_w, display_h);
-	//
-
-
 }
+
+
 void geProject::ImguiWindow::onEvent() {}
 
 void geProject::ImguiWindow::update(float deltaTime, std::shared_ptr<Scene> scene) {
@@ -60,16 +54,28 @@ void geProject::ImguiWindow::dockWindow(){
 	ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNavFocus;
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_MenuBar;
 	ImGui::Begin("docker window", (bool*)true, window_flags);	
-	ImGui::PopStyleVar(2);
-	//ImGui::PopStyleVar();
+	ImGui::PopStyleVar(2);	
 	ImGui::DockSpace(ImGui::GetID("docker window"));
 	
 }
 
 void geProject::ImguiWindow::gameViewWindow() {
+	ImGui::BeginMainMenuBar();
+	if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
+		windowRunning = true;
+		
+	}
+	if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {		
+		windowRunning = false;
+	}
+	if (ImGui::MenuItem("Save", "", !windowRunning, windowRunning)) {
+
+	}
+	ImGui::EndMainMenuBar();
 	ImGui::Begin("gameViewWindow");
+
 	ImVec2 size = ImGui::GetContentRegionAvail();	
 	size.x -= ImGui::GetScrollX();
 	size.y -= ImGui::GetScrollY();
@@ -88,6 +94,8 @@ void geProject::ImguiWindow::gameViewWindow() {
 	viewSize = size;
 	ImGui::End();
 	ImGui::SetCursorPos(position);
+	//std::cout << "ViewPos X: " << viewPos[0] << "ViewPos Y: " <<  viewPos[1] << std::endl;
+	//std::cout << " ViewSize X: " << viewSize[0] << " ViewSize Y: " << viewSize[1] << std::endl;
 }
 
 ImVec2 geProject::ImguiWindow::getViewPos() { return viewPos; }
