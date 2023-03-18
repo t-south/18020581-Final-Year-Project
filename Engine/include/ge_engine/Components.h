@@ -4,15 +4,12 @@
 #include "../src/Memory/PoolAllocator.h"
 
 namespace geProject {
-
-
-
 	struct Transform {
 		unsigned int id = 1;
 		glm::vec2 position{ 0 };
 		glm::vec2 scale{ 0 };
 		int rotation{ 0};
-		glm::vec3 dirtyFlag{ 0,0,-1 };
+		glm::vec3 dirtyFlag{0,0,-1 };
 	};
 
 	struct SpriteRender {
@@ -22,8 +19,7 @@ namespace geProject {
 		glm::vec2 texturePos[4] = { glm::vec2{1.0f, 1.0f}, glm::vec2{1.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 1.0f} };
 		GLuint textureId{ 0 };
 		unsigned int spriteSheetId{ 0 }; // 0 == no spritesheet
-		unsigned int zIndex {0};
-		glm::vec3 dirtyFlag{ 0,0,0 }; // dirtyflag  -- renderbatch -- index
+		unsigned int zIndex {0}; 		
 	};
 
 	struct Rigidbody {

@@ -11,7 +11,6 @@
 #include "../SceneManager/LevelScene.h"
 #include "../Clock/Clock.h"
 
-
 namespace geProject {
 	class Application
 	{
@@ -27,6 +26,8 @@ namespace geProject {
 		ImguiWindow* imguiWindow;
 		FrameBuffer* frameBuffer;
 		FrameBuffer* selectionTextures;
+		void loadGame(GameLoadEvent* load);
+		
 	};
 	
 	Application* CreateApplication();

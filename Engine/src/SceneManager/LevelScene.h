@@ -22,6 +22,8 @@ namespace geProject {
 	private:
 		Camera* camera{nullptr};
 		void init();
-
+		virtual void startGamePlay(GameStartEvent* start) override;
+		virtual void stopGamePlay(GameStopEvent* stop) override;
+		virtual void saveGame(GameSaveEvent* save) override;
 	};
 }

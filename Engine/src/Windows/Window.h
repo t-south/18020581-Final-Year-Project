@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 #include <iostream>
+#include <ge_engine/Core.h>
 
 namespace geProject {
 	class Window
@@ -15,6 +16,8 @@ namespace geProject {
 		int getWidth();
 		int getHeight();
 		static void window_size_callback(GLFWwindow* window, int width, int height);
+		void startGamePlay(GameStartEvent* start);
+		void stopGamePlay(GameStopEvent* stop);
 	private:
 		int width, height;
 		const char* title;

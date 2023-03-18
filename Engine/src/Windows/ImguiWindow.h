@@ -6,6 +6,7 @@
 #include "../SceneManager/Scene.h"
 #include "../Render/FrameBuffer.h"
 #include <GLFW/glfw3.h>
+#include <ge_engine/Core.h>
 
 
 
@@ -31,5 +32,6 @@ namespace geProject {
 		void dockWindow();
 		bool windowRunning{ false };
 		void gameViewWindow();
+		bool loadLevel{ false };
 	};
 }

@@ -1,5 +1,6 @@
 #include "ImguiWindow.h"
 
+
 //credit to https: //github.com/ocornut/imgui/blob/master/examples/example_glfw_opengl3/main.cpp -- an imgui example
 geProject::ImguiWindow::ImguiWindow(GLFWwindow* m_window, int windowWidth, int windowHeight, FrameBuffer* fBuffer): windowWidth(windowWidth), windowHeight(windowHeight){
 	frameBuffer = fBuffer;
@@ -64,15 +65,25 @@ void geProject::ImguiWindow::dockWindow(){
 void geProject::ImguiWindow::gameViewWindow() {
 	ImGui::BeginMainMenuBar();
 	if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
+		eventSystem.publish(new GameStartEvent());
 		windowRunning = true;
-		
 	}
-	if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {		
+	if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {	
+		eventSystem.publish(new GameStopEvent());
 		windowRunning = false;
 	}
-	if (ImGui::MenuItem("Save", "", !windowRunning, windowRunning)) {
-
+	if (ImGui::Button("Save")) {
+		eventSystem.publish(new GameSaveEvent());
 	}
+	if (ImGui::MenuItem("Editor", "", loadLevel, !loadLevel)) {
+		eventSystem.publish(new GameLoadEvent(1));
+		loadLevel = false;
+	}
+	if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
+		eventSystem.publish(new GameLoadEvent(2));
+		loadLevel = false;
+	}
+
 	ImGui::EndMainMenuBar();
 	ImGui::Begin("gameViewWindow");
 

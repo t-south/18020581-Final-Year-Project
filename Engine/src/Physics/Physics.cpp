@@ -49,8 +49,7 @@ void geProject::Physics::addEntity(Entity& entity) {
 	}
 	b2Body* worldBody = world.CreateBody(&body);
 	worldBody->CreateFixture(&shape, rigid->density);
-
-
+	
 }
 
 void geProject::Physics::update(float deltaTime){

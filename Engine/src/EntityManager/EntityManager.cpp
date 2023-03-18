@@ -73,8 +73,7 @@ void geProject::EntityManager::assignTransform(uInt entityId, Transform transfor
 
 
 void geProject::EntityManager::assignSpriteRender(uInt entityId, SpriteRender sprite) {
-	if (entityId < maxEntities && entityId >= 0) {
-		sprite.dirtyFlag[0] = 1;
+	if (entityId < maxEntities && entityId >= 0) {	
 		sprite.entityId = entityId;
 		std::memcpy(componentSpriteRender[entityId], &sprite, sizeof(SpriteRender));	
 		entities[entityId].compMask = entities[entityId].compMask | sprite.id;
@@ -248,8 +247,7 @@ geProject::BoxCollider* geProject::EntityManager::getBoxColliderComponent(uInt e
 }
 
 
-void geProject::EntityManager::reloadManager() {
-	
+void geProject::EntityManager::reloadManager() {	
 	for (int i = 0; i < entities.size(); i++) {
 		componentTransforms[i]->id = 0;
 		componentSpriteRender[i]->id = 0;
@@ -337,7 +335,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 		if (ImGui::DragInt("zIndex", &zIndex, 1, 0, 10, "%d", 1)) {
 			if (zIndex != sprite->zIndex) {
 				sprite->zIndex = zIndex;
-				sprite->dirtyFlag[0] = 1;
+				transform->dirtyFlag[0] = 1;
 				entityUpdated = true;
 			}
 		}

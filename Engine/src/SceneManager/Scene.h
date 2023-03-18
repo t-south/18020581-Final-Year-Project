@@ -8,6 +8,7 @@
 #include "../Windows/Window.h"
 #include "../Render/Renderer.h"
 #include "../Render/FrameBuffer.h"
+#include "../Physics/Physics.h"
 
 
 
@@ -32,7 +33,6 @@ namespace geProject {
 		virtual void setEntityDrag(bool drag) = 0;
 		virtual bool getEntityDrag() = 0;
 		virtual void setPicking() = 0;
-
 		void setWindow(Window* window);
 		void setMouseListener();
 		void setKeyboardListener();
@@ -52,6 +52,7 @@ namespace geProject {
 		EntityManager* manager{ nullptr };
 		Renderer* renderer{ nullptr };
 		FrameBuffer* selectionTextures{ nullptr };
+		Physics* physicsManager{ nullptr };
 
 		//(de)serialisation
 		std::string filePath;
@@ -62,7 +63,7 @@ namespace geProject {
 		void deserialize(std::string filepath);
 
 		//overrides for serialising to/from json
-		void to_json(json& data, FontRender& comp);
+		void to_json(json& data, FontRender& comp);		
 		void to_json(json& data, SpriteRender& comp);
 		void to_json(json& data, Transform& comp);
 		void to_json(json& data, Rigidbody& comp);
@@ -76,6 +77,10 @@ namespace geProject {
 		void from_json(json& data, CircleCollider& comp);
 		void from_json(json& data, BoxCollider& comp);
 
+		//event listeners
+		virtual void startGamePlay(GameStartEvent* start) = 0;
+		virtual void stopGamePlay(GameStopEvent* stop) = 0;
+		virtual void saveGame(GameSaveEvent* save) = 0;
 
 	};
 }

@@ -5,7 +5,9 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	gridHeight = 32;
 	resourceManager = new ResourceManager();
 	//resourceManager->loadLevel();
-
+	eventSystem.subscribe(this, &LevelEditorScene::startGamePlay);
+	eventSystem.subscribe(this, &LevelEditorScene::stopGamePlay);
+	eventSystem.subscribe(this, &LevelEditorScene::saveGame);
 	std::cout << "Editor Scene!" << std::endl;	
 	manager = new EntityManager(10000);
 	renderer = new Renderer(*(resourceManager));
@@ -27,11 +29,12 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	unsigned int blend1 = resourceManager->loadTexture("../../../../Game/assets/images/blendImage1.png");
 	unsigned int blend2 = resourceManager->loadTexture("../../../../Game/assets/images/blendImage2.png");
 	//unsigned int red = resourceManager->loadTexture("../../../../Game/assets/images/red.jpg");
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/decorationsAndBlocks.png", 81, 16, 16, 0, 3));
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/icons.png", 16, 32, 32, 0, 3));
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/spritesheet.png", 26, 16, 16, 0, 3));
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 3));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/decorationsAndBlocks.png", 81, 16, 16, 0, 0));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/icons.png", 16, 32, 32, 0, 0));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/spritesheet.png", 26, 16, 16, 0, 0));
+	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 0));
 	selectionTextures = new FrameBuffer(1920, 1080, true);
+	physicsManager = new Physics(*manager);
 }
 
 
@@ -113,7 +116,16 @@ void geProject::LevelEditorScene::init() {
 }
 
 size_t geProject::LevelEditorScene::addEntityToScene(unsigned int entityId){
-	entities.push_back(manager->getEntity(entityId));
+	auto entity = manager->getEntity(entityId);
+	entities.push_back(entity);
+	physicsManager->addEntity(*entity);
+	if ((entity->compMask & 16) == 16) {
+		auto box = manager->getBoxColliderComponent(entity->id);
+		auto trans = manager->getTransformComponent(entity->id);
+		glm::vec2 centre = glm::vec2(trans->position[0] , trans->position[1]) + box->offset;
+		editor->addBox(centre, box->centre, glm::vec4(0,1,0,1), trans->rotation, 300);
+	}
+	
 	//renderer->addSpriteToBatch(manager->getSpriteComponent(entityId), manager->getTransformComponent(entityId));
 	return entities.size();
 }
@@ -126,7 +138,8 @@ geProject::Camera* geProject::LevelEditorScene::getCamera() {
 	return editorCam->getCamera();
 }
 
-void geProject::LevelEditorScene::update(float deltaTime) {		
+void geProject::LevelEditorScene::update(float deltaTime) {	
+	
 	setGridLines();
 	editorCam->update(deltaTime);
 	editorCam->getCamera()->projectionUpdate();
@@ -150,12 +163,12 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	//editor->addBox(glm::vec2(400.0f, 200.0f), glm::vec2(64.0f, 32.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0, 1);
 	
 
-	
+	/*
 	
 	editor->addCircle(glm::vec2(x, y), glm::vec3(0.0f, 1.0f, 0.0f), 64.0f, 20, 1);
 	x += 50.0f * deltaTime;
 	y += 50.0f * deltaTime;
-	
+	*/
 
 
 	/*if (testSpritesheet == 18) {
@@ -175,6 +188,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 
 	//DRAG AND DROP
 	if (entityDrag == true) {
+		
 		auto transform = manager->getTransformComponent(activatedEntity);
 		float scroll = editorCam->getCamera()->getScroll();		
 		transform->position[0] = (int)((float)(mouse->getCameraXpos() * scroll) / gridWidth) * (int)(gridWidth) ;
@@ -190,21 +204,24 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	if (manager->hasUpdate()) {
 		entities.clear();
 		for (int i = 0; i < manager->getEntityNum(); i++) {
+			
 			entities.push_back(manager->getEntity(i));			
 			// only sprites that have not been added to the renderer previously will be set to 0
 			auto trans = manager->getTransformComponent(i);
 			auto sprite = manager->getSpriteComponent(i);
+			//transform dirtyflag for render index is by default set to -1 when first created
 			if (trans->dirtyFlag[2] == -1) {				
 				renderer->addSpriteToBatch(sprite, trans);				
 				trans->dirtyFlag[0] = 0;
 			}
-			else if (trans->dirtyFlag[0] > 0) {
+			//if there has been any updates the dirty flag in transform component will be set to 1
+			else if (trans->dirtyFlag[0] == 1) {
 				renderer->updateSprite(sprite, trans);
 			}
 		}
-		manager->endFrame();		
-		Scene::serialize(filePath);
+		manager->endFrame();			
 	}		
+	physicsManager->update(deltaTime);
 	editor->render(*(editorCam->getCamera()));
 	mouse->endFrame();
 	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
@@ -348,4 +365,27 @@ void geProject::LevelEditorScene::setPicking() {
 		//scene->updateImgui();
 	}
 	selectionTextures->unBindPicking();	
+}
+
+
+void geProject::LevelEditorScene::startGamePlay(GameStartEvent* start) {
+	if (start->getType() == Type::gameStart) {
+		std::cout << "starting play" << std::endl;
+		Scene::serialize(filePath);
+	}
+}
+
+void geProject::LevelEditorScene::stopGamePlay(GameStopEvent* stop) {
+	if (stop->getType() == Type::gameStop) {
+		std::cout << "stopping play" << std::endl;
+		activatedEntity = -1;
+		Scene::reloadLevel(filePath);
+	}
+}
+
+void geProject::LevelEditorScene::saveGame(GameSaveEvent* save) { 
+	if (save->getType() == Type::gameSave) {
+		std::cout << "GAME SAVED" << std::endl;
+		Scene::serialize(filePath);
+	}
 }

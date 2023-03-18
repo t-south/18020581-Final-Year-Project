@@ -38,5 +38,8 @@ namespace geProject {
 		virtual void init() override;
 		unsigned int createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY);
 		void setGridLines();
+		virtual void startGamePlay(GameStartEvent* start) override;
+		virtual void stopGamePlay(GameStopEvent* stop) override;
+		virtual void saveGame(GameSaveEvent* save) override;
 	};
 }

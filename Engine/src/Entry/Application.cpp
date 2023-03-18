@@ -1,5 +1,7 @@
 #include "Application.h"
 
+geProject::EventHandler eventSystem;
+
 namespace geProject {
 	Application::Application() {
 
@@ -10,6 +12,8 @@ namespace geProject {
 	}
 
 	void Application::Startup() {
+		eventSystem = EventHandler();
+		eventSystem.subscribe(this, &Application::loadGame);
 		gameWindow = new geProject::Window("game", 1920, 1080);
 		gameClock = Clock::getInstance();
 		sceneManager = new SceneStates();
@@ -93,7 +97,16 @@ namespace geProject {
 
 
 
+	void geProject::Application::loadGame(GameLoadEvent* load) {
+		if (load->getType() == Type::gameLoad) {
+			std::cout << "GAME LOADED" << std::endl;	
+			sceneManager->switchScene(load->sceneId);
+		}
+	}
+
+
 
 }
+
 
 

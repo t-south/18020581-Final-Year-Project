@@ -125,6 +125,7 @@ void geProject::Scene::deserialize(std::string filepath) {
 					manager->assignBoxCollider(entityId, box);
 				}
 				addEntityToScene(entityId);
+				addEntityToScene(entityId);
 			}
 			iFile.close();
 		}
@@ -144,15 +145,14 @@ void geProject::Scene::to_json(json& data, FontRender& comp) {}
 void geProject::Scene::to_json(json& data, SpriteRender& comp) {
 	data = json{
 		"SpriteRender", {		
-		{"colorR", comp.color[0]}, {"colorG", comp.color[1]}, {"colorB", comp.color[2]}, {"colorA", comp.color[3]},
-		{"texturePosX1",comp.texturePos[0][0]}, {"texturePosY1", comp.texturePos[0][1]},
-		{"texturePosX2",comp.texturePos[1][0]}, {"texturePosY2", comp.texturePos[1][1]},
-		{"texturePosX3",comp.texturePos[2][0]}, {"texturePosY3", comp.texturePos[2][1]},
-		{"texturePosX4",comp.texturePos[3][0]}, {"texturePosY4", comp.texturePos[3][1]},
-		{"textureId", comp.textureId},
-		{"spriteSheetId", comp.spriteSheetId},
-		{"zIndex", comp.zIndex},
-		{"dirtyFlag", comp.dirtyFlag[0]}, {"renderBuffer", comp.dirtyFlag[1]}, {"bufferIndex", comp.dirtyFlag[2]}
+			{"colorR", comp.color[0]}, {"colorG", comp.color[1]}, {"colorB", comp.color[2]}, {"colorA", comp.color[3]},
+			{"texturePosX1",comp.texturePos[0][0]}, {"texturePosY1", comp.texturePos[0][1]},
+			{"texturePosX2",comp.texturePos[1][0]}, {"texturePosY2", comp.texturePos[1][1]},
+			{"texturePosX3",comp.texturePos[2][0]}, {"texturePosY3", comp.texturePos[2][1]},
+			{"texturePosX4",comp.texturePos[3][0]}, {"texturePosY4", comp.texturePos[3][1]},
+			{"textureId", comp.textureId},
+			{"spriteSheetId", comp.spriteSheetId},
+			{"zIndex", comp.zIndex}
 		}
 
 	};
@@ -228,9 +228,6 @@ void geProject::Scene::from_json(json& data, SpriteRender& comp) {
 	data[1].at("textureId").get_to(comp.textureId);
 	data[1].at("spriteSheetId").get_to(comp.spriteSheetId);
 	data[1].at("zIndex").get_to(comp.zIndex);
-	data[1].at("dirtyFlag").get_to(comp.dirtyFlag[0]);
-	data[1].at("renderBuffer").get_to(comp.dirtyFlag[1]);
-	data[1].at("bufferIndex").get_to(comp.dirtyFlag[2]);
 }
 
 
@@ -338,3 +335,4 @@ void geProject::Scene::reloadLevel(std::string filepath) {
 	manager->reloadManager();
 	deserialize(filePath);
 }
+

@@ -1,8 +1,8 @@
 #include "Window.h"
 
+
 geProject::Window::Window(const char* m_title, int m_width, int m_height): title(m_title), width(m_width), height(m_height){		
 	//enable glfw errors
-	
 	glfwSetErrorCallback(&glfwError);	
 	if (!glfwInit())
 		throw std::runtime_error("GLFW failed to initialize.");

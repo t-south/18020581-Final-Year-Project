@@ -18,7 +18,7 @@ namespace geProject {
 		void addSpriteToBatch(SpriteRender* sprite, Transform* transform);
 		void updateSprite(SpriteRender* sprite, Transform* transform);
 		static void render(Camera& camera, std::string shaderPath);
-
+		unsigned int getZindexBatch(unsigned int zIndex);
 		void clear();
 	private:
 		ResourceManager* resourceManager;	

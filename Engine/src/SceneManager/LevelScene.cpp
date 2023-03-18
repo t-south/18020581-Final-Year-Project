@@ -28,3 +28,22 @@ void geProject::LevelScene::setEntityDrag(bool drag) {}
 bool geProject::LevelScene::getEntityDrag() { return false; }
 
 void geProject::LevelScene::setPicking(){}
+
+
+void geProject::LevelScene::startGamePlay(GameStartEvent* start) {
+	if (start->getType() == Type::gameStart) {
+		std::cout << "level scene starting play" << std::endl;
+	}
+}
+
+void geProject::LevelScene::stopGamePlay(GameStopEvent* stop) {
+	if (stop->getType() == Type::gameStop) {
+		std::cout << "level scene stopping play" << std::endl;
+	}
+}
+
+void geProject::LevelScene::saveGame(GameSaveEvent* save) {
+	if (save->getType() == Type::gameSave) {
+
+	}
+}

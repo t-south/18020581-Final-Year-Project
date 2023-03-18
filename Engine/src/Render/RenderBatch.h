@@ -30,6 +30,8 @@ namespace geProject {
 		void render(Camera& camera, std::string shaderPath);
 		unsigned int getSpriteNum();
 		unsigned int getZindex();
+		void removeVertices(unsigned int index);
+		int getUnusedRenderSection();
 	private:
 		unsigned int vao, vbo, maxBatch, vertSize, spriteNum, zIndex;
 		bool hasUpdate{ true };

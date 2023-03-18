@@ -76,10 +76,8 @@ void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transfor
 		else if (sprite->spriteSheetId > 0) {
 			textures[sprite->textureId] = resourceManager->requestSpriteSheet(sprite->textureId);
 		}		
-		transform->dirtyFlag[2] = index;
-		sprite->dirtyFlag[2] = index + 2;
-		transform->dirtyFlag[0] = 0;
-		sprite->dirtyFlag[0] = 0;
+		transform->dirtyFlag[2] = index;	
+		transform->dirtyFlag[0] = 0;	
 		createVertices(sprite, transform, index);
 		hasUpdate = true;
 		spriteNum++;
@@ -92,8 +90,7 @@ void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transfor
 void geProject::RenderBatch::updateSprite(SpriteRender* sprite, Transform* transform) {
 	if (sprite->zIndex == zIndex) {
 		createVertices(sprite, transform, transform->dirtyFlag[2]);
-		transform->dirtyFlag[0] = 0;
-		sprite->dirtyFlag[0] = 0;
+		transform->dirtyFlag[0] = 0;	
 		hasUpdate = true;
 	}
 }
@@ -102,7 +99,6 @@ void geProject::RenderBatch::updateSprite(SpriteRender* sprite, Transform* trans
 void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* transform, unsigned int index) {
 	glm::vec2 centre = getCentre(transform->position, glm::vec2(transform->position[0] + (1 * transform->scale.x), transform->position[1] + (1 * transform->scale.y)));//getCentre(transform->position, glm::vec2(transform->position[0] + (0 * transform->scale.x), transform->position[1] + (1 * transform->scale.y)));
 	for (int i = 0; i < 4; i++) {
-
 		switch (i) {
 		case 0:
 			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
@@ -138,6 +134,12 @@ void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* tra
 		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 8] = (float)sprite->textureId; // texture id
 		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] = (float)sprite->entityId + 1;
 		index += vertSize;
+	}
+}
+
+void geProject::RenderBatch::removeVertices(unsigned int index) {
+	for (int i = index; i < index + (4*vertSize); i++) {
+		vertices[i] = 0;
 	}
 }
 
@@ -210,7 +212,14 @@ void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 	shader->detach();
 }
 
-
+int geProject::RenderBatch::getUnusedRenderSection() {
+	for (int i = 0; i < vertices.size(); i++) {
+		if (vertices[i] == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 unsigned int geProject::RenderBatch::getSpriteNum() {
 	return spriteNum;
