@@ -2,16 +2,9 @@
 #include "Camera.h"
 
 namespace geProject {
-	class LevelCamera {
+	class LevelCamera : public Camera {
 	public:
-		LevelCamera(MouseListener& mouse, Camera& camera);
-		~LevelCamera();
-		void update(float deltaTime);
-
-	private:
-		glm::vec2 prevClick;
-		float drag{ 0.1f };
-		MouseListener* mouseListen;
-		Camera* camera;
+		LevelCamera(glm::vec2 pos);
+		void update(float dt);
 	};
 }

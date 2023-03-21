@@ -33,5 +33,7 @@ namespace geProject {
 		bool windowRunning{ false };
 		void gameViewWindow();
 		bool loadLevel{ false };
+		ImVec2 getViewPortCentre(ImVec2 size);
+		ImVec2 getMaxViewPort();
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "../Cameras/LevelCamera.h"
 namespace geProject {
 	class LevelScene : public Scene {
 	public:
@@ -14,7 +15,6 @@ namespace geProject {
 		virtual std::vector<Entity*> getEntities() override;
 		virtual void render(std::string shaderPath) override;
 		virtual void setActiveEntity(int entityId) override;
-		virtual void setCameraControlLayout() override;
 		virtual unsigned int getActiveEntity() override;
 		virtual void setEntityDrag(bool drag) override;
 		virtual bool getEntityDrag() override;
@@ -22,8 +22,6 @@ namespace geProject {
 	private:
 		Camera* camera{nullptr};
 		void init();
-		virtual void startGamePlay(GameStartEvent* start) override;
-		virtual void stopGamePlay(GameStopEvent* stop) override;
 		virtual void saveGame(GameSaveEvent* save) override;
 	};
 }

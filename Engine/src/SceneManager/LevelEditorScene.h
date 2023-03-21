@@ -10,23 +10,23 @@ namespace geProject {
 		~LevelEditorScene();		
 		virtual void update(float deltaTime) override;	
 		virtual size_t addEntityToScene(unsigned int entityId) override;
-		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) override;
-		virtual Camera* getCamera() override;
+		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) override;	
 		virtual void updateImgui() override;
 		virtual void updateSceneImgui() override;
 		virtual std::vector<Entity*> getEntities() override;
 		virtual void render(std::string shaderPath) override;
 		virtual void setActiveEntity(int entityId) override;
-		virtual void setCameraControlLayout() override;
 		virtual unsigned int getActiveEntity() override;
 		virtual void setEntityDrag(bool drag) override;
 		virtual bool getEntityDrag() override;
-		virtual void setPicking() override;
+		
+		virtual void setPicking() override;		
 	private:
 		int activatedEntity{ -1 };
-		int gridWidth, gridHeight;
+		float gridWidth, gridHeight;
 		bool entityDrag{ false };	
 		bool entityClicked{ false };
+	
 		EditorCamera* editorCam;
 		EditorRender* editor;
 		std::vector<unsigned int> sprites;
@@ -38,8 +38,7 @@ namespace geProject {
 		virtual void init() override;
 		unsigned int createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY);
 		void setGridLines();
-		virtual void startGamePlay(GameStartEvent* start) override;
-		virtual void stopGamePlay(GameStopEvent* stop) override;
 		virtual void saveGame(GameSaveEvent* save) override;
+		
 	};
 }

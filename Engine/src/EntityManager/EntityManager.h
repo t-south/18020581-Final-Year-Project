@@ -1,4 +1,6 @@
 #pragma once
+
+#include <ge_engine/Core.h>
 #include <vector>
 #include <ge_engine/Entity.h>
 #include <ge_engine/Components.h>
@@ -18,6 +20,7 @@ namespace geProject {
 		uInt addEntity();
 		uInt getEntityNum();
 		Entity* getEntity(uInt entityId);
+		std::vector<Entity> getEntities();
 		//Components
 		void assignTransform(uInt entityId, Transform transform);
 		void assignSpriteRender(uInt entityId, SpriteRender sprite);
@@ -46,6 +49,7 @@ namespace geProject {
 		bool hasUpdate();
 		void endFrame();
 		void reloadManager();
+		void assignUpdate();
 	private:		
 		bool entityUpdated;
 		uInt maxEntities;
@@ -57,5 +61,14 @@ namespace geProject {
 		std::vector <FontRender*> componentFontRender;
 		unsigned int playerId;
 		std::vector<Entity> entities;	
+		glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
+
+		void updateTransform(TransformEvent* event);
+		void updateSprite(SpriteEvent* event);
+		void updateRigidBody(RigidEvent* event);
+		void updateBoxCollider(BoxColliderEvent* event);
+		void updateCircleCollider(CircleColliderEvent* event);
+
+
 	};
 }

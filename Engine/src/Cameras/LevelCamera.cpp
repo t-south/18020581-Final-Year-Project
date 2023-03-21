@@ -1,10 +1,12 @@
 #include "LevelCamera.h"
 
 
-geProject::LevelCamera::LevelCamera(MouseListener& mouse, Camera& camera) {
-	mouseListen = &mouse;	
+geProject::LevelCamera::LevelCamera(glm::vec2 pos) {
+	position = glm::vec3(pos, 0.0f);   
+	projectionUpdate();
 }
 
-geProject::LevelCamera::~LevelCamera() {}
+void geProject::LevelCamera::update(float dt) {
+	deltaTime = dt;
+}
 
-void geProject::LevelCamera::update(float deltaTime){}

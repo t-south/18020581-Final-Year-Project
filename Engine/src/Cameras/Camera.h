@@ -1,19 +1,19 @@
 #pragma once
 //using GLM library --- https: //github.com/g-truc/glm ---
+#define GLFW_INCLUDE_NONE
 #include <glm/vec2.hpp>
 #include <examples/libs/glfw/include/GLFW/glfw3.h>
 #include <glm/mat4x4.hpp>
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
-#include "../Inputs/MouseListener.h"
+#include <ge_engine/Core.h>
 
 //orthographic camera for 2d games
 //converts from world coordinates to normalised device coordinates
 namespace geProject {
 	class Camera {
-	public:
-		Camera(glm::vec2 pos);
-		~Camera();
+	public:		
+		virtual ~Camera();
 		void projectionUpdate();
 		glm::mat4 getViewMatrix();
 		glm::mat4 getProjection();
@@ -24,21 +24,25 @@ namespace geProject {
 		glm::vec2 getPosition();
 		void setPosition(glm::vec2 pos);
 		void setScroll(float scale);
-		float getScroll();
-	private:		
+		float getScroll();	
+		virtual void update(float dt) = 0;		
+	protected:		
 		//camera facing direction		
-		glm::vec3 position;
-		glm::vec3 direction;
+		static glm::vec3 position;
+		static glm::vec3 direction;
 		//x axis
-		glm::vec3 right;
+		static glm::vec3 right;
 		//y axis is upward direction
-		glm::vec3 up;
-		glm::vec2 projSize;
+		static glm::vec3 up;
+		static glm::vec2 projSize;
 		//where is the camera in relation to world
-		glm::mat4 view, viewInv;
+		static glm::mat4 view, viewInv;
 		//maps to screen size
-		glm::mat4 projection, projInv;
-		float scroll;
-	
+		static glm::mat4 projection, projInv;
+		static glm::vec2 prevClick;
+		float drag{ 0.0f };
+		static float scroll;
+		float deltaTime{ 0.0f };
+		bool mouseDown{ false };			
 	};
 }

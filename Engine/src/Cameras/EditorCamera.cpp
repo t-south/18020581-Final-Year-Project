@@ -1,48 +1,74 @@
 #include "EditorCamera.h"
 #include <iostream>
 
-
-geProject::EditorCamera::EditorCamera(Camera& cam) {
-	camera = &cam;
-
+geProject::EditorCamera::EditorCamera(glm::vec2 pos){
+	position = glm::vec3(pos, 0.0f);
+	eventSystem.subscribe(this, &EditorCamera::cameraMouseButton);
+	eventSystem.subscribe(this, &EditorCamera::cameraMouseScrolled);
+	eventSystem.subscribe(this, &EditorCamera::mouseMoved);
+	projectionUpdate();
 }
 
-geProject::EditorCamera::~EditorCamera() {}
+void geProject::EditorCamera::update(float dt) {
+	projectionUpdate();
+	deltaTime = dt;
+	eventSystem.handleEvents(Type::mousePressed);
+	eventSystem.handleEvents(Type::mouseMove);
+	eventSystem.handleEvents(Type::mouseScroll);
+}
 
 
-void geProject::EditorCamera::update(float deltaTime) {
-	if (mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE) && drag > 0) {
-		prevClick = glm::vec2(mouseListen->getCameraXpos(), mouseListen->getCameraYpos());
+void geProject::EditorCamera::cameraMouseButton(MouseButtonEvent* mouse){		
+	if (mouse->mouseButton == GLFW_MOUSE_BUTTON_MIDDLE && mouse->mouseButtonDown == GLFW_PRESS) {			
+		mouseDown = true;
+	}
+	else if (GLFW_MOUSE_BUTTON_MIDDLE && mouse->mouseButtonDown == GLFW_RELEASE) {
+		mouseDown = false;
+	}	
+}
+
+
+void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {
+	//std::cout << "Mouse X: " << drag << std::endl;
+	projectionUpdate();
+	if (mouseDown) {
+		if (prevClick[0] == 0 && prevClick[1] == 0) {
+			prevClick[0] = mouse->posX;
+			prevClick[1] =  mouse->posY;
+			drag -= deltaTime;
+		}
 		drag -= deltaTime;
-
-	}
-	else if (mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
-		glm::vec2 cameraPos = glm::vec2(mouseListen->getCameraXpos(), mouseListen->getCameraYpos());
-		cameraPos = (prevClick - cameraPos);
-		cameraPos = camera->getPosition() - cameraPos * (deltaTime * 10.0f);
+		glm::vec2 cameraPos = glm::vec2(mouse->posX, mouse->posY);
+		cameraPos = prevClick - cameraPos;
+		cameraPos = getPosition() - cameraPos * (deltaTime * 2.0f);
 		//interpolate between origin of drag and the new camera position
-		prevClick[0] = prevClick[0] * (1.0 - deltaTime) + (mouseListen->getCameraXpos() * deltaTime);
-		prevClick[1] = prevClick[1] * (1.0 - deltaTime) + (mouseListen->getCameraYpos() * deltaTime);
-		camera->setPosition(camera->getPosition() - cameraPos);
+		prevClick[0] = prevClick[0] * (1.0 - deltaTime) + (mouse->posX * deltaTime);
+		prevClick[1] = prevClick[1] * (1.0 - deltaTime) + (mouse->posY * deltaTime);
+		setPosition(getPosition() - cameraPos);
+		//std::cout << "cameraPosX : " << cameraPos[0] << " cameraPosY: " << cameraPos[1] << std::endl;
 	}
-	if (drag <= 0 && !mouseListen->mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE)) {
+	if (drag <= 0 && !mouseDown) {
 		drag = 0.1f;
-	}
-	float mouseX = mouseListen->getScreenXpos();
-	float mouseY = mouseListen->getScreenYpos();
+	}	
 
-	if (mouseListen->getYscroll() != 0.0f && (mouseX >= 0.0f && mouseX <= 1920.0f) && (mouseY >= 0.0f && mouseY <= 1080.0f)) {
-		auto scrollval = mouseListen->getYscroll();
+}
+
+void geProject::EditorCamera::cameraMouseScrolled(MouseScrollEvent* scroll){
+	//std::cout << "Context: " << scroll->getContexts() << " Type: " << scroll->getType() << std::endl;
+	auto scrollval = scroll->yScroll;
+	if (scrollval != 0.0f && (scroll->screenX >= 0.0f && scroll->screenX <= 1920.0f) && (scroll->screenY >= 0.0f && scroll->screenY <= 1080.0f)) {		
 		int signum = (0 < scrollval) - (scrollval < 0);
-		camera->setScroll(pow(abs(mouseListen->getYscroll()), 1 / camera->getScroll()) * 0.2f * -signum);
+		setScroll(pow(abs(scrollval), 1 / getScroll()) * 0.2f * -signum);
 	}
 
-
 }
 
-geProject::Camera* geProject::EditorCamera::getCamera() {
-	return camera;
-}
 
-void geProject::EditorCamera::setKeyboardListener(KeyboardListener& key) { keyboard = &key; }
-void geProject::EditorCamera::setMouseListener(MouseListener& mouse) { mouseListen = &mouse; }
+
+
+
+
+
+
+
+

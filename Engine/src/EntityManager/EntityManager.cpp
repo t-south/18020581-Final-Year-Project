@@ -25,12 +25,12 @@ geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntiti
 		componentBoxCollider.push_back(reinterpret_cast<BoxCollider*>(boxPool.allocate(sizeof(BoxCollider))));
 		componentBoxCollider[i]->id = 0;
 	}
-	std::cout << "Transform size : " << sizeof(Transform) << std::endl;
-	std::cout << "SpriteRender size : " << sizeof(SpriteRender) << std::endl;
-	std::cout << "FontRender size : " << sizeof(FontRender) << std::endl;
-	std::cout << "Rigidbody size : " << sizeof(Rigidbody) << std::endl;
-	std::cout << "CircleCollider size : " << sizeof(CircleCollider) << std::endl;
-	std::cout << "BoxCollider size : " << sizeof(BoxCollider) << std::endl;
+
+	eventSystem.subscribe(this, &EntityManager::updateTransform);
+	eventSystem.subscribe(this, &EntityManager::updateSprite);
+	eventSystem.subscribe(this, &EntityManager::updateRigidBody);
+	eventSystem.subscribe(this, &EntityManager::updateBoxCollider);
+	eventSystem.subscribe(this, &EntityManager::updateCircleCollider);
 }
 
 geProject::EntityManager::~EntityManager(){}
@@ -60,7 +60,9 @@ void geProject::EntityManager::assignTransform(uInt entityId, Transform transfor
 			transform.dirtyFlag[2] = -1;
 		}
 		transform.dirtyFlag[0] = 1;
-		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));		
+		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));	
+		auto box = componentTransforms[entityId];
+		box->centre = getCentre(box->position, glm::vec2(box->position[0] + (1 * box->scale.x), box->position[1] + (1 * box->scale.y)));
 		entities[entityId].compMask = entities[entityId].compMask | transform.id;
 		entityUpdated = true;
 	}
@@ -114,6 +116,7 @@ void geProject::EntityManager::assignCircleCollider(uInt entityId, CircleCollide
 void geProject::EntityManager::assignBoxCollider(uInt entityId, BoxCollider box) {
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentBoxCollider[entityId], &box, sizeof(BoxCollider));
+		auto transform = componentTransforms[entityId];		
 		entities[entityId].compMask = entities[entityId].compMask | box.id;
 		entityUpdated = true;	
 	}
@@ -185,23 +188,6 @@ void geProject::EntityManager::deleteComponent(uInt entityId, uInt componentId) 
 }
 
 
-/*
-template <class T>
-std::vector<T> geProject::EntityManager::getComponents(int componentId){	
-	switch (componentId) {
-	case 1:
-		return componentTransforms;
-	case 2:
-		return componentSpriteRender;
-	case 4:
-		return componentFontRender;
-	default:
-		break;
-	}
-	
-}*/
-
-
 std::vector<geProject::Transform*> geProject::EntityManager::getTransformComponents() {
 	return componentTransforms;
 }
@@ -259,6 +245,43 @@ void geProject::EntityManager::reloadManager() {
 	entities.clear();
 }
 
+void geProject::EntityManager::assignUpdate(){
+	entityUpdated = true;
+}
+
+glm::vec2 geProject::EntityManager::getCentre(glm::vec2 bLeft, glm::vec2 tRight){
+	glm::vec2 centre{};
+	centre[0] = (bLeft[0] + tRight[0]) / 2;
+	centre[1] = (bLeft[1] + tRight[1]) / 2;
+	return centre;
+}
+
+
+//EVENT LISTENERS
+void geProject::EntityManager::updateTransform(TransformEvent* event){
+	componentTransforms[event->entityId]->position[0] = event->posX;
+	componentTransforms[event->entityId]->position[1] = event->posY;
+	componentTransforms[event->entityId]->rotation = event->rotation;
+	entityUpdated = true;
+	componentTransforms[event->entityId]->dirtyFlag[0] = 1;
+}
+
+void geProject::EntityManager::updateSprite(SpriteEvent* event){
+	assignSpriteRender(event->entityId, *event->sprite);
+}
+
+void geProject::EntityManager::updateRigidBody(RigidEvent* event){
+	assignRigidBody(event->entityId, *event->rigidbody);
+}
+
+void geProject::EntityManager::updateBoxCollider(BoxColliderEvent* event){
+	assignBoxCollider(event->entityId, *event->boxcollider);
+}
+
+void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event){
+	assignCircleCollider(event->entityId, *event->circlecollider);
+}
+
 
 
 unsigned int geProject::EntityManager::getEntityNum() {
@@ -266,55 +289,67 @@ unsigned int geProject::EntityManager::getEntityNum() {
 }
 
 geProject::Entity* geProject::EntityManager::getEntity(uInt entityId) {
-	return &entities[entityId];
+	if (entities.size() > 0) {
+		return &entities[entityId];
+	}
+}
+
+std::vector<geProject::Entity> geProject::EntityManager::getEntities(){
+	return entities;
 }
 
 void geProject::EntityManager::endFrame() {
 	entityUpdated = false;
 }
 
+
+//IMGUI
 void geProject::EntityManager::updateImgui(uInt entityId) {
 	auto entity = getEntity(entityId);
 	auto sprite  = getSpriteComponent(entityId);
-	auto transform = getTransformComponent(entityId);
+	auto trans = getTransformComponent(entityId);
 	//TRANSFORM IMGUI updates
-	float positionX = transform->position[0];
-	float positionY = transform->position[1];
-
+	float positionX = trans->position[0];
+	float positionY = trans->position[1];
+	bool transformUpdate = false;
+	bool spriteUpdate = false;
+	bool rigidUpdate = false;
+	bool boxUpdate = false;
+	bool circleUpdate = false;
 	if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+		
 		if (ImGui::DragFloat("positonX", &positionX)) {
-			if (positionX != transform->position[0]) {
-				transform->position[0] = positionX;
-				entityUpdated = true;
-				transform->dirtyFlag[0] = 1;
+			if (positionX != trans->position[0]) {
+				trans->position[0] = positionX;
+				transformUpdate = true;
+				trans->dirtyFlag[0] = 1;
 			}
 		}
-
 		if (ImGui::DragFloat("positonY", &positionY)) {
-			if (positionY != transform->position[1]) {
-				transform->position[1] = positionY;
-				entityUpdated = true;
-				transform->dirtyFlag[0] = 1;
+			if (positionY != trans->position[1]) {
+				trans->position[1] = positionY;
+				transformUpdate = true;
+				trans->dirtyFlag[0] = 1;
 			}
 		}
-		float scaleX = transform->scale[0];
-		float scaleY = transform->scale[1];
+		float scaleX = trans->scale[0];
+		float scaleY = trans->scale[1];
 		if (ImGui::DragFloat("scaleX", &scaleX)) {
-			if (scaleX != transform->scale[0]) {
-				transform->scale[0] = scaleX;
-				entityUpdated = true;
-				transform->dirtyFlag[0] = 1;
+			if (scaleX != trans->scale[0]) {
+				trans->scale[0] = scaleX;
+				transformUpdate = true;
+				trans->dirtyFlag[0] = 1;
 			}
 		}
 		if (ImGui::DragFloat("scaleY", &scaleY)) {
-			if (scaleY != transform->scale[1]) {
-				transform->scale[1] = scaleY;
-				entityUpdated = true;
-				transform->dirtyFlag[0] = 1;
+			if (scaleY != trans->scale[1]) {
+				trans->scale[1] = scaleY;
+				transformUpdate = true;
+				trans->dirtyFlag[0] = 1;
 			}
 		}
 
-		int rotation = transform->rotation;
+		int rotation = trans->rotation;
 		if (ImGui::DragInt("rotation", &rotation)) {
 			if (rotation >= 0) {
 				rotation = rotation % 360;
@@ -322,21 +357,34 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			else if (rotation < 0) {
 				rotation = rotation % -360;
 			}
-			if (rotation != transform->rotation) {
-				transform->rotation = rotation;
-				entityUpdated = true;
-				transform->dirtyFlag[0] = 1;
+			if (rotation != trans->rotation) {
+				trans->rotation = rotation;
+				transformUpdate = true;
+				trans->dirtyFlag[0] = 1;
 			}
+		}
+		float centreX = trans->centre[0];
+		float centreY = trans->centre[1];
+		if (ImGui::DragFloat("centreX", &centreX)) {
+			trans->centre[0] = centreX;
+			transformUpdate = true;
+		}
+		if (ImGui::DragFloat("centreY", &centreY)) {
+			trans->centre[1] = centreY;
+			transformUpdate = true;
+		}
+		if (entityUpdated) {
+			//eventSystem.publishImmediately(new TransformEvent(entityId, density));
 		}
 	}
 	//SPRITE IMGUI updates
-	if (ImGui::CollapsingHeader("Sprite Component", ImGuiTreeNodeFlags_DefaultOpen)) {
+	if (ImGui::CollapsingHeader("Sprite Component")) {
 		int zIndex = sprite->zIndex;
 		if (ImGui::DragInt("zIndex", &zIndex, 1, 0, 10, "%d", 1)) {
 			if (zIndex != sprite->zIndex) {
 				sprite->zIndex = zIndex;
-				transform->dirtyFlag[0] = 1;
-				entityUpdated = true;
+				trans->dirtyFlag[0] = 1;
+				spriteUpdate = true;
 			}
 		}
 
@@ -347,14 +395,13 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			sprite->color[1] = color.y;
 			sprite->color[2] = color.z;
 			sprite->color[3] = color.w;
-			transform->dirtyFlag[0] = 1;
-			entityUpdated = true;
+			trans->dirtyFlag[0] = 1;
+			spriteUpdate = true;
 		}
 	}
 
 	//RIGIDBODY IMGUI updates
-	if ((entity->compMask & 4) == 4) {
-		ImGui::Columns(2);
+	if ((entity->compMask & 4) == 4) {		
 		if (ImGui::CollapsingHeader("RigidBody component")) {
 			auto rigid = getRigidBodyComponent(entityId);
 			int collider = rigid->collider;
@@ -370,86 +417,81 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			int bType = rigid->bodyType;
 			if (ImGui::DragInt("rigidBody", &collider)) {
 				rigid->collider = collider;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragFloat("friction", &friction)) {
 				rigid->friction = friction;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragFloat("angular damping", &aDamp)) {
 				rigid->angularDamping = aDamp;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragFloat("linear damping", &lDamp)) {
 				rigid->linearDamping = lDamp;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
-			if (ImGui::DragFloat("density", &density)) {
+			if (ImGui::InputFloat("density", &density)) {
 				rigid->density = density;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::Checkbox("fixed rotate", &fRotate)) {
 				rigid->fixedRotate = fRotate;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::Checkbox("bullet", &bullet)) {
 				rigid->bullet = bullet;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragInt("bodyType", &bType, 1, 0, 3, "%d", 0)) {
 				rigid->bodyType = bType;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragFloat("velocityX", &velocityX)) {
 				rigid->velocity[0] = velocityX;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragFloat("velocityY", &velocityY)) {
 				rigid->velocity[1] = velocityY;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::DragFloat("velocityZ", &velocityZ)) {
 				rigid->velocity[2] = velocityZ;
-				entityUpdated = true;
+				rigidUpdate = true;
 			}
 			if (ImGui::Button("Delete Rigidbody")) {
 				deleteComponent(entityId, 4);
+			}
+			if (rigidUpdate) {
+				eventSystem.publishImmediately(new RigidEvent(entityId, *rigid));
 			}
 		}
 	}
 
 	//CIRCLE COLLIDER IMGUI updates
-	if ((entity->compMask & 8) == 8) {
-		ImGui::NextColumn();
+	if ((entity->compMask & 8) == 8) {		
 		if (ImGui::CollapsingHeader("Circle Collider Component")) {
 			auto circleCollider = getCircleColliderComponent(entityId);
-			float centreX = circleCollider->centre[0];
-			float centreY = circleCollider->centre[1];
 			float radius = circleCollider->radius;
 			float oX = circleCollider->offset[0];
 			float oY = circleCollider->offset[1];
-			if (ImGui::DragFloat("centreX", &centreX)) {
-				circleCollider->centre[0] = centreX;
-				entityUpdated = true;
-			}
-			if (ImGui::DragFloat("centreY", &centreY)) {
-				circleCollider->centre[1] = centreY;
-				entityUpdated = true;
-			}
 			if (ImGui::DragFloat("radius", &radius)) {
 				circleCollider->radius = radius;
-				entityUpdated = true;
+				circleUpdate = true;
 			}
 			if (ImGui::DragFloat("offsetX", &oX)) {
 				circleCollider->offset[0] = oX;
-				entityUpdated = true;
+				circleUpdate = true;
 			}
 			if (ImGui::DragFloat("offsetY", &oY)) {
 				circleCollider->offset[1] = oY;
-				entityUpdated = true;
+				circleUpdate = true;
 			}
 			if (ImGui::Button("Delete Circle Collider")) {
 				deleteComponent(entityId, 8);
+			}
+			if (circleUpdate) {
+				eventSystem.publishImmediately(new CircleColliderEvent(entityId, *circleCollider));
 			}
 		}
 
@@ -457,46 +499,48 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 
 	}
 	//BOX COLLIDER IMGUI updates
-	if ((entity->compMask & 16) == 16) {
-		ImGui::NextColumn();
+	if ((entity->compMask & 16) == 16) {		
 		if (ImGui::CollapsingHeader("Box Collider Component")) {
 			auto boxCollider = getBoxColliderComponent(entityId);
-			float centreX = boxCollider->centre[0];
-			float centreY = boxCollider->centre[1];
+			float boxSizeX = boxCollider->boxSize[0];
+			float boxSizeY = boxCollider->boxSize[1];
 			float oX = boxCollider->offset[0];
 			float oY = boxCollider->offset[1];
 			float originX = boxCollider->origin[0];
 			float originY = boxCollider->origin[0];
-			if (ImGui::DragFloat("centreX", &centreX)) {
-				boxCollider->centre[0] = centreX;
-				entityUpdated = true;
+			if (ImGui::DragFloat("boxSizeX", &boxSizeX)) {
+				boxCollider->boxSize[0] = boxSizeX;
+				boxUpdate = true;
 			}
-			if (ImGui::DragFloat("centreY", &centreY)) {
-				boxCollider->centre[1] = centreY;
-				entityUpdated = true;
+			if (ImGui::DragFloat("boxSizeY", &boxSizeY)) {
+				boxCollider->boxSize[1] = boxSizeY;
+				boxUpdate = true;
 			}
 			if (ImGui::DragFloat("offsetX", &oX)) {
 				boxCollider->offset[0] = oX;
-				entityUpdated = true;
+				boxUpdate = true;
 			}
 			if (ImGui::DragFloat("offsetY", &oY)) {
 				boxCollider->offset[1] = oY;
-				entityUpdated = true;
+				boxUpdate = true;
 			}
 			if (ImGui::DragFloat("originX", &originX)) {
 				boxCollider->origin[0] = originX;
-				entityUpdated = true;
+				boxUpdate = true;
 			}
 			if (ImGui::DragFloat("originY", &originY)) {
 				boxCollider->origin[1] = originY;
-				entityUpdated = true;
+				boxUpdate = true;
 			}
 			if (ImGui::Button("Delete Box Collider")) {
 				deleteComponent(entityId, 16);
 			}
+			if (boxUpdate) {
+				eventSystem.publishImmediately(new BoxColliderEvent(entityId, *boxCollider));
+			}
 		}
 	}
-
+	entityUpdated = transformUpdate || spriteUpdate || rigidUpdate || boxUpdate || circleUpdate;
 
 
 	if (ImGui::BeginPopupContextWindow("UniqueId")) {
@@ -518,6 +562,8 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 		}
 		ImGui::EndPopup();
 	}
+
+
 
 
 

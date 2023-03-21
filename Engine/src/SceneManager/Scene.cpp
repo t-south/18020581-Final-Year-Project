@@ -1,6 +1,16 @@
 #include "Scene.h"
 
+geProject::Window* geProject::Scene::gameWindow;
 
+//MANAGERS
+geProject::ResourceManager* geProject::Scene::resourceManager;
+geProject::Physics* geProject::Scene::physicsManager;
+geProject::EntityManager* geProject::Scene::manager;
+
+std::string geProject::Scene::getFilePath()
+{
+	return filePath;
+}
 
 void geProject::Scene::serialize(std::string filepath) {
 	oFile.open(filepath);
@@ -163,6 +173,7 @@ void geProject::Scene::to_json(json& data, Transform& comp) {
 			{"positionX", comp.position[0]}, {"positionY", comp.position[1]},
 			{"scaleX", comp.scale[0]}, {"scaleY", comp.scale[1]},
 			{"rotation", comp.rotation},
+			{"circlecentreX", comp.centre[0]}, {"circlecentreY" , comp.centre[1]},
 			{"dirtyFlag", comp.dirtyFlag[0]}, {"renderBuffer", comp.dirtyFlag[1]}, {"bufferIndex", comp.dirtyFlag[2]}
 		}
 	};
@@ -188,8 +199,7 @@ void geProject::Scene::to_json(json& data, Rigidbody& comp) {
 
 void geProject::Scene::to_json(json& data, CircleCollider& comp) {
 	data = json{
-		"CircleCollider", {
-			{"circlecentreX", comp.centre[0]}, {"circlecentreY" , comp.centre[1]},
+		"CircleCollider", {			
 			{"circleRadius", comp.radius},
 			{"circleoffsetX", comp.offset[0]}, {"circleoffsetY", comp.offset[1]}
 		}
@@ -199,8 +209,8 @@ void geProject::Scene::to_json(json& data, CircleCollider& comp) {
 
 void geProject::Scene::to_json(json& data, BoxCollider& comp) {
 	data = json{
-		"BoxCollider", {
-			{"boxcentreX", comp.centre[0]}, {"boxcentreY" , comp.centre[1]},
+		"BoxCollider", {			
+			{"boxSizeX", comp.boxSize[0]}, {"boxSizeY", comp.boxSize[1]},
 			{"boxoffsetX", comp.offset[0]}, {"boxoffsetY", comp.offset[1]},
 			{"boxoriginX", comp.origin[0]}, {"boxoriginY", comp.origin[1]}
 		}
@@ -237,6 +247,8 @@ void geProject::Scene::from_json(json& data, Transform& comp) {
 	data[1].at("scaleX").get_to(comp.scale[0]);
 	data[1].at("scaleY").get_to(comp.scale[1]);
 	data[1].at("rotation").get_to(comp.rotation);
+	data[1].at("circlecentreX").get_to(comp.centre[0]);
+	data[1].at("circlecentreY").get_to(comp.centre[1]);
 	data[1].at("dirtyFlag").get_to(comp.dirtyFlag[0]);
 	data[1].at("renderBuffer").get_to(comp.dirtyFlag[1]);
 	data[1].at("bufferIndex").get_to(comp.dirtyFlag[2]);
@@ -247,9 +259,7 @@ void geProject::Scene::from_json(json& data, CircleCollider& comp) {
 	if (data[1] == 0) {
 		comp.id = 0;
 	}
-	else {
-		data[1].at("circlecentreX").get_to(comp.centre[0]);
-		data[1].at("circlecentreY").get_to(comp.centre[1]);
+	else {		
 		data[1].at("circleRadius").get_to(comp.radius);
 		data[1].at("circleoffsetX").get_to(comp.offset[0]);
 		data[1].at("circleoffsetY").get_to(comp.offset[1]);
@@ -261,8 +271,8 @@ void geProject::Scene::from_json(json& data, BoxCollider& comp) {
 		comp.id = 0;
 	}
 	else {
-		data[1].at("boxcentreX").get_to(comp.centre[0]);
-		data[1].at("boxcentreY").get_to(comp.centre[1]);
+		data[1].at("boxSizeX").get_to(comp.boxSize[0]);
+		data[1].at("boxSizeY").get_to(comp.boxSize[1]);
 		data[1].at("boxoffsetX").get_to(comp.offset[0]);
 		data[1].at("boxoffsetY").get_to(comp.offset[1]);
 		data[1].at("boxoriginX").get_to(comp.origin[0]);
@@ -318,21 +328,22 @@ float geProject::Scene::getMouseX() { return mouse->getYpos(); }
 
 float geProject::Scene::getMouseY() { return mouse->getYpos(); }
 
-void geProject::Scene::setViewPos(float x, float y) {
-	mouse->setViewPos(x, y);
-}
-
-void geProject::Scene::setViewSize(float x, float y) {
-	mouse->setViewSize(x, y);
-}
 
 geProject::MouseListener* geProject::Scene::getMouseListener() {
 	return mouse;
 }
 
 void geProject::Scene::reloadLevel(std::string filepath) {
+	physicsManager->clear();
 	renderer->clear();
-	manager->reloadManager();
-	deserialize(filePath);
+	manager->reloadManager();	
 }
 
+geProject::Camera* geProject::Scene::getCamera(){
+	return camera;
+}
+
+
+void geProject::Scene::setPhysics(bool check) {
+	physicsEnabled = check;
+}

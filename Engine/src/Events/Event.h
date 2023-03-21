@@ -1,26 +1,16 @@
 #pragma once
 
+#include <ge_engine/Components.h>
 
-
-//contexts of input
-//types of input for that context
-
-//convert raw input to context dependent id's
-
-//use callbacks instead of polling, a map of functions will be called depending on context and type
-
-//input every frame
-//current active context is evaluated
-
-//go through ordered list of contexts, if input cant be mapped move onto next context
 namespace geProject {
 	enum Type
 	{
 		NoType, 
-		closeWindow, resizeWindow, focusWindow, stopFocusWindow, moveWindow,
+		closeWindow, viewPort, projection, stopFocusWindow, moveWindow,
 		keyPressed, keyReleased,
 		mousePressed, mouseReleased, mouseMove, mouseScroll,
-		gameStart, gameStop, gameSave, gameLoad
+		gameStart, gameStop, gameSave, gameLoad,
+		transForm, spriteRender, rigidBody, boxCollider, circleCollider
 	};
 	enum Context {
 		NoCategory = 0,				/* 0b0000000000000001 */
@@ -32,15 +22,12 @@ namespace geProject {
 	};
 
 	class Event {
-	public:
-		
 	protected:
 		static Event* instance;
 		Context eventContext;
-		bool eventHandled{ false };
-		virtual bool isEventHandled() const = 0;
-		virtual void setHandled() = 0;
-
+		bool eventHandled{ false };			
+		bool isEventHandled(){ return eventHandled; };
+		void setHandled(){ eventHandled = true; };
 	};
 
 
@@ -50,24 +37,21 @@ namespace geProject {
 	public:	
 		static int getType() { return Type::gameStart; };
 		static int getContexts() { return AppCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
 	class GameStopEvent : public Event {
 	public:
 		static int getType() { return Type::gameStop; };
 		static int getContexts() { return AppCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
 	class GameSaveEvent : public Event {
 	public:
 		static int getType() { return Type::gameSave; };
 		static int getContexts() { return AppCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
 	class GameLoadEvent : public Event {
@@ -76,8 +60,7 @@ namespace geProject {
 		unsigned int sceneId;
 		static int getType() { return Type::gameLoad; };
 		static int getContexts() { return AppCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
 
@@ -90,8 +73,7 @@ namespace geProject {
 	protected:
 		int keycode;
 		KeyEvent(int keycode) : keycode(keycode) {};
-		virtual bool isEventHandled() const = 0;
-		virtual void setHandled() = 0;
+		virtual int getContexts() = 0;
 	};	
 
 	class KeyPressed : public KeyEvent {
@@ -101,8 +83,7 @@ namespace geProject {
 		static int getType() { return Type::keyPressed; };
 		static int getContexts() { return KeyboardCat | InputCat; };
 		inline int getPressedCount() const { return pressedCount; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
 	class KeyReleased : public KeyEvent {
@@ -112,51 +93,110 @@ namespace geProject {
 		static int getType() { return Type::keyReleased; };
 		static int getContexts() { return KeyboardCat | InputCat; };
 		inline int getPressedCount() const { return pressedCount; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
 
 	//MOUSE EVENTS
 
-	class mouseEvent : public Event {
-	protected:
-		mouseEvent(float posX, float posY) : posX(posX), posY(posY) {};
+	class MouseMoveEvent : public Event {
+	public:
+		MouseMoveEvent(float posX, float posY) : posX(posX), posY(posY) {};
 		float posX, posY;
-		virtual bool isEventHandled() const = 0;
-		virtual void setHandled() = 0;
-	};
-
-	class mousePressed : public mouseEvent {
-	public:
-		static int getType() { return Type::mousePressed; };
-		static int getContexts() { return MouseCat | InputCat | MouseButtonCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
-	};
-
-	class mouseReleased : public mouseEvent {
-	public:
-		static int getType() { return Type::mouseReleased; };
-		static int getContexts() { return MouseCat | InputCat | MouseButtonCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
-	};
-
-	class mouseMove : public mouseEvent {
-	public:
 		static int getType() { return Type::mouseMove; };
 		static int getContexts() { return MouseCat | InputCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
 	};
 
-	class mouseScroll : public mouseEvent {
+
+	class MouseScrollEvent : public Event {
 	public:
+		MouseScrollEvent(float xOffset, float yOffset, float screenx, float screeny) : xScroll(xOffset), yScroll(yOffset), screenX(screenx), screenY(screeny) {};
 		static int getType() { return Type::mouseScroll; };
 		static int getContexts() { return MouseCat | InputCat; };
-		virtual bool isEventHandled() const override { return eventHandled; };
-		virtual void setHandled() override { eventHandled = true; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		float xScroll, yScroll, screenX, screenY;
 	};
+
+	class MouseButtonEvent : public Event {
+	public:
+		MouseButtonEvent(int button, bool mouseDown, float posX, float posY) : mouseButton(button), mouseButtonDown(mouseDown), mouseX(posX), mouseY(posY){ };
+		static int getType() { return Type::mousePressed; };
+		static int getContexts() { return MouseCat | InputCat | MouseButtonCat; };	
+		bool contextCheck(Context cat) { return getContexts() & cat; }	
+		int mouseButton;
+		bool mouseButtonDown;	
+		float mouseX, mouseY;
+	};
+
+
+	class TransformEvent : public Event {
+	public:
+		TransformEvent(int id, int posx, int posy, int rotate) : entityId(id), posX(posx), posY(posy), rotation(rotate) {};
+		static int getType() { return Type::transForm; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }		
+		int entityId, posX, posY, rotation;
+	};
+
+	class SpriteEvent : public Event {
+	public:
+		SpriteEvent(int id, SpriteRender& spr) : entityId(id), sprite(&spr) {};
+		static int getType() { return Type::spriteRender; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		SpriteRender* sprite;
+		int entityId;
+	};
+
+	class RigidEvent : public Event {
+	public:
+		RigidEvent(int id, Rigidbody& rigid) : entityId(id), rigidbody(&rigid) {};
+		static int getType() { return Type::rigidBody; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		Rigidbody* rigidbody;
+		int entityId;
+	};
+
+	class BoxColliderEvent : public Event {
+	public:
+		BoxColliderEvent(int id, BoxCollider& box) : entityId(id), boxcollider(&box) {};
+		static int getType() { return Type::boxCollider; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		BoxCollider* boxcollider;
+		int entityId;
+	};
+
+	class CircleColliderEvent : public Event {
+	public:
+		CircleColliderEvent(int id, CircleCollider& circle) : entityId(id), circlecollider(&circle) {};
+		static int getType() { return Type::circleCollider; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		CircleCollider* circlecollider;
+		int entityId;
+	};
+
+
+	class ViewPortEvent : public Event {
+	public:
+		ViewPortEvent(float winposX, float winposY, float winsizeX, float winsizeY): windowPosX(winposX), windowPosY(winposY), windowSizeX(winsizeX), windowSizeY(winsizeY){};
+		static int getType() { return Type::viewPort; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		float windowPosX, windowPosY, windowSizeX, windowSizeY;
+	};
+
+	class ProjectionEvent : public Event {
+	public:
+		ProjectionEvent(float winposX, float winposY, float winsizeX, float winsizeY) : windowPosX(winposX), windowPosY(winposY), windowSizeX(winsizeX), windowSizeY(winsizeY) {};
+		static int getType() { return Type::viewPort; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		float windowPosX, windowPosY, windowSizeX, windowSizeY;
+	};
+
 
 }

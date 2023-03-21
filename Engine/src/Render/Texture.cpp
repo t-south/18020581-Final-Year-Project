@@ -33,7 +33,7 @@ geProject::Texture::Texture(const char* filePath): filePath(filePath), textureHe
 		textureHeight = height;
 		
 		if (nrChannels == 4) {			
-			std::cout << nrChannels << " " << textureWidth << " " << textureHeight << std::endl;
+			//std::cout << nrChannels << " " << textureWidth << " " << textureHeight << std::endl;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}

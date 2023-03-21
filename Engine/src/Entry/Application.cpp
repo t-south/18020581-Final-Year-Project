@@ -13,6 +13,8 @@ namespace geProject {
 
 	void Application::Startup() {
 		eventSystem = EventHandler();
+		eventSystem.subscribe(this, &Application::startGamePlay);
+		eventSystem.subscribe(this, &Application::stopGamePlay);
 		eventSystem.subscribe(this, &Application::loadGame);
 		gameWindow = new geProject::Window("game", 1920, 1080);
 		gameClock = Clock::getInstance();
@@ -25,7 +27,6 @@ namespace geProject {
 		int levelSceneId = sceneManager->addScene(levelScene);
 		//add window to scene, also add mouse listener and keyboard listener
 		sceneManager->getCurrentScene()->setWindow(gameWindow);
-		sceneManager->getCurrentScene()->setCameraControlLayout();
 		//mouse = MouseListener::getInstance();
 		frameBuffer = new FrameBuffer(1920, 1080);
 		int width = gameWindow->getWidth();
@@ -61,11 +62,8 @@ namespace geProject {
 			}*/
 			//SCENE UPDATES
 			//add the view size and position of imgui game window to scene
-			auto viewPos = imguiWindow->getViewPos();
-			auto viewSize = imguiWindow->getViewSize();
-			scene->setViewPos(viewPos.x, viewPos.y);
-			scene->setViewSize(viewSize.x, viewSize.y);
 			scene->update(deltaTime);
+
 			frameBuffer->unBind();
 			//inverse for view has to be taken after render
 
@@ -95,11 +93,33 @@ namespace geProject {
 		glfwSetErrorCallback(NULL);
 	}
 
+	void geProject::Application::startGamePlay(GameStartEvent* start) {
+		if (start->getType() == Type::gameStart) {			
+			std::cout << "starting play" << std::endl;
+			auto scene = sceneManager->getCurrentScene();
+			scene->serialize(scene->getFilePath());
+			scene->setPhysics(true);
+			scene->setActiveEntity(-1);				
+		}
+	}
 
+	void geProject::Application::stopGamePlay(GameStopEvent* stop) {
+		if (stop->getType() == Type::gameStop) {
+			std::cout << "stopping play" << std::endl;
+			auto scene = sceneManager->getCurrentScene();
+			scene->reloadLevel(scene->getFilePath());	
+			scene->setPhysics(false);
+			scene = sceneManager->getCurrentScene();			
+			scene->deserialize(scene->getFilePath());
+		}
+	}
 
 	void geProject::Application::loadGame(GameLoadEvent* load) {
 		if (load->getType() == Type::gameLoad) {
-			std::cout << "GAME LOADED" << std::endl;	
+			std::cout << "GAME LOADED" << std::endl;
+			if (load->sceneId == 1) {
+				sceneManager->getCurrentScene()->setActiveEntity(-1);
+			}
 			sceneManager->switchScene(load->sceneId);
 		}
 	}

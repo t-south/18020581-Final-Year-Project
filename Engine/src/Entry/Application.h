@@ -1,5 +1,5 @@
 #pragma once
-#include <ge_engine/Core.h>
+
 #include <stdio.h>
 #include <iostream>
 #include <glad/glad.h>
@@ -10,6 +10,7 @@
 #include "../SceneManager/LevelEditorScene.h"
 #include "../SceneManager/LevelScene.h"
 #include "../Clock/Clock.h"
+#include <ge_engine/Core.h>
 
 namespace geProject {
 	class Application
@@ -26,8 +27,9 @@ namespace geProject {
 		ImguiWindow* imguiWindow;
 		FrameBuffer* frameBuffer;
 		FrameBuffer* selectionTextures;
-		void loadGame(GameLoadEvent* load);
-		
+		void startGamePlay(GameStartEvent* start);
+		void stopGamePlay(GameStopEvent* stop);
+		void loadGame(GameLoadEvent* load);	
 	};
 	
 	Application* CreateApplication();

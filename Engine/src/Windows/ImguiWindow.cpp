@@ -63,6 +63,8 @@ void geProject::ImguiWindow::dockWindow(){
 }
 
 void geProject::ImguiWindow::gameViewWindow() {
+	ImVec2 vPos = viewPos;
+	ImVec2 vSize = viewSize;
 	ImGui::BeginMainMenuBar();
 	if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
 		eventSystem.publish(new GameStartEvent());
@@ -83,17 +85,30 @@ void geProject::ImguiWindow::gameViewWindow() {
 		eventSystem.publish(new GameLoadEvent(2));
 		loadLevel = false;
 	}
-
 	ImGui::EndMainMenuBar();
 	ImGui::Begin("gameViewWindow");
+	
+	
+	ImVec2 size = getMaxViewPort();
+	ImVec2 position = getViewPortCentre(size);
+	ImGui::SetCursorPos(position);
+	ImVec2 corner = ImGui::GetCursorPos();
+	corner.x -= ImGui::GetScrollX();
+	corner.y -= ImGui::GetScrollY();
+	ImGui::Image((ImTextureID)frameBuffer->getTextureId(), size, ImVec2(0, 1), ImVec2(1, 0));
+	viewPos = corner;
+	viewSize = size;
+	
 
-	ImVec2 size = ImGui::GetContentRegionAvail();	
+
+	/*
+	ImVec2 size = ImGui::GetContentRegionAvail();
 	size.x -= ImGui::GetScrollX();
 	size.y -= ImGui::GetScrollY();
 	if ((size.x / (16.0f / 9.0f)) > size.y) {
 		size.x = size.y * (16.0f / 9.0f);
 	}
-	ImVec2 position = ImGui::GetContentRegionAvail();	
+	ImVec2 position = ImGui::GetContentRegionAvail();
 	position.x -= ImGui::GetScrollX();
 	position.y -= ImGui::GetScrollY();
 	position.x = (position.x / 2.0f) - (size.x / 2.0f) + ImGui::GetCursorPosX();
@@ -103,11 +118,42 @@ void geProject::ImguiWindow::gameViewWindow() {
 	viewPos.x -= ImGui::GetScrollX();
 	viewPos.y -= ImGui::GetScrollY();
 	viewSize = size;
-	ImGui::End();
 	ImGui::SetCursorPos(position);
+	*/
+	ImGui::End();
+	
 	//std::cout << "ViewPos X: " << viewPos[0] << "ViewPos Y: " <<  viewPos[1] << std::endl;
 	//std::cout << " ViewSize X: " << viewSize[0] << " ViewSize Y: " << viewSize[1] << std::endl;
+	
+	
+	if (vPos.x != viewPos.x || vPos.y != viewPos.y || vSize.x != viewSize.x || vSize.y != viewSize.y) {
+		eventSystem.publishImmediately(new ViewPortEvent(viewPos.x, viewPos.y, viewSize.x, viewSize.y));
+		std::cout << "publishing view port event" << std::endl;
+	}
 }
 
 ImVec2 geProject::ImguiWindow::getViewPos() { return viewPos; }
 ImVec2 geProject::ImguiWindow::getViewSize() { return viewSize; }
+
+
+
+ImVec2 geProject::ImguiWindow::getMaxViewPort() {
+	ImVec2 windowSize = ImGui::GetContentRegionAvail();
+	windowSize.x -= ImGui::GetScrollX();
+	windowSize.y -= ImGui::GetScrollY();
+	float aspectWidth = windowSize.x;
+	float aspectHeight = aspectWidth / (16.0f / 9.0f);
+	if (aspectHeight > windowSize.y) {
+		// We must switch to pillarbox mode
+		aspectHeight = windowSize.y;
+		aspectWidth = aspectHeight * (16.0f / 9.0f);
+	}
+	return ImVec2(aspectWidth, aspectHeight);
+}
+
+ImVec2 geProject::ImguiWindow::getViewPortCentre(ImVec2 aspectSize) {	
+	ImVec2 windowSize = ImGui::GetContentRegionAvail();
+	float viewportX = (windowSize.x / 2.0f) - (aspectSize.x / 2.0f);
+	float viewportY = (windowSize.y / 2.0f) - (aspectSize.y / 2.0f);
+	return ImVec2(viewportX + ImGui::GetCursorPosX(), viewportY + ImGui::GetCursorPosY());
+}
