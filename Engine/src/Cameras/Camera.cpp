@@ -1,17 +1,4 @@
 #include "Camera.h"
-glm::vec3 geProject::Camera::position;
-glm::vec3 geProject::Camera::direction = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 geProject::Camera::right;
-glm::vec3 geProject::Camera::up  = glm::vec3(0.0f, 1.0f, 0.0f);;
-glm::vec2 geProject::Camera::projSize = glm::vec2(6.0f, 3.0f);
-glm::vec2 geProject::Camera::prevClick;
-glm::mat4 geProject::Camera::view;
-glm::mat4 geProject::Camera::viewInv;
-glm::mat4 geProject::Camera::projection;
-glm::mat4 geProject::Camera::projInv;
-
-
-float geProject::Camera::scroll = 1.0f;
 
 geProject::Camera::~Camera(){}
 
@@ -19,7 +6,6 @@ glm::mat4 geProject::Camera::getViewMatrix(){
 	//view = glm::mat4(0.0f);
 	view = glm::lookAt(position, position + direction, up);
 	viewInv = glm::inverse(view);
-
 	return view; 
 }
 

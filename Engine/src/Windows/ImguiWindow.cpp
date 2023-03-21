@@ -99,9 +99,9 @@ void geProject::ImguiWindow::gameViewWindow() {
 	viewPos = corner;
 	viewSize = size;
 	
-
-
+	
 	/*
+	
 	ImVec2 size = ImGui::GetContentRegionAvail();
 	size.x -= ImGui::GetScrollX();
 	size.y -= ImGui::GetScrollY();

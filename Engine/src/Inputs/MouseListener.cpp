@@ -77,36 +77,37 @@ bool geProject::MouseListener::isDrag() { return geProject::MouseListener::getIn
 
 
 float geProject::MouseListener::getCameraMouseX() {  
+    /*
     float x = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos[0];
     glm::vec4 worldCoordX = glm::vec4((x / MouseListener::getInstance()->viewSize.x) * 2.0f - 1.0f, 0.0f, 0.0f, 1.0f);
     worldCoordX = MouseListener::getInstance()->viewInv * MouseListener::getInstance()->projectionInv * worldCoordX;
     glm::mat4 tmp = MouseListener::getInstance()->projectionInv;
     return worldCoordX.x;
-
-    /*
+    */
+    
     float currentX = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos.x;
     currentX = (currentX / MouseListener::getInstance()->viewSize.x) * 2.0f - 1.0f;
     glm::vec4 tmp = glm::vec4(currentX, 0, 0, 1);  
     glm::vec4 worldCoordX = MouseListener::getInstance()->viewInv * MouseListener::getInstance()->projectionInv * tmp;
     return worldCoordX.x;
-    */
+    
     
 }
 
 float geProject::MouseListener::getCameraMouseY() {   
-    
+    /*
     float y = MouseListener::getInstance()->viewPos[1] - MouseListener::getInstance()->getYpos();
     glm::vec4 worldCoordY = glm::vec4(0.0f, (y / MouseListener::getInstance()->viewSize.y) * 2.0f - 1.0f, 0.0f, 1.0f);
     worldCoordY = viewInv * projectionInv * worldCoordY;
     glm::mat4 tmp = MouseListener::getInstance()->projectionInv;
     return worldCoordY.y;
-    /*
+    */
     float currentY = MouseListener::getInstance()->getYpos() - MouseListener::getInstance()->viewPos.y;
     currentY = -((currentY / MouseListener::getInstance()->viewSize.y) * 2.0f - 1.0f);
     glm::vec4 tmp = glm::vec4(0, currentY, 0, 1);       
     glm::vec4  worldCoordY = MouseListener::getInstance()->viewInv * MouseListener::getInstance()->projectionInv * tmp;
     return worldCoordY.y;
-    */
+    
     //return yPos;
 }
 

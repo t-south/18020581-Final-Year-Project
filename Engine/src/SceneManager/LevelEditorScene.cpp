@@ -59,7 +59,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		std::cout << "World X: " << mouse->getScreenXpos() << " World Y: " << mouse->getScreenYpos() << std::endl;
 		std::cout << "Camera X: " << mouse->getCameraMouseX() << " Camera Y: " << mouse->getCameraMouseY() << std::endl;
 	}
-	
+	camera->projectionUpdate();
 	
 	camera->update(deltaTime);
 	
@@ -111,8 +111,9 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		auto transform = manager->getTransformComponent(activatedEntity);
 		float scroll = camera->getScroll();		
 		camera->projectionUpdate();
-		transform->position[0] = (int)(((float)mouse->getCameraMouseX() * scroll) / (int)gridWidth) * gridWidth ;
-		transform->position[1] = (int)(((float)mouse->getCameraMouseY() * scroll) / (int)gridHeight) * gridHeight;
+		
+		transform->position[0] = (int)((mouse->getCameraMouseX() * scroll) / gridWidth) * gridWidth ;
+		transform->position[1] = (int)((mouse->getCameraMouseY() * scroll) / gridHeight) * gridHeight;
 		//std::cout << "Pos x: " << mouse->getCameraMouseX() << " Pos Y: " << mouse->getCameraMouseY() << " scroll: " << scroll << " gridwidth: " << gridWidth << " gridheight: " << gridHeight << std::endl;
 		manager->assignTransform(activatedEntity, *transform);		
 		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && entityDrag == true) {
@@ -202,10 +203,10 @@ std::vector<geProject::Entity*> geProject::LevelEditorScene::getEntities() {
 
 unsigned int geProject::LevelEditorScene::createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY) {
 	unsigned int entity = manager->addEntity();
-	//float y = camera->getCameraY();
+	//float y = camera->getCameraY();	
 	
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
-	manager->assignTransform(entity, Transform{ .position = {mouse->getScreenXpos(), mouse->getScreenYpos()/*mouse->getCameraMouseX(), mouse->getCameraMouseY()}*/}, .scale = {sizeX, sizeY} });
+	manager->assignTransform(entity, Transform{ .position = {/*mouse->getScreenXpos(), mouse->getScreenYpos()}*/mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY}});
 	manager->assignSpriteRender(entity, *sprite);
 	//entities.push_back(manager->getEntity(entity));
 	entityDrag = true;	

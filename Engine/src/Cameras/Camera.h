@@ -28,20 +28,20 @@ namespace geProject {
 		virtual void update(float dt) = 0;		
 	protected:		
 		//camera facing direction		
-		static glm::vec3 position;
-		static glm::vec3 direction;
+		glm::vec3 position;
+		glm::vec3 direction{ 0.0f, 0.0f, -1.0f };
 		//x axis
-		static glm::vec3 right;
+		glm::vec3 right;
 		//y axis is upward direction
-		static glm::vec3 up;
-		static glm::vec2 projSize;
+		glm::vec3 up{ 0.0f, 1.0f, 0.0f };
+		glm::vec2 projSize{ 6.0f, 3.0f };
 		//where is the camera in relation to world
-		static glm::mat4 view, viewInv;
+		glm::mat4 view, viewInv;
 		//maps to screen size
-		static glm::mat4 projection, projInv;
-		static glm::vec2 prevClick;
+		glm::mat4 projection, projInv;
+		glm::vec2 prevClick;
 		float drag{ 0.0f };
-		static float scroll;
+		float scroll{ 1.0f };
 		float deltaTime{ 0.0f };
 		bool mouseDown{ false };			
 	};
