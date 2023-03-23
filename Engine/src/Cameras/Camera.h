@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 #include <ge_engine/Core.h>
+#include <iostream>
 
 //orthographic camera for 2d games
 //converts from world coordinates to normalised device coordinates
@@ -39,7 +40,7 @@ namespace geProject {
 		glm::mat4 view, viewInv;
 		//maps to screen size
 		glm::mat4 projection, projInv;
-		glm::vec2 prevClick;
+		glm::vec2 prevClick{0,0};
 		float drag{ 0.0f };
 		float scroll{ 1.0f };
 		float deltaTime{ 0.0f };

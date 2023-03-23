@@ -25,6 +25,7 @@ namespace geProject {
 		float getYdiff();
 		bool isMouseButtonDown(int button);
 		void updateViewPort(ViewPortEvent* event);
+		void updateProjection(ProjectionEvent* event);
 		bool isDrag();
 		float getCameraMouseX();
 		float getCameraMouseY();

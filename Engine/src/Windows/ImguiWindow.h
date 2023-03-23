@@ -32,7 +32,8 @@ namespace geProject {
 		void dockWindow();
 		bool windowRunning{ false };
 		void gameViewWindow();
-		bool loadLevel{ false };		
+		bool loadLevel{ false };
+		bool gridSelection{ false };
 		ImVec2 getMaxViewPort();
 	};
 }

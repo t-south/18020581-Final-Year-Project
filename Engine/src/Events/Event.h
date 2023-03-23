@@ -6,7 +6,7 @@ namespace geProject {
 	enum Type
 	{
 		NoType, 
-		closeWindow, viewPort, projection, stopFocusWindow, moveWindow,
+		closeWindow, viewPort, projection, gridToggle, moveWindow,
 		keyPressed, keyReleased,
 		mousePressed, mouseReleased, mouseMove, mouseScroll,
 		gameStart, gameStop, gameSave, gameLoad,
@@ -67,35 +67,16 @@ namespace geProject {
 
 	//KEYBOARD EVENTS
 
-	class KeyEvent : public Event {
+	class KeyPressedEvent : public Event {
 	public:
-		inline int getKey() const { return keycode; };
-	protected:
-		int keycode;
-		KeyEvent(int keycode) : keycode(keycode) {};
-		virtual int getContexts() = 0;
-	};	
-
-	class KeyPressed : public KeyEvent {
-	public:
-		int pressedCount;
-		KeyPressed(int keycode, int pressedCount) : KeyEvent(keycode), pressedCount(pressedCount) {};
+		KeyPressedEvent(int kcode, int pressedCount, bool press) : keycode(kcode), pressedCount(pressedCount), pressed(press) {};
 		static int getType() { return Type::keyPressed; };
 		static int getContexts() { return KeyboardCat | InputCat; };
 		inline int getPressedCount() const { return pressedCount; };
 		bool contextCheck(Context cat) { return getContexts() & cat; }
+		int pressedCount, keycode;
+		bool pressed;
 	};
-
-	class KeyReleased : public KeyEvent {
-	public:
-		int pressedCount;
-		KeyReleased(int keycode, int pressedCount) : KeyEvent(keycode), pressedCount(pressedCount) {};
-		static int getType() { return Type::keyReleased; };
-		static int getContexts() { return KeyboardCat | InputCat; };
-		inline int getPressedCount() const { return pressedCount; };
-		bool contextCheck(Context cat) { return getContexts() & cat; }
-	};
-
 
 	//MOUSE EVENTS
 
@@ -193,12 +174,20 @@ namespace geProject {
 
 	class ProjectionEvent : public Event {
 	public:
-		ProjectionEvent(float winposX, float winposY, float winsizeX, float winsizeY) : windowPosX(winposX), windowPosY(winposY), windowSizeX(winsizeX), windowSizeY(winsizeY) {};
-		static int getType() { return Type::viewPort; };
+		ProjectionEvent(glm::mat4 pinv, glm::mat4 vinv) : projInv(pinv), viewInv(vinv) {};
+		static int getType() { return Type::projection; };
 		static int getContexts() { return AppCat; };
 		bool contextCheck(Context cat) { return getContexts() & cat; }
-		float windowPosX, windowPosY, windowSizeX, windowSizeY;
+		glm::mat4 projInv, viewInv;
 	};
 
+	class GridToggleEvent : public Event {
+	public:
+		GridToggleEvent(bool toggled): toggled(toggled){}
+		static int getType() { return Type::gridToggle; };
+		static int getContexts() { return AppCat; };
+		bool contextCheck(Context cat) { return getContexts() & cat; }
+		bool toggled;
+	};
 
 }

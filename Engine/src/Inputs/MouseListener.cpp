@@ -6,6 +6,7 @@ geProject::MouseListener* geProject::MouseListener::instance = nullptr;
 
 geProject::MouseListener::MouseListener() : xPos(0), yPos(0), xPrev(0), yPrev(0), xScroll(0), yScroll(0), windowWidth(0), windowHeight(0) {
     eventSystem.subscribe(this, &MouseListener::updateViewPort);
+    eventSystem.subscribe(this, &MouseListener::updateProjection);    
 }
 
 geProject::MouseListener::~MouseListener()
@@ -37,21 +38,22 @@ void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, doub
 
 void geProject::MouseListener::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
-    std::cout << "ViewPos X: " << geProject::MouseListener::getInstance()->viewPos[0] << "ViewPos Y: " << geProject::MouseListener::getInstance()->viewPos[1] << std::endl;
-    std::cout << " ViewSize X: " << geProject::MouseListener::getInstance()->viewSize[0] << " ViewSize Y: " << geProject::MouseListener::getInstance()->viewSize[1] << std::endl;
-    if (action == GLFW_PRESS) {
-        eventSystem.publish(new MouseButtonEvent(button, GLFW_PRESS, MouseListener::getInstance()->xPos, MouseListener::getInstance()->yPos));
+    //std::cout << "ViewPos X: " << geProject::MouseListener::getInstance()->viewPos[0] << "ViewPos Y: " << geProject::MouseListener::getInstance()->viewPos[1] << std::endl;
+    //std::cout << " ViewSize X: " << geProject::MouseListener::getInstance()->viewSize[0] << " ViewSize Y: " << geProject::MouseListener::getInstance()->viewSize[1] << std::endl;
+
+    if (action == GLFW_PRESS) {    
+        eventSystem.publish(new MouseButtonEvent(button, GLFW_PRESS, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
         geProject::MouseListener::getInstance()->mouseButton[button] = true;
     }
     else if (action == GLFW_RELEASE) {
-        eventSystem.publish(new MouseButtonEvent(button, GLFW_RELEASE, MouseListener::getInstance()->xPos, MouseListener::getInstance()->yPos));
+        eventSystem.publish(new MouseButtonEvent(button, GLFW_RELEASE, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
         geProject::MouseListener::getInstance()->mouseButton[button] = false;
         geProject::MouseListener::getInstance()->isDragging = false;
     }
 }
 
 void geProject::MouseListener::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {  
-    eventSystem.publish(new MouseScrollEvent(xoffset, yoffset, MouseListener::getInstance()->xPos, MouseListener::getInstance()->yPos));
+    eventSystem.publish(new MouseScrollEvent(xoffset, yoffset, MouseListener::getInstance()->getScreenXpos(), MouseListener::getInstance()->getScreenYpos()));
     MouseListener::getInstance()->xScroll = xoffset;
     MouseListener::getInstance()->yScroll = yoffset;
 }
@@ -80,7 +82,10 @@ bool geProject::MouseListener::isDrag() { return geProject::MouseListener::getIn
 
 
 float geProject::MouseListener::getCameraMouseX() {  
+    
     float currentX = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos.x ;
+    glm::mat4 test1 = MouseListener::getInstance()->viewInv;
+    glm::mat4 test2 = MouseListener::getInstance()->projectionInv;
     currentX = (currentX / MouseListener::getInstance()->viewSize.x) * 2.0f - 1.0f;
     glm::vec4 tmp = glm::vec4(currentX, 0, 0, 1);  
     glm::vec4 worldCoordX = MouseListener::getInstance()->viewInv * MouseListener::getInstance()->projectionInv * tmp;
@@ -133,13 +138,21 @@ void geProject::MouseListener::setInverses(glm::mat4 inverseProj, glm::mat4 inve
 
 bool geProject::MouseListener::isMouseButtonDown(int button) { return mouseButton[button]; }
 
-void geProject::MouseListener::updateViewPort(ViewPortEvent* event) {
-    viewPos.x = event->windowPosX;
-    viewPos.y = event->windowPosY;
-    viewSize.x = event->windowSizeX;
-    viewSize.y = event->windowSizeY;
+void geProject::MouseListener::updateViewPort(ViewPortEvent* e) {
+    viewPos.x = e->windowPosX;
+    viewPos.y = e->windowPosY;
+    viewSize.x = e->windowSizeX;
+    viewSize.y = e->windowSizeY;
     //std::cout << "ViewPos: " << viewPos.x << " " << viewPos.y << " ViewSize: " << viewSize.x << " " << viewSize.y << std::endl;
 }
+
+
+void geProject::MouseListener::updateProjection(ProjectionEvent* e) {
+    MouseListener::getInstance()->projectionInv = e->projInv;
+    MouseListener::getInstance()->viewInv = e->viewInv;
+    //std::cout << "ViewPos: " << viewPos.x << " " << viewPos.y << " ViewSize: " << viewSize.x << " " << viewSize.y << std::endl;
+}
+
 
 float geProject::MouseListener::getViewXsize() { return (float)geProject::MouseListener::getInstance()->viewSize.x; }
 float geProject::MouseListener::getViewYsize() { return (float)geProject::MouseListener::getInstance()->viewSize.y; }

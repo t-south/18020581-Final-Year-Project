@@ -10,13 +10,14 @@ namespace geProject {
 		
 		static KeyboardListener* getInstance();
 		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);		
-		static bool isKeyPressed(int key);
+		static bool isKeyPressed(int key);		
+		void endFrame();
 	private:
 		KeyboardListener() {};
 		KeyboardListener(const KeyboardListener& obj) = delete;
-		bool keyPressed[350] = { 0 };
+		std::unordered_map<int, bool> keyPressed;
 		static KeyboardListener* instance;
 		~KeyboardListener();
-		
+
 	};
 }

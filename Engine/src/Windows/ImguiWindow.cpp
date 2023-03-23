@@ -84,8 +84,13 @@ void geProject::ImguiWindow::gameViewWindow() {
 	if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
 		eventSystem.publish(new GameLoadEvent(2));
 		loadLevel = false;
+	
 	}
 	ImGui::EndMainMenuBar();
+
+	
+
+	
 	ImGui::Begin("gameViewWindow");	
 	
 	ImVec2 size = getMaxViewPort();
@@ -103,7 +108,12 @@ void geProject::ImguiWindow::gameViewWindow() {
 	ImGui::SetCursorPos(position);
 	
 	ImGui::End();
-	
+
+	ImGui::Begin("Config");
+	if (ImGui::Checkbox("grid", &gridSelection)) {
+		eventSystem.publishImmediately(new GridToggleEvent(gridSelection));
+	}
+	ImGui::End();
 	//std::cout << "ViewPos X: " << viewPos[0] << "ViewPos Y: " <<  viewPos[1] << std::endl;
 	//std::cout << " ViewSize X: " << viewSize[0] << " ViewSize Y: " << viewSize[1] << std::endl;
 	

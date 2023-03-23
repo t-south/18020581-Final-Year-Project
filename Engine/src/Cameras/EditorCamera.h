@@ -14,6 +14,6 @@ namespace geProject {
 		float prevY{ 0 };
 		void update(float dt);
 		glm::vec2 cameraPos;
-
+		void updateKeyPress(KeyPressedEvent* e);		
 	};
 }

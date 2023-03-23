@@ -45,7 +45,8 @@ namespace geProject {
 			for (auto& observer : *observers) {
 				count++;
 				observer->callEvent();
-			}			
+			}	
+		
 		}
 
 	private:

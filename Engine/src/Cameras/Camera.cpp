@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+
 geProject::Camera::~Camera(){}
 
 glm::mat4 geProject::Camera::getViewMatrix(){	
@@ -33,10 +34,15 @@ glm::mat4 geProject::Camera::getProjectionInverse() {
 glm::vec2 geProject::Camera::getProjSize() { return projSize; }
 
 glm::vec2 geProject::Camera::getPosition() {
+	projectionUpdate();
 	return glm::vec2(position[0], position[1]);
 }
 
-void geProject::Camera::setPosition(glm::vec2 pos) { position = position - glm::vec3(pos, 0.0f); }
+void geProject::Camera::setPosition(glm::vec2 pos) { 
+	position -= glm::vec3(pos, 0);
+	projectionUpdate();
+	eventSystem.publishImmediately(new ProjectionEvent(projInv, viewInv));
+}
 
 void geProject::Camera::setScroll(float scale) { scroll += scale; }
 float geProject::Camera::getScroll() { return scroll; }

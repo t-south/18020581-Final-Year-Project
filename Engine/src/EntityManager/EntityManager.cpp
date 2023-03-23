@@ -147,14 +147,8 @@ void geProject::EntityManager::assignFontRender(uInt entityId, FontRender font) 
 	else {
 		std::cout << "unable to assign font" << std::endl;
 		delete(&font);
-	}
-	
+	}	
 }
-
-
-
-
-
 
 
 void geProject::EntityManager::deleteComponent(uInt entityId, uInt componentId) {
@@ -316,17 +310,18 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 	bool spriteUpdate = false;
 	bool rigidUpdate = false;
 	bool boxUpdate = false;
-	bool circleUpdate = false;
-	if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen)) {
-		
-		if (ImGui::DragFloat("positonX", &positionX)) {
+	bool circleUpdate = false;	
+
+
+	if (ImGui::CollapsingHeader("Transform Component", ImGuiTreeNodeFlags_DefaultOpen)) {		
+		if (ImGui::DragFloat("positonX", &positionX), 0.01f, 1.0f, "%.3f") {
 			if (positionX != trans->position[0]) {
 				trans->position[0] = positionX;
 				transformUpdate = true;
 				trans->dirtyFlag[0] = 1;
 			}
 		}
-		if (ImGui::DragFloat("positonY", &positionY)) {
+		if (ImGui::DragFloat("positonY", &positionY), 0.01f, 1.0f, "%.3f") {
 			if (positionY != trans->position[1]) {
 				trans->position[1] = positionY;
 				transformUpdate = true;
@@ -374,7 +369,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			trans->centre[1] = centreY;
 			transformUpdate = true;
 		}
-		if (entityUpdated) {
+		if (transformUpdate) {
 			eventSystem.publishImmediately(new TransformEvent(entityId, trans->position[0], trans->position[1], trans->rotation));
 		}
 	}
@@ -415,9 +410,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			float density = rigid->density;
 			bool fRotate = rigid->fixedRotate;
 			bool bullet = rigid->bullet;
-			int bType = rigid->bodyType;
-		
-		
+			int bType = rigid->bodyType;		
 			if (ImGui::InputInt("body type", &bType)) {
 				if (bType > 2) {
 					bType--;
@@ -427,9 +420,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 				}
 				rigid->bodyType = bType;
 				rigidUpdate = true;
-			}
-
-		
+			}		
 			if (ImGui::DragInt("rigidBody", &collider)) {
 				rigid->collider = collider;
 				rigidUpdate = true;
@@ -506,10 +497,8 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 				eventSystem.publishImmediately(new CircleColliderEvent(entityId, *circleCollider));
 			}
 		}
-
-
-
 	}
+
 	//BOX COLLIDER IMGUI updates
 	if ((entity->compMask & 16) == 16) {		
 		if (ImGui::CollapsingHeader("Box Collider Component")) {
