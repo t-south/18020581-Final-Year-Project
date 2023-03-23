@@ -13,7 +13,6 @@ namespace geProject {
 		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) override;	
 		virtual void updateImgui() override;
 		virtual void updateSceneImgui() override;
-		virtual std::vector<Entity*> getEntities() override;
 		virtual void render(std::string shaderPath) override;
 		virtual void setActiveEntity(int entityId) override;
 		virtual unsigned int getActiveEntity() override;

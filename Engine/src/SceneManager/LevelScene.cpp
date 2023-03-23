@@ -26,10 +26,12 @@ void geProject::LevelScene::update(float deltaTime){
 	if (manager->hasUpdate()) {
 		entities.clear();
 		for (int i = 0; i < manager->getEntityNum(); i++) {
-			entities.push_back(manager->getEntity(i));
+			
+			auto ent = manager->getEntity(i);
+			entities[ent->id] = ent;
 			// only sprites that have not been added to the renderer previously will be set to 0
-			auto trans = manager->getTransformComponent(i);
-			auto sprite = manager->getSpriteComponent(i);
+			auto trans = manager->getTransformComponent(ent->id);
+			auto sprite = manager->getSpriteComponent(ent->id);
 			//transform dirtyflag for render index is by default set to -1 when first created
 			if (trans->dirtyFlag[2] == -1) {
 				renderer->addSpriteToBatch(sprite, trans);
@@ -54,7 +56,7 @@ void geProject::LevelScene::render(std::string shaderPath){
 }
 void geProject::LevelScene::updateImgui() {}
 void geProject::LevelScene::updateSceneImgui() {}
-std::vector<geProject::Entity*> geProject::LevelScene::getEntities() { return entities; }
+
 void geProject::LevelScene::setActiveEntity(int entityId){}
 
 unsigned int geProject::LevelScene::getActiveEntity() { return 0; }

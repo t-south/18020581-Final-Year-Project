@@ -97,33 +97,33 @@ void geProject::RenderBatch::updateSprite(SpriteRender* sprite, Transform* trans
 
 
 void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* transform, unsigned int index) {
-	glm::vec2 centre = getCentre(transform->position, glm::vec2(transform->position[0] + (1 * transform->scale.x), transform->position[1] + (1 * transform->scale.y)));//getCentre(transform->position, glm::vec2(transform->position[0] + (0 * transform->scale.x), transform->position[1] + (1 * transform->scale.y)));
+	
 	for (int i = 0; i < 4; i++) {
 		switch (i) {
 		case 0:
-			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (1 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (/*0.5f*/ 1 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*0.5f*/ 1 * transform->scale.y); //y
 			break;
 		case 1:
-			vertices[index] = transform->position[0] + (1 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (/*0.5f*/ 1 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*-0.5f*/ 0 * transform->scale.y); //y
 			break;
 
 		case 2:
-			vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (/*/-0.5f*/0 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*-0.5f*/ 0 * transform->scale.y); //y
 			break;
 
 		case 3:
-			vertices[index] = transform->position[0] + (0 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (1 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (/*-0.5f*/ 0 * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*0.5f*/ 1 * transform->scale.y); //y
 			break;
 
 		}
 		if (transform->rotation > 0 || transform->rotation < 0) {
-			glm::vec2 newVerts = rotate(glm::vec2(vertices[index], vertices[index + 1]), centre, transform->rotation);
+			glm::vec2 newVerts = rotate(glm::vec2(vertices[index], vertices[index + 1]), transform->centre, transform->rotation);
 			vertices[index] = newVerts[0];
-			vertices[index + 1] = newVerts[1];
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = newVerts[1];
 		}
 		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = sprite->color[0]; //r
 		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = sprite->color[1]; //g
@@ -165,6 +165,7 @@ void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
 	auto shader = resourceManager->requestShader(shaderPath);
+	camera.projectionUpdate();
 	shader->setMat4f("uProjMat", camera.getProjection());
 	shader->setMat4f("uViewMat", camera.getViewMatrix());	
 	unsigned int count = 0;
@@ -196,7 +197,7 @@ void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glDrawElements(GL_TRIANGLES, spriteNum * vertSize * sizeof(float), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, spriteNum * 10 * sizeof(float), GL_UNSIGNED_INT, 0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glBindVertexArray(0);
@@ -232,11 +233,4 @@ unsigned int geProject::RenderBatch::getZindex() {
 glm::vec2 geProject::RenderBatch::rotate(glm::vec2 vert, glm::vec2 centre, float rotation) {
 	rotation = rotation * PI / 180.0;
 	return glm::vec2((cos(rotation) * (vert.x - centre.x) - sin(rotation) * (vert.y - centre.y) + centre.x), (sin(rotation) * (vert.x - centre.x) + cos(rotation) * (vert.y - centre.y) + centre.y));
-}
-
-glm::vec2 geProject::RenderBatch::getCentre(glm::vec2 bLeft, glm::vec2 tRight) {
-	glm::vec2 centre{};
-	centre[0] = (bLeft[0] + tRight[0]) / 2;
-	centre[1] = (bLeft[1] + tRight[1]) / 2;
-	return centre;
 }

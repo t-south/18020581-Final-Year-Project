@@ -36,6 +36,9 @@ void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, doub
 }
 
 void geProject::MouseListener::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+
+    std::cout << "ViewPos X: " << geProject::MouseListener::getInstance()->viewPos[0] << "ViewPos Y: " << geProject::MouseListener::getInstance()->viewPos[1] << std::endl;
+    std::cout << " ViewSize X: " << geProject::MouseListener::getInstance()->viewSize[0] << " ViewSize Y: " << geProject::MouseListener::getInstance()->viewSize[1] << std::endl;
     if (action == GLFW_PRESS) {
         eventSystem.publish(new MouseButtonEvent(button, GLFW_PRESS, MouseListener::getInstance()->xPos, MouseListener::getInstance()->yPos));
         geProject::MouseListener::getInstance()->mouseButton[button] = true;
@@ -84,8 +87,8 @@ float geProject::MouseListener::getCameraMouseX() {
     glm::mat4 tmp = MouseListener::getInstance()->projectionInv;
     return worldCoordX.x;
     */
-    
-    float currentX = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos.x;
+  
+    float currentX = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos.x ;
     currentX = (currentX / MouseListener::getInstance()->viewSize.x) * 2.0f - 1.0f;
     glm::vec4 tmp = glm::vec4(currentX, 0, 0, 1);  
     glm::vec4 worldCoordX = MouseListener::getInstance()->viewInv * MouseListener::getInstance()->projectionInv * tmp;
@@ -102,8 +105,9 @@ float geProject::MouseListener::getCameraMouseY() {
     glm::mat4 tmp = MouseListener::getInstance()->projectionInv;
     return worldCoordY.y;
     */
-    float currentY = MouseListener::getInstance()->getYpos() - MouseListener::getInstance()->viewPos.y;
-    currentY = -((currentY / MouseListener::getInstance()->viewSize.y) * 2.0f - 1.0f);
+   
+    float currentY = MouseListener::getInstance()->viewPos.y - MouseListener::getInstance()->getYpos();
+    currentY = ((currentY / MouseListener::getInstance()->viewSize.y) * 2.0f - 1.0f);
     glm::vec4 tmp = glm::vec4(0, currentY, 0, 1);       
     glm::vec4  worldCoordY = MouseListener::getInstance()->viewInv * MouseListener::getInstance()->projectionInv * tmp;
     return worldCoordY.y;
@@ -112,27 +116,25 @@ float geProject::MouseListener::getCameraMouseY() {
 }
 
 float geProject::MouseListener::getScreenXpos() {
-    float x = ((getXpos() - viewPos[0]) / getViewXsize()) * 1920.0f;
-    //float x = ((xPos - viewPos.x) / viewSize.x) * 1920.0f;   
-
-    /*
-    float currentX = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos.x;
-    currentX = (currentX / MouseListener::getInstance()->viewSize.x) * 1920.0f;
-    return currentX;  
-    */
+    //float x = ((getXpos() - viewPos[0]) / getViewXsize()) * 1920.0f;
+    float x = (xPos - viewPos.x) / viewSize.x * 1920.0f; 
+    
+    //float x = MouseListener::getInstance()->getXpos() - MouseListener::getInstance()->viewPos.x;
+    //x = (x / MouseListener::getInstance()->viewSize.x) * 1920.0f;
     return x;
+    
+
 }
 
 
 float geProject::MouseListener::getScreenYpos() {
     float y = ((viewPos[1] - getYpos()) / getViewYsize()) * 1080.0f;
-    //float y = ((yPos - viewPos.x) / viewSize.y) * 1080.0f;
-
-    /*
-    float currentY = MouseListener::getInstance()->getYpos() - MouseListener::getInstance()->viewPos.y;
-    currentY = 1080.0f - ((currentY / MouseListener::getInstance()->viewSize.y) * 1080.0f);
-    return currentY;*/
+    //float y = (yPos - viewPos.x) / viewSize.y * 1080.0f;
+    
+    //float y = MouseListener::getInstance()->getYpos() - MouseListener::getInstance()->viewPos.y;
+    //y = (y / MouseListener::getInstance()->viewSize.y) * 1080.0f;
     return y;
+
 }
 
 
@@ -162,7 +164,7 @@ void geProject::MouseListener::updateViewPort(ViewPortEvent* event) {
     viewPos.y = event->windowPosY;
     viewSize.x = event->windowSizeX;
     viewSize.y = event->windowSizeY;
-    std::cout << "ViewPos: " << viewPos.x << " " << viewPos.y << " ViewSize: " << viewSize.x << " " << viewSize.y << std::endl;
+    //std::cout << "ViewPos: " << viewPos.x << " " << viewPos.y << " ViewSize: " << viewSize.x << " " << viewSize.y << std::endl;
 }
 
 float geProject::MouseListener::getViewXsize() { return (float)geProject::MouseListener::getInstance()->viewSize.x; }

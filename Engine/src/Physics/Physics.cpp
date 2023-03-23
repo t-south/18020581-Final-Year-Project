@@ -17,12 +17,15 @@ geProject::Physics::~Physics(){}
 
 void geProject::Physics::addEntity(Entity& entity) {
 	//if(entity.compMask ) // select components based on the mask in the entity
+	//std::cout << bodies.count(entity.id) << std::endl;
 	if (bodies.count(entity.id) == 0 && (entity.compMask & 4) == 4) {
 		//if there is a rigidbody make a new body		
 		auto rigid = manager->getRigidBodyComponent(entity.id);
 		auto transform = manager->getTransformComponent(entity.id);
 		b2BodyDef body;
-		body.angle = transform->rotation;
+		double PI = 3.14159265;
+		float angle = transform->rotation * PI / 180.0;
+		body.angle = angle;
 		body.position.Set(transform->position.x, transform->position.y);
 		body.angularDamping = rigid->angularDamping;
 		body.linearDamping = rigid->linearDamping;
@@ -45,17 +48,20 @@ void geProject::Physics::addEntity(Entity& entity) {
 		auto circle = manager->getCircleColliderComponent(entity.id);
 		//should i use mask or check id of components returned from entity manager?
 		auto box = manager->getBoxColliderComponent(entity.id);
+		//convert from degrees to radians
 		if (circle->id > 0) {
 			shape.m_radius = circle->radius;
 		}
 		else if (box->id > 0) {
-			shape.SetAsBox(transform->centre.x, transform->centre.y, b2Vec2(box->origin[0], box->origin[1]), 0);
-			body.position.Set(body.position.x + box->offset[0], body.position.y + box->offset[1]);
-
+			shape.SetAsBox(box->boxSize[0] *0.5f , box->boxSize[1] *0.5f , b2Vec2(box->origin[0], box->origin[1]), 0);
 		}
+		body.position.Set(body.position.x  + box->offset[0], body.position.y + box->offset[1]);
+		
 		b2Body* worldBody = world.CreateBody(&body);
 		bodies[entity.id] = worldBody;
+	
 		worldBody->CreateFixture(&shape, rigid->density);
+
 	}
 
 	
@@ -68,6 +74,10 @@ void geProject::Physics::removeEntity(Entity& entity){
 }
 
 void geProject::Physics::clear(){
+	for (auto& body : bodies) {
+		// Do stuff
+		world.DestroyBody(body.second);
+	}
 	bodies.clear();
 }
 
@@ -78,9 +88,11 @@ void geProject::Physics::update(float deltaTime){
 		world.Step(timeStep, velocity, position);
 		if (bodies.size() > 0) {
 			for (auto &body : bodies) {
-				b2Vec2 position = body.second->GetPosition();
-				float angle = bodies[0]->GetAngle();
-				printf("%4.2f %4.2f %4.2f %4.2f\n", position.x, position.y, angle, (int)body.first);
+				float test = body.second->GetAngle();
+				b2Vec2 position = body.second->GetPosition();				 ;
+				double PI = 3.14159265;
+				float angle = (float)(body.second->GetAngle() * (180.0/ PI));
+				printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());
 				eventSystem.publishImmediately(new TransformEvent((int)body.first, position.x, position.y, angle));
 			}
 
@@ -92,17 +104,36 @@ void geProject::Physics::update(float deltaTime){
 
 
 void geProject::Physics::updateRigidBody(RigidEvent* event){
-	auto body = bodies[event->entityId];	
-	if (body != nullptr) {
-		auto fixture = body->GetFixtureList();
-		fixture->SetDensity(event->rigidbody->density);
-		body->ResetMassData();
+	if (bodies.count(event->entityId) == 1) {
+		b2Body* body = bodies[event->entityId];		
+		for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()){
+			fixture->SetDensity(event->rigidbody->density);		
+		}		
+		//body->ResetMassData();
 		bodies[event->entityId] = body;
 	}
 }
 
-void geProject::Physics::updateBoxCollider(BoxColliderEvent* event){
+void geProject::Physics::updateBoxCollider(BoxColliderEvent* event){	
+	if (bodies.count(event->entityId) == 1) {
+		b2Body* body = bodies[event->entityId];
+		b2Fixture* fixture = body->GetFixtureList();
+		b2Vec2 position = body->GetPosition();			
+		position.x += event->offSetX;
+		position.y += event->offsetY;
+		b2PolygonShape shape = b2PolygonShape();
+		body->DestroyFixture(body->GetFixtureList());
+		double angle = body->GetAngle();
+		body->SetTransform(position, angle);
+		float density = body->GetMass();
+		shape.SetAsBox(event->boxSizeX, event->boxSizeY, position, angle);		
+		bodies[event->entityId] = body;
+		body->CreateFixture(&shape, density);
+	}
 }
 
-void geProject::Physics::updateCircleCollider(CircleColliderEvent* event){
+void geProject::Physics::updateCircleCollider(CircleColliderEvent* event){	
+	if (bodies.count(event->entityId) == 1) {
+		auto circle = bodies[event->entityId];
+	}
 }

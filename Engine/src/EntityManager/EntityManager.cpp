@@ -122,7 +122,6 @@ void geProject::EntityManager::assignBoxCollider(uInt entityId, BoxCollider box)
 	}
 	else{
 		std::cout << "unable to assign box collider" << std::endl;
-		delete(&box);
 	}
 }
 
@@ -259,9 +258,11 @@ glm::vec2 geProject::EntityManager::getCentre(glm::vec2 bLeft, glm::vec2 tRight)
 
 //EVENT LISTENERS
 void geProject::EntityManager::updateTransform(TransformEvent* event){
-	componentTransforms[event->entityId]->position[0] = event->posX;
-	componentTransforms[event->entityId]->position[1] = event->posY;
-	componentTransforms[event->entityId]->rotation = event->rotation;
+	auto newTransform = componentTransforms[event->entityId];
+	newTransform->position[0] = event->posX;
+	newTransform->position[1] = event->posY;
+	newTransform->rotation = event->rotation;
+	newTransform->centre = getCentre(newTransform->position, glm::vec2(newTransform->position[0] + (1 * newTransform->scale.x), newTransform->position[1] + (1 * newTransform->scale.y)));
 	entityUpdated = true;
 	componentTransforms[event->entityId]->dirtyFlag[0] = 1;
 }
@@ -275,7 +276,7 @@ void geProject::EntityManager::updateRigidBody(RigidEvent* event){
 }
 
 void geProject::EntityManager::updateBoxCollider(BoxColliderEvent* event){
-	assignBoxCollider(event->entityId, *event->boxcollider);
+	assignBoxCollider(event->entityId, BoxCollider{ .boxSize = {event->boxSizeX, event->boxSizeY} });
 }
 
 void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event){
@@ -374,7 +375,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			transformUpdate = true;
 		}
 		if (entityUpdated) {
-			//eventSystem.publishImmediately(new TransformEvent(entityId, density));
+			eventSystem.publishImmediately(new TransformEvent(entityId, trans->position[0], trans->position[1], trans->rotation));
 		}
 	}
 	//SPRITE IMGUI updates
@@ -415,6 +416,20 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			bool fRotate = rigid->fixedRotate;
 			bool bullet = rigid->bullet;
 			int bType = rigid->bodyType;
+		
+		
+			if (ImGui::InputInt("body type", &bType)) {
+				if (bType > 2) {
+					bType--;
+				}
+				else if (bType < 0) {
+					bType++;
+				}
+				rigid->bodyType = bType;
+				rigidUpdate = true;
+			}
+
+		
 			if (ImGui::DragInt("rigidBody", &collider)) {
 				rigid->collider = collider;
 				rigidUpdate = true;
@@ -443,10 +458,7 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 				rigid->bullet = bullet;
 				rigidUpdate = true;
 			}
-			if (ImGui::DragInt("bodyType", &bType, 1, 0, 3, "%d", 0)) {
-				rigid->bodyType = bType;
-				rigidUpdate = true;
-			}
+
 			if (ImGui::DragFloat("velocityX", &velocityX)) {
 				rigid->velocity[0] = velocityX;
 				rigidUpdate = true;
@@ -463,8 +475,8 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 				deleteComponent(entityId, 4);
 			}
 			if (rigidUpdate) {
-				eventSystem.publishImmediately(new RigidEvent(entityId, *rigid));
-			}
+				eventSystem.publishImmediately(new RigidEvent(entityId, *rigid));			}
+
 		}
 	}
 
@@ -504,39 +516,29 @@ void geProject::EntityManager::updateImgui(uInt entityId) {
 			auto boxCollider = getBoxColliderComponent(entityId);
 			float boxSizeX = boxCollider->boxSize[0];
 			float boxSizeY = boxCollider->boxSize[1];
-			float oX = boxCollider->offset[0];
-			float oY = boxCollider->offset[1];
-			float originX = boxCollider->origin[0];
-			float originY = boxCollider->origin[0];
-			if (ImGui::DragFloat("boxSizeX", &boxSizeX)) {
+
+			if (ImGui::InputFloat("boxSizeX", &boxSizeX, 0.01f)) {
 				boxCollider->boxSize[0] = boxSizeX;
-				boxUpdate = true;
+				if (boxSizeX != boxCollider->boxSize[0]) {
+					boxUpdate = true;
+				}
+				
 			}
-			if (ImGui::DragFloat("boxSizeY", &boxSizeY)) {
+			
+			if (ImGui::InputFloat("boxSizeY", &boxSizeY), 0.01f) {	
 				boxCollider->boxSize[1] = boxSizeY;
-				boxUpdate = true;
+				if (boxSizeY != boxCollider->boxSize[1]) {
+					boxUpdate = true;
+				}
+				
 			}
-			if (ImGui::DragFloat("offsetX", &oX)) {
-				boxCollider->offset[0] = oX;
-				boxUpdate = true;
-			}
-			if (ImGui::DragFloat("offsetY", &oY)) {
-				boxCollider->offset[1] = oY;
-				boxUpdate = true;
-			}
-			if (ImGui::DragFloat("originX", &originX)) {
-				boxCollider->origin[0] = originX;
-				boxUpdate = true;
-			}
-			if (ImGui::DragFloat("originY", &originY)) {
-				boxCollider->origin[1] = originY;
-				boxUpdate = true;
-			}
+
 			if (ImGui::Button("Delete Box Collider")) {
 				deleteComponent(entityId, 16);
 			}
 			if (boxUpdate) {
-				eventSystem.publishImmediately(new BoxColliderEvent(entityId, *boxCollider));
+				eventSystem.publishImmediately(new BoxColliderEvent(entityId, boxCollider->offset[0], boxCollider->offset[1], 
+					boxCollider->boxSize[0], boxCollider->boxSize[1], boxCollider->origin[0], boxCollider->origin[1]));
 			}
 		}
 	}

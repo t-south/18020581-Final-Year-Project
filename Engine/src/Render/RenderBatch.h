@@ -41,7 +41,6 @@ namespace geProject {
 		std::vector<unsigned int> createIndexes();
 		void createVertices(SpriteRender* sprite, Transform* transform, unsigned int index);
 		void init();
-		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);
-		glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
+		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);	
 	};
 }

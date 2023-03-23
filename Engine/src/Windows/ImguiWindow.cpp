@@ -86,28 +86,9 @@ void geProject::ImguiWindow::gameViewWindow() {
 		loadLevel = false;
 	}
 	ImGui::EndMainMenuBar();
-	ImGui::Begin("gameViewWindow");
-	
+	ImGui::Begin("gameViewWindow");	
 	
 	ImVec2 size = getMaxViewPort();
-	ImVec2 position = getViewPortCentre(size);
-	ImGui::SetCursorPos(position);
-	ImVec2 corner = ImGui::GetCursorPos();
-	corner.x -= ImGui::GetScrollX();
-	corner.y -= ImGui::GetScrollY();
-	ImGui::Image((ImTextureID)frameBuffer->getTextureId(), size, ImVec2(0, 1), ImVec2(1, 0));
-	viewPos = corner;
-	viewSize = size;
-	
-	
-	/*
-	
-	ImVec2 size = ImGui::GetContentRegionAvail();
-	size.x -= ImGui::GetScrollX();
-	size.y -= ImGui::GetScrollY();
-	if ((size.x / (16.0f / 9.0f)) > size.y) {
-		size.x = size.y * (16.0f / 9.0f);
-	}
 	ImVec2 position = ImGui::GetContentRegionAvail();
 	position.x -= ImGui::GetScrollX();
 	position.y -= ImGui::GetScrollY();
@@ -118,8 +99,9 @@ void geProject::ImguiWindow::gameViewWindow() {
 	viewPos.x -= ImGui::GetScrollX();
 	viewPos.y -= ImGui::GetScrollY();
 	viewSize = size;
+	
 	ImGui::SetCursorPos(position);
-	*/
+	
 	ImGui::End();
 	
 	//std::cout << "ViewPos X: " << viewPos[0] << "ViewPos Y: " <<  viewPos[1] << std::endl;
@@ -138,22 +120,15 @@ ImVec2 geProject::ImguiWindow::getViewSize() { return viewSize; }
 
 
 ImVec2 geProject::ImguiWindow::getMaxViewPort() {
+	float aspectSize = (16.0f / 9.0f);
 	ImVec2 windowSize = ImGui::GetContentRegionAvail();
 	windowSize.x -= ImGui::GetScrollX();
 	windowSize.y -= ImGui::GetScrollY();
 	float aspectWidth = windowSize.x;
-	float aspectHeight = aspectWidth / (16.0f / 9.0f);
-	if (aspectHeight > windowSize.y) {
-		// We must switch to pillarbox mode
+	float aspectHeight = aspectWidth / aspectSize;
+	if (aspectHeight > windowSize.y) {		
 		aspectHeight = windowSize.y;
-		aspectWidth = aspectHeight * (16.0f / 9.0f);
+		aspectWidth = aspectHeight * aspectSize;
 	}
 	return ImVec2(aspectWidth, aspectHeight);
-}
-
-ImVec2 geProject::ImguiWindow::getViewPortCentre(ImVec2 aspectSize) {	
-	ImVec2 windowSize = ImGui::GetContentRegionAvail();
-	float viewportX = (windowSize.x / 2.0f) - (aspectSize.x / 2.0f);
-	float viewportY = (windowSize.y / 2.0f) - (aspectSize.y / 2.0f);
-	return ImVec2(viewportX + ImGui::GetCursorPosX(), viewportY + ImGui::GetCursorPosY());
 }

@@ -6,6 +6,7 @@ geProject::EditorCamera::EditorCamera(glm::vec2 pos){
 	eventSystem.subscribe(this, &EditorCamera::cameraMouseButton);
 	eventSystem.subscribe(this, &EditorCamera::cameraMouseScrolled);
 	eventSystem.subscribe(this, &EditorCamera::mouseMoved);
+	
 	projectionUpdate();
 }
 

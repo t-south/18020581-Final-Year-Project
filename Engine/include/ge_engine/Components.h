@@ -46,8 +46,9 @@ namespace geProject {
 	struct BoxCollider {
 		unsigned int id = 16;		
 		glm::vec2 boxSize{0.0f, 0.0f};
-		glm::vec2 offset;
-		glm::vec2 origin{0.0f, 0.0f};
+		glm::vec2 offset{ 0 };
+		glm::vec2 origin{0,0};
+
 	};
 
 

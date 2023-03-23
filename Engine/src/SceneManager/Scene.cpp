@@ -19,7 +19,7 @@ void geProject::Scene::serialize(std::string filepath) {
 		//serialize each entity into json
 		json sceneData;
 		for (auto const& i : entities) {
-			json entity = serializeEntity(*manager->getEntity(i->id));
+			json entity = serializeEntity(*manager->getEntity(i.first));
 			if (entity != NULL) {
 				sceneData.push_back(entity);
 			}
@@ -134,8 +134,7 @@ void geProject::Scene::deserialize(std::string filepath) {
 					from_json(boxData, box);
 					manager->assignBoxCollider(entityId, box);
 				}
-				addEntityToScene(entityId);
-				addEntityToScene(entityId);
+				addEntityToScene(entityId);		
 			}
 			iFile.close();
 		}
@@ -209,11 +208,11 @@ void geProject::Scene::to_json(json& data, CircleCollider& comp) {
 
 void geProject::Scene::to_json(json& data, BoxCollider& comp) {
 	data = json{
-		"BoxCollider", {			
-			{"boxSizeX", comp.boxSize[0]}, {"boxSizeY", comp.boxSize[1]},
+		"BoxCollider", {		
 			{"boxoffsetX", comp.offset[0]}, {"boxoffsetY", comp.offset[1]},
-			{"boxoriginX", comp.origin[0]}, {"boxoriginY", comp.origin[1]}
-		}
+			{"boxSizeX", comp.boxSize[0]}, {"boxSizeY", comp.boxSize[1]},
+			{"boxOriginX", comp.origin[0]}, {"boxOriginY", comp.origin[1]}
+	}
 	};	
 }
 
@@ -271,12 +270,12 @@ void geProject::Scene::from_json(json& data, BoxCollider& comp) {
 		comp.id = 0;
 	}
 	else {
-		data[1].at("boxSizeX").get_to(comp.boxSize[0]);
-		data[1].at("boxSizeY").get_to(comp.boxSize[1]);
 		data[1].at("boxoffsetX").get_to(comp.offset[0]);
 		data[1].at("boxoffsetY").get_to(comp.offset[1]);
-		data[1].at("boxoriginX").get_to(comp.origin[0]);
-		data[1].at("boxoriginY").get_to(comp.origin[1]);
+		data[1].at("boxSizeX").get_to(comp.boxSize[0]);
+		data[1].at("boxSizeY").get_to(comp.boxSize[1]);
+		data[1].at("boxOriginX").get_to(comp.origin[0]);
+		data[1].at("boxOriginY").get_to(comp.origin[1]);
 	}
 }
 

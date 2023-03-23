@@ -48,30 +48,17 @@ namespace geProject {
 		while (!glfwWindowShouldClose(gameWindow->getWindow())) {
 			glfwPollEvents();
 			auto scene = sceneManager->getCurrentScene();
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			glDisable(GL_BLEND);
-			scene->setPicking();
-			glEnable(GL_BLEND);
+			//TEXTURE SELECTION UPDATES
+			scene->setPicking();	
 			frameBuffer->bind();
 			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			/*if (keyboard->isKeyPressed(GLFW_KEY_SPACE)) {
-				std::cout << "Space Key is pressed \n" << std::endl;
-				sceneManager->switchScene(levelSceneId);
-			}*/
+			glClear(GL_COLOR_BUFFER_BIT );
 			//SCENE UPDATES
-			//add the view size and position of imgui game window to scene
 			scene->update(deltaTime);
-
 			frameBuffer->unBind();
 			//inverse for view has to be taken after render
-
 			//IMGUI UPDATES
-			imguiWindow->update(deltaTime, scene);
-			if (loopCount > 0) {
-				//scene->getCurrentScene()->update(deltaTime);
-			}
+			imguiWindow->update(deltaTime, scene);		
 			//imguiwindow->render(width, height);
 			glfwSwapBuffers(gameWindow->getWindow());
 			gameClock->updateTime();

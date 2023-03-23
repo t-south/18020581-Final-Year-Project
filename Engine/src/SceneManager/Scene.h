@@ -25,8 +25,7 @@ namespace geProject {
 		Camera* getCamera();
 		virtual void updateImgui() = 0;
 		virtual void updateSceneImgui() = 0;
-		virtual void render(std::string shaderPath) = 0;
-		virtual std::vector<Entity*> getEntities() = 0;
+		virtual void render(std::string shaderPath) = 0;	
 		virtual void setActiveEntity(int entityId) = 0;
 		virtual unsigned int getActiveEntity() = 0;
 		virtual void setEntityDrag(bool drag) = 0;
@@ -45,7 +44,7 @@ namespace geProject {
 		void setPhysics(bool check);
 		//friend class SceneSerialize;
 	protected:
-		std::vector<Entity*> entities;		
+		std::unordered_map<unsigned int, Entity*> entities;		
 		static Window* gameWindow;
 		MouseListener* mouse;
 		KeyboardListener* keyboard;
@@ -59,8 +58,11 @@ namespace geProject {
 		//(de)serialisation
 		std::string filePath;
 		std::ofstream oFile;		
-		json serializeEntity(Entity& entity);
 		bool physicsEnabled{ false };
+
+
+
+		json serializeEntity(Entity& entity);
 		//overrides for serialising to/from json
 		void to_json(json& data, FontRender& comp);		
 		void to_json(json& data, SpriteRender& comp);

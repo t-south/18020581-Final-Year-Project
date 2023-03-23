@@ -132,11 +132,12 @@ namespace geProject {
 
 	class TransformEvent : public Event {
 	public:
-		TransformEvent(int id, int posx, int posy, int rotate) : entityId(id), posX(posx), posY(posy), rotation(rotate) {};
+		TransformEvent(int id, float posx, float posy, float rotate) : entityId(id), posX(posx), posY(posy), rotation(rotate) {};
 		static int getType() { return Type::transForm; };
 		static int getContexts() { return AppCat; };
 		bool contextCheck(Context cat) { return getContexts() & cat; }		
-		int entityId, posX, posY, rotation;
+		int entityId;
+		float posX, posY, rotation;
 	};
 
 	class SpriteEvent : public Event {
@@ -151,22 +152,23 @@ namespace geProject {
 
 	class RigidEvent : public Event {
 	public:
-		RigidEvent(int id, Rigidbody& rigid) : entityId(id), rigidbody(&rigid) {};
+		RigidEvent(unsigned int id, Rigidbody& rigid) : entityId(id), rigidbody(&rigid) {};
 		static int getType() { return Type::rigidBody; };
 		static int getContexts() { return AppCat; };
 		bool contextCheck(Context cat) { return getContexts() & cat; }
 		Rigidbody* rigidbody;
-		int entityId;
+		unsigned int entityId;
 	};
 
 	class BoxColliderEvent : public Event {
 	public:
-		BoxColliderEvent(int id, BoxCollider& box) : entityId(id), boxcollider(&box) {};
+		BoxColliderEvent(unsigned int id, float offX, float offY, float sizeX, float sizeY, float origX, float origY) 
+			: entityId(id), offSetX(offX), offsetY(offY), boxSizeX(sizeX), boxSizeY(sizeY), originX(origX), originY(origY){};
 		static int getType() { return Type::boxCollider; };
 		static int getContexts() { return AppCat; };
-		bool contextCheck(Context cat) { return getContexts() & cat; }
-		BoxCollider* boxcollider;
-		int entityId;
+		bool contextCheck(Context cat) { return getContexts() & cat; }		
+		float offSetX, offsetY, boxSizeX, boxSizeY, originX, originY;
+		unsigned int entityId;
 	};
 
 	class CircleColliderEvent : public Event {
@@ -176,7 +178,7 @@ namespace geProject {
 		static int getContexts() { return AppCat; };
 		bool contextCheck(Context cat) { return getContexts() & cat; }
 		CircleCollider* circlecollider;
-		int entityId;
+		unsigned int entityId;
 	};
 
 
