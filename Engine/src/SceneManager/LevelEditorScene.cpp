@@ -242,26 +242,26 @@ void geProject::LevelEditorScene::setGridLines() {
 	glm::vec2 pos = camera->getPosition();
 	float scroll = camera->getScroll();
 	glm::vec2 projSize = camera->getProjSize() * scroll;
-	float x, y, vLine, hLine, maxLine;
+	float x, y, verticalLine, horizontalLine, maxLine;
 	x = ((pos.x / gridWidth) - 1) * gridWidth;
 	y = ((pos.y / gridHeight) - 1) * gridHeight;
-	vLine = (projSize.x / gridWidth) + 2;
-	hLine = (projSize.y / gridHeight) + 2;
+	verticalLine = (projSize.x / gridWidth) + 2;
+	horizontalLine = (projSize.y / gridHeight) + 2;
 	maxLine = 0;
-	if (hLine >= vLine) {
-		maxLine = hLine;
+	if (horizontalLine >= verticalLine) {
+		maxLine = horizontalLine;
 	}
 	else {
-		maxLine = vLine;
+		maxLine = verticalLine;
 	}
 	for (int i = 0; i < maxLine; i++) {
 		float newX = x + (gridWidth * i);
 		float newY = y + (gridHeight * i);
-		if (i < vLine) {
-			editor->addLine(glm::vec2(newX, y), glm::vec2(newX, y + (int)projSize.y + gridHeight), glm::vec3(0.2f, 0.2f, 0.2f), 1);
+		if (i < verticalLine) {
+			editor->addLine(glm::vec2(newX, y), glm::vec2(newX, y + projSize.y + gridHeight), glm::vec3(0.2f, 0.2f, 0.2f), 1);
 		}
-		if (i < hLine) {
-			editor->addLine(glm::vec2(x, newY), glm::vec2(x + (int)projSize.x + gridWidth, newY), glm::vec3(0.2f, 0.2f, 0.2f), 1);
+		if (i < horizontalLine) {
+			editor->addLine(glm::vec2(x, newY), glm::vec2(x + projSize.x + gridWidth, newY), glm::vec3(0.2f, 0.2f, 0.2f), 1);
 		}
 	}
 }
