@@ -9,12 +9,13 @@ namespace geProject {
 	public:
 		SpriteSheet(const char* filePath, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing , int zIndex);
 		~SpriteSheet();
-		SpriteRender getSprite(unsigned int spriteAtlasId);
+		SpriteRender& getSprite(unsigned int spriteAtlasId);
 		unsigned int getSpriteSize();
 		unsigned int getSpriteWidth();
 		unsigned int getSpriteHeight();
 		unsigned int getSpriteSheetHeight();
 		unsigned int getSpriteSheetWidth();
+		
 	private:
 		std::vector<SpriteRender> sprites;
 		unsigned int spriteNum, spriteHeight, spriteWidth, border;

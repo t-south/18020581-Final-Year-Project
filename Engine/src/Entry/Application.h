@@ -30,6 +30,7 @@ namespace geProject {
 		void startGamePlay(GameStartEvent* start);
 		void stopGamePlay(GameStopEvent* stop);
 		void loadGame(GameLoadEvent* load);	
+
 	};
 	
 	Application* CreateApplication();

@@ -44,6 +44,6 @@ void geProject::Camera::setPosition(glm::vec2 pos) {
 	eventSystem.publishImmediately(new ProjectionEvent(projInv, viewInv));
 }
 
-void geProject::Camera::setScroll(float scale) { scroll += scale; }
+void geProject::Camera::setScroll(float scale) { scroll += scale; projectionUpdate(); }
 float geProject::Camera::getScroll() { return scroll; }
 

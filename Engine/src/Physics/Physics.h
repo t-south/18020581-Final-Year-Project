@@ -11,9 +11,12 @@ namespace geProject {
 		Physics(EntityManager& emanager);
 		~Physics();
 		void addEntity(Entity& entity);
-		void removeEntity(Entity& entity);
+		void addBoxCollider(BoxCollider& box);
+		void addCircleCollider(CircleCollider& circle);
+		void removeEntity(int  entityId);
 		void clear();
 		void update(float deltaTime);
+		//b2RayCastOutput getRayCast(int entityId, float coordAx, float coordAy, float coordBx, float coordBy);
 	private:
 		b2Vec2 gravity{0, -10.0f};
 		b2World world;
@@ -21,10 +24,11 @@ namespace geProject {
 		float timeStep;
 		int velocity;
 		int position;
-		std::unordered_map<unsigned int, b2Body*> bodies;
+		std::unordered_map<int, b2Body*> bodies;
 		EntityManager* manager{ nullptr };	
-		void updateRigidBody(RigidEvent* event);
-		void updateBoxCollider(BoxColliderEvent* event);
-		void updateCircleCollider(CircleColliderEvent* event);
+		void updateRigidBody(RigidEvent* e);
+		void updateBoxCollider(BoxColliderEvent* e);
+		void updateCircleCollider(CircleColliderEvent* e);	
+		void deleteEntityPhysics(DeleteEntityEvent* e);
 	};
 }

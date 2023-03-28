@@ -58,7 +58,9 @@ namespace geProject {
 			frameBuffer->unBind();
 			//inverse for view has to be taken after render
 			//IMGUI UPDATES
-			imguiWindow->update(deltaTime, scene);		
+		
+			imguiWindow->update(deltaTime, scene);
+	
 			//imguiwindow->render(width, height);
 			glfwSwapBuffers(gameWindow->getWindow());
 			gameClock->updateTime();
@@ -85,7 +87,9 @@ namespace geProject {
 			std::cout << "starting play" << std::endl;
 			auto scene = sceneManager->getCurrentScene();
 			scene->serialize(scene->getFilePath());
+			scene->serialize("../../../../Game/assets/levels/levelEditor.json");
 			scene->setPhysics(true);
+			//scene->init();
 			scene->setActiveEntity(-1);				
 		}
 	}
@@ -98,6 +102,7 @@ namespace geProject {
 			scene->setPhysics(false);
 			scene = sceneManager->getCurrentScene();			
 			scene->deserialize(scene->getFilePath());
+			scene->setActiveEntity(-1);
 		}
 	}
 

@@ -68,7 +68,10 @@ void geProject::RenderBatch::init() {
 
 void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transform) {	
 	if (spriteNum <= maxBatch && sprite->zIndex == zIndex) {
-		int index = spriteNum * 4 * vertSize;		
+		int index = spriteNum * 4 * vertSize;
+		if (vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] != 0.0f) { // get the index where the object id is stored
+			index = getUnusedRenderSection();
+		}	
 		//load in new texture into texture array if not present, leave 0th element for normal colors		
 		if (sprite->spriteSheetId == 0 && sprite->textureId > 0 && textures[sprite->textureId] == nullptr) {
 			textures[sprite->textureId] = resourceManager->requestTexture(sprite->textureId);
@@ -101,27 +104,27 @@ void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* tra
 	for (int i = 0; i < 4; i++) {
 		switch (i) {
 		case 0:
-			vertices[index] = transform->position[0] + (/*0.5f*/ 1 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*0.5f*/ 1 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (0.5f /* 1*/ * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0.5f /* 1*/ * transform->scale.y); //y
 			break;
 		case 1:
-			vertices[index] = transform->position[0] + (/*0.5f*/ 1 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*-0.5f*/ 0 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (0.5f /* 1*/ * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (-0.5f /* 0*/ * transform->scale.y); //y
 			break;
 
 		case 2:
-			vertices[index] = transform->position[0] + (/*/-0.5f*/0 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*-0.5f*/ 0 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + ( -0.5f /* 0*/ * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (-0.5f /* 0*/ * transform->scale.y); //y
 			break;
 
 		case 3:
-			vertices[index] = transform->position[0] + (/*-0.5f*/ 0 * transform->scale.x); //x
-			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (/*0.5f*/ 1 * transform->scale.y); //y
+			vertices[index] = transform->position[0] + (-0.5f /* 0*/ * transform->scale.x); //x
+			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = transform->position[1] + (0.5f /* 1*/ * transform->scale.y); //y
 			break;
 
 		}
 		if (transform->rotation > 0 || transform->rotation < 0) {
-			glm::vec2 newVerts = rotate(glm::vec2(vertices[index], vertices[index + 1]), transform->centre, transform->rotation);
+			glm::vec2 newVerts = rotate(glm::vec2(vertices[index], vertices[index + 1]), transform->position, transform->rotation);
 			vertices[index] = newVerts[0];
 			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = newVerts[1];
 		}
@@ -139,9 +142,13 @@ void geProject::RenderBatch::createVertices(SpriteRender* sprite, Transform* tra
 
 void geProject::RenderBatch::removeVertices(unsigned int index) {
 	for (int i = index; i < index + (4*vertSize); i++) {
-		vertices[i] = 0;
+		vertices[i] = 0;  //reset vertices in specific index 
 	}
+	spriteNum--;
+
 }
+
+
 
 
 std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
@@ -162,8 +169,12 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 }
 
 void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {	
+	if (shaderPath == "../../../../Game/assets/shaders/SelectionVertexShader.glsl") {
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
+	
 	auto shader = resourceManager->requestShader(shaderPath);
 	camera.projectionUpdate();
 	shader->setMat4f("uProjMat", camera.getProjection());
@@ -181,17 +192,9 @@ void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 		count++;
 	}
 
-	/*
-	int index = 0;
-	for (auto const& i : vertices) {
-		if (index % 9 == 0) {
-			std::cout << std::endl;
-		}
-		std::cout << i << " ";
-		index++;
+
 	
-	}
-	*/
+	int index = 0;
 	//shader->setIntArray("textures", slots);
 	
 	glBindVertexArray(vao);
@@ -211,15 +214,18 @@ void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {
 		}
 	}	
 	shader->detach();
+
+	
 }
 
 int geProject::RenderBatch::getUnusedRenderSection() {
-	for (int i = 0; i < vertices.size(); i++) {
-		if (vertices[i] == 0) {
-			return i;
-		}
+	int count = 0;
+	int verticesSize = vertSize * 4;
+	while (vertices[(static_cast<std::vector<float, std::allocator<float>>::size_type>(count) * verticesSize) + 9] != 0) {
+		count++;
 	}
-	return -1;
+	
+	return count * verticesSize;
 }
 
 unsigned int geProject::RenderBatch::getSpriteNum() {
@@ -234,3 +240,5 @@ glm::vec2 geProject::RenderBatch::rotate(glm::vec2 vert, glm::vec2 centre, float
 	rotation = rotation * PI / 180.0;
 	return glm::vec2((cos(rotation) * (vert.x - centre.x) - sin(rotation) * (vert.y - centre.y) + centre.x), (sin(rotation) * (vert.x - centre.x) + cos(rotation) * (vert.y - centre.y) + centre.y));
 }
+
+

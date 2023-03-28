@@ -22,5 +22,6 @@ namespace geProject {
 		Camera* camera{nullptr};
 		void init();
 		virtual void saveGame(GameSaveEvent* save) override;
+		
 	};
 }

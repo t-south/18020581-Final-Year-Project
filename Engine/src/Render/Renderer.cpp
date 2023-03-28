@@ -3,6 +3,7 @@
 std::vector<geProject::RenderBatch> geProject::Renderer::renderList;
 
 geProject::Renderer::Renderer(geProject::ResourceManager& resources){
+	eventSystem.subscribe(this, &Renderer::deleteEntity);
 	resourceManager = &resources;
 	int zIndexRange = 10;
 	//instantiate 10 zindex batches
@@ -75,6 +76,7 @@ void geProject::Renderer::addSpriteToBatch(SpriteRender* sprite, Transform* tran
 
 void geProject::Renderer::updateSprite(SpriteRender* sprite, Transform* transform) {	
 	if (transform->dirtyFlag[2] > -1) {
+
 		//if zIndex is different from the current entities renderbatch
 		if (sprite->zIndex != renderList[transform->dirtyFlag[1]].getZindex()) {
 			//remove the entity from the renderbatch and switch the renderbatch to the new z index;
@@ -99,6 +101,7 @@ void geProject::Renderer::updateSprite(SpriteRender* sprite, Transform* transfor
 void geProject::Renderer::render(Camera& camera, std::string shaderPath) {
 	//std::cout << "number of batches" << renderList.size() << std::endl;
 	//iterate backward through list to allow layers with lower z index to be towards the front
+	
 	for (int i = renderList.size() - 1; i >= 0 ;i--) {
 		renderList[i].render(camera, shaderPath);
 	}
@@ -110,4 +113,8 @@ void geProject::Renderer::clear() {
 		renderList.clear();
 		//renderList.push_back(RenderBatch(maxBatch, 0, *resourceManager));
 	}
+}
+
+void geProject::Renderer::deleteEntity(DeleteEntityEvent* e){
+	renderList[e->renderBatch].removeVertices(e->renderIndex);
 }

@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 //#include <glm/mat4x4.hpp>
 #include <memory>
+#include <imgui.h>
 #include <ge_engine/Core.h>
 
 namespace geProject {
@@ -13,6 +14,7 @@ namespace geProject {
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+		
 		void endFrame();
 		//getters
 		float getXpos();
@@ -37,6 +39,7 @@ namespace geProject {
 		void setInverses(glm::mat4 inverseProj, glm::mat4 inverseView);
 		float getViewXsize();
 		float getViewYsize();
+		bool checkMouseBoundaries();
 	private:
 		MouseListener();
 		MouseListener(const MouseListener& obj) = delete;

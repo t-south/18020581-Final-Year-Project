@@ -7,8 +7,11 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	//resourceManager->loadLevel();
 	eventSystem.subscribe(this, &LevelEditorScene::saveGame);
 	eventSystem.subscribe(this, &LevelEditorScene::changeSelectionView);
+	eventSystem.subscribe(this, &LevelEditorScene::deleteEntity);
+	eventSystem.subscribe(this, &LevelEditorScene::updateCopy);
 	std::cout << "Editor Scene!" << std::endl;	
 	manager = new EntityManager(10000);
+	animationManager = new AnimationManager(*manager, *resourceManager);
 	renderer = new Renderer(*(resourceManager));
 	//shader = new geProject::Shader("../../../../Game/assets/shaders/defaultVertexShader.glsl", );
 	camera = new EditorCamera(glm::vec2(-250.0f, 0.0f));	
@@ -21,10 +24,11 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	editor = new EditorRender(*(resourceManager));
 	//init();	
 	//unsigned int red = resourceManager->loadTexture("../../../../Game/assets/images/red.jpg");
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/decorationsAndBlocks.png", 81, 16, 16, 0, 0));
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/icons.png", 16, 32, 32, 0, 0));
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/spritesheet.png", 26, 16, 16, 0, 0));
-	sprites.push_back(resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 0));
+	resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/decorationsAndBlocks.png", 81, 16, 16, 0, 0);
+	resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/spritesheet.png", 26, 16, 16, 0, 0);
+	resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/Sprite-0001.png", 1, 32, 32, 0, 0);
+	resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/icons.png", 16, 32, 32, 0, 0);
+	resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 0);
 	selectionTextures = new FrameBuffer(1920, 1080, true);
 	physicsManager = new Physics(*manager);
 	
@@ -68,29 +72,33 @@ void geProject::LevelEditorScene::reAssignEntityToScene(unsigned int entityScene
 	//entities[entitySceneId] = manager->getEntity(entityId);
 }
 
-void geProject::LevelEditorScene::update(float deltaTime) {		
-	
-	//setGridLines();
-	
+void geProject::LevelEditorScene::update(float deltaTime) {			
 	camera->update(deltaTime);	
-	
-	if (loopcount % 150 == 0) {		
+	if (gridSelected) {
+		setGridLines();
+	}
+	/*
+	if (loopcount % 100 == 0) {		
 		std::cout << "View X: " << mouse->getViewXsize() << " View Y: " << mouse->getViewYsize() << std::endl;
 		std::cout << "Mouse X: " << mouse->getXpos() << " Mouse Y: " << mouse->getYpos() << std::endl;
 		std::cout << "World X: " << mouse->getScreenXpos() << " World Y: " << mouse->getScreenYpos() << std::endl;
 		std::cout << "Camera X: " << mouse->getCameraMouseX() << " Camera Y: " << mouse->getCameraMouseY() << std::endl;
+		std::cout << mouse->checkMouseBoundaries() << std::endl;
 	}
-
+	*/
+	
 	//DEBUG DRAWING FOR PHYSICS
-	auto ent = manager->getEntities();	
-	for (int i = 0; i < ent.size(); i++) {
-		auto box = manager->getBoxColliderComponent(i);
-		auto trans = manager->getTransformComponent(i);
-		if (box->id > 0) {
-			//multiply by 2 since box size is set to half width / height
-			editor->addBox(trans->centre + box->offset, box->boxSize, glm::vec3(0.0f, 1.0f, 0.0f), trans->rotation, 1);
-		}
+
+	/*
+	if (loopcount % 150 == 0) {
+		std::cout << "clicked: " << entityClicked << std::endl;
+		std::cout << "dragged: " << entityDrag << std::endl;
+		std::cout << "active entity: " << activatedEntity << std::endl;
 	}
+	*/
+
+		
+
 	
 	//DRAG AND DROP
 	if (entityDrag == true && activatedEntity > -1) {
@@ -98,7 +106,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		float scroll = camera->getScroll();
 		float viewWidth = mouse->getViewXsize();
 		float viewHeight = mouse->getViewYsize();
-		if (gridSelected) {
+		if (gridSelected) {			
 			transform->position[0] = (int)(mouse->getCameraMouseX() / gridWidth) * gridWidth;
 			transform->position[1] = (int)(mouse->getCameraMouseY() / gridHeight) * gridHeight;
 		}
@@ -114,8 +122,8 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
 		}		
 	}
-
-
+	//std::cout << activatedEntity << std::endl;
+	
 	//UPDATES TO RENDERING
 	if (manager->hasUpdate()) {		
 		for (int i = 0; i < manager->getEntityNum(); i++) {	
@@ -124,7 +132,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 			}
 			auto ent = manager->getEntity(i);
 			if ((ent->compMask & 4) == 4) {//check for rigidbody
-				if ((ent->compMask & 8) == 8 || (ent->compMask & 16) == 16) {//check for boxcollider or circlecollider
+				if ((ent->compMask & 8) == 8 || (ent->compMask & 16) == 16) {//check for boxcollider or circlecollider			
 					physicsManager->addEntity(*ent);
 				}
 			}
@@ -132,7 +140,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 			auto trans = manager->getTransformComponent(i);
 			auto sprite = manager->getSpriteComponent(i);
 			//transform dirtyflag for render index is by default set to -1 when first created
-			if (trans->dirtyFlag[2] == -1) {				
+			if (trans->dirtyFlag[2] == -1 ) {
 				renderer->addSpriteToBatch(sprite, trans);				
 				trans->dirtyFlag[0] = 0;
 			}
@@ -143,13 +151,43 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		}
 		//manager->endFrame();			
 	}
+	animationManager->update(deltaTime);
 	mouse->endFrame();
 	keyboard->endFrame();
 	if (physicsEnabled == true) {
 		physicsManager->update(deltaTime);
 	}
-	editor->render(*(camera));
+	manager->endFrame();
 	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");	
+	editor->render(*(camera));
+	
+
+
+	for (const auto& i : manager->getEntities()) {
+		if (i.id > -1) {
+			auto trans = manager->getTransformComponent(i.id);
+			if ((i.compMask & 8) == 8) {
+				for (auto& circle : manager->getCircleColliderComponents(i.id)) {
+					if (circle.id > 0) {
+						//multiply by 2 since box size is set to half width / height
+						editor->addCircle(trans->position + circle.offset, glm::vec3(0.0f, 1.0f, 0.0f), circle.radius, 16, 1);
+					}
+				}
+			}
+			if ((i.compMask & 16) == 16) {
+				for (auto& box : manager->getBoxColliderComponents(i.id)) {
+					if (box.id > 0) {
+						//multiply by 2 since box size is set to half width / height
+						editor->addBox(trans->position + box.offset, box.boxSize, glm::vec3(0.0f, 1.0f, 0.0f), trans->rotation, 1);
+					}
+				}
+			}
+		}
+
+
+	}
+
+
 	loopcount++;
 }
 
@@ -160,51 +198,84 @@ void geProject::LevelEditorScene::render(std::string shaderPath) {
 
 void geProject::LevelEditorScene::setActiveEntity(int entityId) {
 	activatedEntity = entityId;
+	if (entityId == -1) {
+		entityDrag = false;
+	}
 }
 
 void geProject::LevelEditorScene::updateSceneImgui() {
-	if (activatedEntity > -1) {
-		ImGui::Begin("Inspector");
-		manager->updateImgui(activatedEntity);
-		ImGui::End();
-	}
+	ImGui::Begin("Inspector");
+	manager->updateImgui(activatedEntity);
+	ImGui::End();
 	updateImgui();
+
 }
 
 void geProject::LevelEditorScene::updateImgui() {
 	ImGui::Begin("Editor Window");
-	//credit to https ://github.com/ocornut/imgui/issues/1977
-	ImGui::Text("Manually wrapping:");
-	ImGuiStyle& style = ImGui::GetStyle();	
-	float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
-	auto spriteSheet = resourceManager->requestSpriteSheet(sprites[0]);
-	unsigned int spriteSize = spriteSheet->getSpriteSize();
-	for (int i = 1; i < spriteSize + 1; i++){
-		auto newSprite = spriteSheet->getSprite(i);
-		// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-		ImVec2 spriteDimensions(32, 32);
-		ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
-		ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);
-		ImGui::PushID(i);
-		float spriteDim = 0.25f;
-		
-		if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
-			if (entityDrag == false) {				
-				createEditorBlock(&newSprite, spriteDim, spriteDim);
+	if (ImGui::BeginTabBar("Tab")) {
+		if (ImGui::BeginTabItem("Environment")) {
+			//credit to https ://github.com/ocornut/imgui/issues/1977
+			ImGui::Text("Manually wrapping:");
+			ImGuiStyle& style = ImGui::GetStyle();
+			float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+			auto spriteSheet = resourceManager->requestSpriteSheet(1);
+			unsigned int spriteSize = spriteSheet->getSpriteSize();
+			for (int i = 0; i < spriteSize; i++) {
+				auto newSprite = spriteSheet->getSprite(i);
+				// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+				ImVec2 spriteDimensions(32, 32);
+				ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
+				ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);
+				ImGui::PushID(i);
+				float spriteDim = 0.25f;
+				if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+					if (entityDrag == false) {
+						createEnvironmentBlock(&newSprite, spriteDim, spriteDim);
+					}
+				}
+				ImGui::PopID();
+				float last_button_x2 = ImGui::GetItemRectMax().x;
+				float next_button_x2 = last_button_x2 + style.ItemSpacing.x;
+				if (i < spriteSize && next_button_x2 < window_visible_x2)
+					ImGui::SameLine();
 			}
+			ImGui::EndTabItem();
 		}
-		ImGui::PopID();
-		float last_button_x2 = ImGui::GetItemRectMax().x;
-		float next_button_x2 = last_button_x2 + style.ItemSpacing.x; 
-		if (i < spriteSize && next_button_x2 < window_visible_x2)
-			ImGui::SameLine();
+		if (ImGui::BeginTabItem("Characters")) {			
+			auto playerSprites = resourceManager->requestSpriteSheet(2);
+			auto newSprite = playerSprites->getSprite(0);
+			// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+			ImVec2 spriteDimensions(32, 32);
+			ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
+			ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);		
+			float spriteDim = 0.25f;
+			if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+				if (entityDrag == false) {
+					createCharacterBlock(&newSprite, spriteDim, spriteDim);
+				}
+			}
+
+			auto secondplayerspsrites = resourceManager->requestSpriteSheet(3);
+			auto secondPlayer = secondplayerspsrites->getSprite(0);
+			// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples			
+			ImVec2 uvplayer0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
+			ImVec2 uvplayer1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);			
+			if (ImGui::ImageButton((ImTextureID)secondPlayer.textureId, spriteDimensions, uvplayer0, uvplayer1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+				if (entityDrag == false) {
+					createCharacterBlock(&secondPlayer, spriteDim, spriteDim);
+				}
+			}
+			ImGui::EndTabItem();
+		}
+		ImGui::EndTabBar();
 	}
 	ImGui::End();
 }
 
 
 
-unsigned int geProject::LevelEditorScene::createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY) {
+unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY) {	
 	unsigned int entity = manager->addEntity();
 	//float y = camera->getCameraY();		
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
@@ -212,7 +283,19 @@ unsigned int geProject::LevelEditorScene::createEditorBlock(SpriteRender* sprite
 	manager->assignSpriteRender(entity, *sprite);
 	//entities.push_back(manager->getEntity(entity));
 	entityDrag = true;	
-	activatedEntity = entity;	
+	setActiveEntity(entity);
+	return entity;
+}
+
+unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY){
+	unsigned int entity = manager->addEntity();
+	auto spriteSheet = resourceManager->requestSpriteSheet(sprite->spriteSheetId);
+	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
+	manager->assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY} });
+	manager->assignSpriteRender(entity, *sprite);	
+	animationManager->assignEntityAnimation(entity, "Running");
+	entityDrag = true;
+	setActiveEntity(entity);
 	return entity;
 }
 
@@ -258,32 +341,42 @@ bool geProject::LevelEditorScene::getEntityDrag() { return entityDrag; }
 
 void geProject::LevelEditorScene::setPicking() {	
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_BLEND);
 	selectionTextures->bindPicking();	
 	render("../../../../Game/assets/shaders/SelectionVertexShader.glsl");	
 	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();
-		int entityId = selectionTextures->getPixel(x, y);
+		int entityId = selectionTextures->getPixel(x, y);		
 		//std::cout << "entity: " << entityId << std::endl;	
-		if (activatedEntity == entityId && entityClicked == true && entityDrag == false) {			
-			entityDrag = true;			
-			entityClicked = false;			
+		if (entityId == -1 && mouse->checkMouseBoundaries()) {
+			entityDrag = false;
+			entityClicked = false;
+			setActiveEntity(-1);
 			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
 		}
-		else if (entityId > -1 && entityClicked == false && entityDrag == false) {			
-			activatedEntity = entityId;	
-			editor->addBox(manager->getTransformComponent(entityId)->centre, glm::vec2(1, 1), glm::vec3(1.0f, 0.0f, 0.0f), 0, 250);
-			entityClicked = true;
-			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);		
+		else {
+			if (activatedEntity == entityId && entityClicked == true && entityDrag == false) {
+				entityDrag = true;
+				entityClicked = false;
+				mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+			}
+			else if (entityId > -1 && entityClicked == false && entityDrag == false) {
+				setActiveEntity(entityId);
+				editor->addBox(manager->getTransformComponent(entityId)->position, glm::vec2(0.26f, 0.26f), glm::vec3(1.0f, 0.0f, 0.0f), 0, 5);
+				entityClicked = true;
+				mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+			}
+			else if (entityId > -1 && entityId != activatedEntity) {
+				setActiveEntity(entityId);
+				entityClicked = true;
+				editor->addBox(manager->getTransformComponent(entityId)->position, glm::vec2(0.26f, 0.26f), glm::vec3(1.0f, 0.0f, 0.0f), 0, 5);
+				mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
+			}
 		}
-		else if (entityId > -1 && entityId != activatedEntity) {
-			activatedEntity = entityId;
-			entityClicked = true;
-			editor->addBox(manager->getTransformComponent(entityId)->centre, glm::vec2(1, 1), glm::vec3(1.0f, 0.0f, 0.0f), 0, 250);
-			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
-		}
+
+		
 		//scene->updateImgui();
 	}
 	selectionTextures->unBindPicking();	
@@ -297,11 +390,22 @@ void geProject::LevelEditorScene::saveGame(GameSaveEvent* save) {
 	if (save->getType() == Type::gameSave) {
 		std::cout << "GAME SAVED" << std::endl;
 		Scene::serialize(filePath);
+		animationManager->serializeAnimations();
 	}
 }
 
 void geProject::LevelEditorScene::changeSelectionView(GridToggleEvent* e){
 	gridSelected = e->toggled;
 }
+
+void geProject::LevelEditorScene::deleteEntity(DeleteEntityEvent* e){
+	setActiveEntity(-1);
+	entities.erase(e->entityId);
+}
+
+void geProject::LevelEditorScene::updateCopy(CopyEntityEvent* e){
+	setActiveEntity(e->newId);	
+}
+
 
 

@@ -9,12 +9,15 @@
 
 namespace geProject {
 	class EventHandler {
+	typedef unsigned int uInt;
 	public:
 		template<class T>
 		void publish(T* event) {
-			std::list<FunctionWrapper*>* observers = events[event->getType()];
+			std::list<FunctionWrapper*>* observers = events[event->getType()];			
 			for (auto& observer : *observers) {
-				observer->setFunctionParam(event);
+				if (event->contextCheck(currentContext)) {
+					observer->setFunctionParam(event);
+				}
 			}
 		};
 
@@ -34,8 +37,10 @@ namespace geProject {
 		void publishImmediately(T* event) {
 			std::list<FunctionWrapper*>* observers = events[event->getType()];
 			for (auto& observer : *observers) {
-				observer->setFunctionParam(event);
-				observer->callEvent();
+				if (event->contextCheck(currentContext)) {
+					observer->setFunctionParam(event);
+					observer->callEvent();
+				}
 			}
 		}
 		
@@ -48,8 +53,9 @@ namespace geProject {
 			}	
 		
 		}
-
+		void setContext(Context context) { currentContext = context; };	
 	private:
+		Context currentContext{Context::AppContext};
 		std::unordered_map<int, std::list<FunctionWrapper*>*> events;	
 	};
 }

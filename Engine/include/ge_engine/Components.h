@@ -1,16 +1,18 @@
 #pragma once
-
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include "../src/Memory/PoolAllocator.h"
+#include <unordered_map>
+#include <vector>
+#include <string>
 
 namespace geProject {
 	struct Transform {
 		unsigned int id = 1;
+		std::string name{"object"};
 		glm::vec2 position{ 0 };
 		glm::vec2 scale{ 0 };
-		int rotation{ 0};
-		glm::vec2 centre;
+		int rotation{ 0};	
 		glm::vec3 dirtyFlag{0,0,-1 };
 	};
 
@@ -32,32 +34,38 @@ namespace geProject {
 		float linearDamping{ 0.0f };
 		float density{ 0.0f };
 		bool fixedRotate{ false };
-		bool bullet{ false };
+		bool bullet{ false };		
 		unsigned int bodyType{ 1 }; // 0 -> kinematic ||| 1 -> dynamic ||| 2 -> static
 		glm::vec3 velocity{ 0, 0.5, 0 };	
 	};
 
 	struct CircleCollider {
-		unsigned int id = 8;		
+		unsigned int id = 8;
+		int entityAssigned;
 		float radius{ 0.0f };
 		glm::vec2 offset;
+		bool sensor{ false };
 	};
 
 	struct BoxCollider {
 		unsigned int id = 16;		
-		glm::vec2 boxSize{0.0f, 0.0f};
+		int entityAssigned;
+		glm::vec2 boxSize{0.25f, 0.25f};
 		glm::vec2 offset{ 0 };
 		glm::vec2 origin{0,0};
+		bool sensor{ false };
 
 	};
 
+	struct Animation {
+		unsigned int id = 32;		
+		float speed{0.8f};
+		int currentFrame{ 0 };
+		bool loopAnimation{ true };
+		std::string state;
+	};
 
-	struct FontRender {
-		unsigned int id = 32;
-		int x;
-		int y;
-		int z;
-		glm::vec3 dirtyFlag{ 0,0,0 };
+	struct EntityType {
 
 	};
 	

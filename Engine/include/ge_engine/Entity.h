@@ -2,7 +2,7 @@
 namespace geProject {
 	struct Entity
 	{
-		unsigned int id;
+		int id{-1};
 		unsigned int compMask;
 	};
 

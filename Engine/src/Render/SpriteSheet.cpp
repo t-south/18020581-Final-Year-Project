@@ -3,7 +3,6 @@
 geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex) : Texture(filePath), spriteNum(spriteNum), spriteWidth(spriteWidth), spriteHeight(spriteHeight), border(borderspacing){
 	//currently only designed for uniform sprites in a spritesheet
 	//UV tex coords for sprite within spritesheet
-	
 	float x, y;
 	
 	x = 0;
@@ -48,10 +47,11 @@ geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum
 
 
 geProject::SpriteSheet::~SpriteSheet() {
+
 }
 
-geProject::SpriteRender geProject::SpriteSheet::getSprite(unsigned int atlasId){
-	return sprites[static_cast<std::vector<geProject::SpriteRender, std::allocator<geProject::SpriteRender>>::size_type>(atlasId) - 1];
+geProject::SpriteRender& geProject::SpriteSheet::getSprite(unsigned int atlasId){	
+	return sprites[static_cast<std::vector<geProject::SpriteRender, std::allocator<geProject::SpriteRender>>::size_type>(atlasId)];
 }
 
 unsigned int geProject::SpriteSheet::getSpriteSize() {

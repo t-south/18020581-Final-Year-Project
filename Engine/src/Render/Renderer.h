@@ -24,5 +24,6 @@ namespace geProject {
 		ResourceManager* resourceManager;	
 		static std::vector<RenderBatch> renderList;
 		static const unsigned int maxBatch{ 500 };
+		void deleteEntity(DeleteEntityEvent* e);
 	};
 }

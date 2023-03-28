@@ -11,41 +11,52 @@
 //data driven aproach. An entity will contain components. Each component will have its own id and be stored in a memory pool of each 
 //type of component. The entity ID will be used to access the index of each component to get each entities components.
 namespace geProject {
+	enum ComponentType {	
+		TransformType = (1 << 0),		/* 0b0000000000000001 */
+		SpriteType = (1 << 1),			/* 0b0000000000000010 */
+		RigidType  = (1 << 2),			/* 0b0000000000000100 */
+		CircleColliderType = (1 << 3),	/* 0b0000000000001000 */
+		BoxColliderType = (1 << 4),		/* 0b0000000000010000 */
+		AnimationType = (1 << 5),		/* 0b0000000000100000 */
+	};
+
+
 	class EntityManager {
 		typedef unsigned int uInt;
 	public:
 		EntityManager(uInt maxEntities);
 		~EntityManager();
 		//Entities
-		uInt addEntity();
+		int addEntity();
+		
+		void deleteEntity(int entityId);
+		void copyEntity(int entityId);
 		uInt getEntityNum();
-		Entity* getEntity(uInt entityId);
+		Entity* getEntity(int entityId);
 		std::vector<Entity> getEntities();
 		//Components
-		void assignTransform(uInt entityId, Transform transform);
-		void assignSpriteRender(uInt entityId, SpriteRender sprite);
-		void assignRigidBody(uInt entityId, Rigidbody rBody);
-		void assignBoxCollider(uInt entityId, BoxCollider box);
-		void assignCircleCollider(uInt entityId, CircleCollider circle);
-		void assignFontRender(uInt entityId, FontRender font);
+		void assignTransform(int entityId, Transform transform);
+		void assignSpriteRender(int entityId, SpriteRender sprite);
+		void assignRigidBody(int entityId, Rigidbody rBody);
+		void assignBoxCollider(int entityId, BoxCollider box);
+		void assignCircleCollider(int entityId, CircleCollider circle);
+		void assignAnimation(int entityId, Animation animate);
 
-		void deleteComponent(uInt entityId, uInt componentId);
+		void deleteComponent(int entityId, uInt componentId);
 		std::vector<Transform*> getTransformComponents();
 		std::vector<SpriteRender*> getSpriteComponents();
-		std::vector <Rigidbody*> getRigidBodyComponents();
-		std::vector <BoxCollider*> getBoxColliderComponents();
-		std::vector<CircleCollider*> getCircleColliderComponents();
-		std::vector<FontRender*> getFontRenderComponents();	
+		std::vector <Rigidbody*> getRigidBodyComponents();	
+		std::vector<Animation*> getAnimationComponents();	
 
 
-		Transform* getTransformComponent(uInt entityId);
-		SpriteRender* getSpriteComponent(uInt entityId);
-		Rigidbody* getRigidBodyComponent(uInt entityId);
-		BoxCollider* getBoxColliderComponent(uInt entityId);
-		CircleCollider* getCircleColliderComponent(uInt entityId);
-		FontRender* getFontRenderComponent(uInt entityId);
+		Transform* getTransformComponent(int entityId);
+		SpriteRender* getSpriteComponent(int entityId);
+		Rigidbody* getRigidBodyComponent(int entityId);
+		std::vector<BoxCollider> getBoxColliderComponents(int entityId);
+		std::vector<CircleCollider> getCircleColliderComponents(int entityId);
+		Animation* getAnimationComponent(int entityId);
 
-		void updateImgui(uInt entityId);
+		void updateImgui(int entityId);
 		bool hasUpdate();
 		void endFrame();
 		void reloadManager();
@@ -56,19 +67,19 @@ namespace geProject {
 		std::vector<Transform*> componentTransforms;
 		std::vector <SpriteRender*> componentSpriteRender;
 		std::vector <Rigidbody*> componentRigidBody;
-		std::vector <BoxCollider*> componentBoxCollider;
-		std::vector <CircleCollider*> componentCircleCollider;
-		std::vector <FontRender*> componentFontRender;
-		unsigned int playerId;
-		std::vector<Entity> entities;	
-		glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
-
+		std::unordered_map<int, std::vector <BoxCollider>> componentBoxCollider;
+		std::unordered_map<int, std::vector <CircleCollider>> componentCircleCollider;
+		std::vector <Animation*> componentAnimation;
+		int playerId, numDeleted;
+		std::vector<Entity> entities;		
+		//glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
 		void updateTransform(TransformEvent* event);
 		void updateSprite(SpriteEvent* event);
 		void updateRigidBody(RigidEvent* event);
 		void updateBoxCollider(BoxColliderEvent* event);
 		void updateCircleCollider(CircleColliderEvent* event);
-
+		bool popup{ false };
+		bool textEdited{ false };
 
 	};
 }

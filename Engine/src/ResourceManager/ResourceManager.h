@@ -27,9 +27,7 @@ namespace geProject {
 		unsigned int loadSpriteSheet(std::string guId, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex);
 		void unloadSpriteSheet(unsigned int guId);
 		std::shared_ptr<geProject::SpriteSheet> requestSpriteSheet(unsigned int guid);
-		
-		void loadLevel();
-		void loadGlobalResources();
+
 	private:
 		static StackAllocator gameResources;
 		std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;

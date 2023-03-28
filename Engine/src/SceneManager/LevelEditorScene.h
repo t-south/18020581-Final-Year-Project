@@ -27,14 +27,17 @@ namespace geProject {
 		bool gridSelected{ false };
 		EditorCamera* editorCam;
 		EditorRender* editor;
-		std::vector<unsigned int> sprites;
+	
 		unsigned int testSpritesheet{ 14 };
 		unsigned int loopcount{ 0 };
 		unsigned int entity;
 		virtual void init() override;
-		unsigned int createEditorBlock(SpriteRender* sprite, float sizeX, float sizeY);
+		unsigned int createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY);
+		unsigned int createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY);
 		void setGridLines();
 		virtual void saveGame(GameSaveEvent* save) override;
-		void changeSelectionView(GridToggleEvent* e);
+		void changeSelectionView(GridToggleEvent* e);	
+		void deleteEntity(DeleteEntityEvent* e);
+		void updateCopy(CopyEntityEvent* e);
 	};
 }

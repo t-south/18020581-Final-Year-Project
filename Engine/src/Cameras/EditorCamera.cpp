@@ -91,7 +91,7 @@ void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {
 void geProject::EditorCamera::cameraMouseScrolled(MouseScrollEvent* scroll){
 	//std::cout << "Context: " << scroll->getContexts() << " Type: " << scroll->getType() << std::endl;
 	auto scrollval = scroll->yScroll;
-	if (scrollval != 0.0f && (scroll->screenX >= 0.0f && scroll->screenX <= 1920.0f) && (scroll->screenY >= 0.0f && scroll->screenY <= 1080.0f)) {		
+	if (scroll->yScroll != 0.0f && (scroll->screenX >= 0.0f && scroll->screenX <= 1920.0f) && (scroll->screenY >= 0.0f && scroll->screenY <= 1080.0f)) {		
 		int signum = (0 < scrollval) - (scrollval < 0);
 		setScroll(pow(abs(scrollval), 1 / getScroll()) * 0.2f * -signum);
 	}

@@ -39,22 +39,24 @@ void geProject::EditorRender::addLine(glm::vec2 origin, glm::vec2 destination, g
 
 
 void geProject::EditorRender::addBox(glm::vec2 centre, glm::vec2 dim, glm::vec3 color, float rotation, unsigned int life) {
-	glm::vec2 min = centre - dim * 0.5f;
-	glm::vec2 max = centre + dim * 0.5f;
-	std::vector<glm::vec2> verts;
-	verts.push_back(glm::vec2(min.x, min.y));
-	verts.push_back(glm::vec2(min.x, max.y));
-	verts.push_back(glm::vec2(max.x, max.y));
-	verts.push_back(glm::vec2(max.x, min.y));
-	if (rotation != 0.0f) {
-		for (int i = 0; i < verts.size(); i++) {
-			verts[i] = rotate(verts[i], centre, rotation);
+	if (dim[0] > 0 && dim[1] > 0) {
+		glm::vec2 min = centre - dim * 0.5f;
+		glm::vec2 max = centre + dim * 0.5f;
+		std::vector<glm::vec2> verts;
+		verts.push_back(glm::vec2(min.x, min.y));
+		verts.push_back(glm::vec2(min.x, max.y));
+		verts.push_back(glm::vec2(max.x, max.y));
+		verts.push_back(glm::vec2(max.x, min.y));
+		if (rotation != 0.0f) {
+			for (int i = 0; i < verts.size(); i++) {
+				verts[i] = rotate(verts[i], centre, rotation);
+			}
 		}
+		addLine(verts[0], verts[1], color, life);
+		addLine(verts[0], verts[3], color, life);
+		addLine(verts[1], verts[2], color, life);
+		addLine(verts[2], verts[3], color, life);
 	}
-	addLine(verts[0], verts[1], color, life);
-	addLine(verts[0], verts[3], color, life);
-	addLine(verts[1], verts[2], color, life);
-	addLine(verts[2], verts[3], color, life);
 }
 
 
@@ -68,20 +70,21 @@ glm::vec2 geProject::EditorRender::rotate(glm::vec2 vert, glm::vec2 centre, floa
 
 
 void geProject::EditorRender::addCircle(glm::vec2 centre, glm::vec3 color, float radius, unsigned int segments, unsigned int life) {
-	std::vector<glm::vec2> verts;
-	int increment = 360 / segments;
-	float angle = 0;
-	for (int i = 0; i < segments; i++) {
-		glm::vec2 point = glm::vec2(radius, 0);
-		point = rotate(point, glm::vec2(0,0), angle);
-		verts.push_back(point + centre);
-		if (i > 0) {
-			addLine(verts[static_cast<std::vector<glm::vec2, std::allocator<glm::vec2>>::size_type>(i) - 1], verts[i], color, life);
+	if (radius > 0) {
+		std::vector<glm::vec2> verts;
+		int increment = 360 / segments;
+		float angle = 0;
+		for (int i = 0; i < segments; i++) {
+			glm::vec2 point = glm::vec2(radius, 0);
+			point = rotate(point, glm::vec2(0, 0), angle);
+			verts.push_back(point + centre);
+			if (i > 0) {
+				addLine(verts[static_cast<std::vector<glm::vec2, std::allocator<glm::vec2>>::size_type>(i) - 1], verts[i], color, life);
+			}
+			angle += increment;
 		}
-		angle += increment;
+		addLine(verts[verts.size() - 1], verts[0], color, life);
 	}
-	addLine(verts[verts.size() - 1], verts[0], color, life);
-
 }
 
 void geProject::EditorRender::createVertices() {
@@ -94,18 +97,18 @@ void geProject::EditorRender::createVertices() {
 				case 0:
 					pos = line->getOrigin();
 					vertices[index] = pos[0];
-					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];
+					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];//x
 					break;
 				case 1:
 					pos = line->getDestination();
 					vertices[index] = pos[0];
-					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];
+					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];//y
 					break;
 				default:
 					break;
 				}
 				glm::vec3 color = line->getColor();
-				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = 0.0f;
+				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = 0.0f;  //z
 				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = color[0];
 				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = color[1];
 				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 5] = color[2];

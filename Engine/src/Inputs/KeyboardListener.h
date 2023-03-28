@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <ge_engine/Core.h>
+#include <imgui.h>
 
 namespace geProject {
 	class KeyboardListener {

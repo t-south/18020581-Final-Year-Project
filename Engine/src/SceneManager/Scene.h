@@ -2,14 +2,14 @@
 #include <ge_engine/Components.h>
 #include <fstream>
 #include <iostream>
-#include "json.hpp"
+#include <ge_engine/json.hpp>
 #include "../Inputs/KeyboardListener.h"
 #include "../Inputs/MouseListener.h"
 #include "../Windows/Window.h"
 #include "../Render/Renderer.h"
 #include "../Render/FrameBuffer.h"
 #include "../Physics/Physics.h"
-
+#include "../Animation/AnimationManager.h"
 
 
 
@@ -44,7 +44,7 @@ namespace geProject {
 		void setPhysics(bool check);
 		//friend class SceneSerialize;
 	protected:
-		std::unordered_map<unsigned int, Entity*> entities;		
+		std::unordered_map<int, Entity*> entities;		
 		static Window* gameWindow;
 		MouseListener* mouse;
 		KeyboardListener* keyboard;
@@ -52,6 +52,7 @@ namespace geProject {
 		static ResourceManager* resourceManager;
 		static Physics* physicsManager;
 		static EntityManager* manager;
+		static AnimationManager* animationManager;
 		Camera* camera;
 		Renderer* renderer{ nullptr };
 		FrameBuffer* selectionTextures{ nullptr };
@@ -64,13 +65,13 @@ namespace geProject {
 
 		json serializeEntity(Entity& entity);
 		//overrides for serialising to/from json
-		void to_json(json& data, FontRender& comp);		
+		void to_json(json& data, Animation& comp);		
 		void to_json(json& data, SpriteRender& comp);
 		void to_json(json& data, Transform& comp);
 		void to_json(json& data, Rigidbody& comp);
 		void to_json(json& data, CircleCollider& comp);
 		void to_json(json& data, BoxCollider& comp);
-		void from_json(json& data, FontRender& comp);
+		void from_json(json& data, Animation& comp);
 		void from_json(json& data, SpriteRender& comp);
 		void from_json(json& data, Transform& comp);
 		void from_json(json& data, Rigidbody& comp);

@@ -30,17 +30,18 @@ namespace geProject {
 		void render(Camera& camera, std::string shaderPath);
 		unsigned int getSpriteNum();
 		unsigned int getZindex();
-		void removeVertices(unsigned int index);
+		void removeVertices(unsigned int index);		
 		int getUnusedRenderSection();
 	private:
 		unsigned int vao, vbo, maxBatch, vertSize, spriteNum, zIndex;
 		bool hasUpdate{ true };
+		bool buffer{ false };
 		ResourceManager* resourceManager;
 		std::vector<float> vertices;
 		std::shared_ptr<geProject::Texture> textures[8]{nullptr};
 		std::vector<unsigned int> createIndexes();
 		void createVertices(SpriteRender* sprite, Transform* transform, unsigned int index);
 		void init();
-		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);	
+		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);			
 	};
 }

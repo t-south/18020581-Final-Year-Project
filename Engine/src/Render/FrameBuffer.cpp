@@ -56,10 +56,12 @@ void geProject::FrameBuffer::bindPicking() { glBindFramebuffer(GL_DRAW_FRAMEBUFF
 void geProject::FrameBuffer::unBindPicking() { glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); }
 
 int geProject::FrameBuffer::getPixel(int x, int y) { 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo); 
+	bind();
 	glReadBuffer(GL_COLOR_ATTACHMENT0);
 	float pixel[3];
+
 	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &pixel);	
+
 	//std::cout << pixel << std::endl;
 	return (int)pixel[0] - 1;
 

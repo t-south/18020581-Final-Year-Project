@@ -7,7 +7,7 @@
 #include "../Render/FrameBuffer.h"
 #include <GLFW/glfw3.h>
 #include <ge_engine/Core.h>
-
+#include "HierarchyWindow.h"
 
 
 //#include "../Render/Window.h"
@@ -27,6 +27,7 @@ namespace geProject {
 	private:
 		GLFWwindow* window;
 		FrameBuffer* frameBuffer;
+		HierarchyWindow* sceneHierarchy;
 		int windowWidth, windowHeight;
 		ImVec2 viewPos, viewSize;
 		void dockWindow();

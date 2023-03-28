@@ -17,12 +17,14 @@ geProject::KeyboardListener* geProject::KeyboardListener::getInstance() {
 
 
 void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
-    if (action == GLFW_PRESS) {        
-        KeyboardListener::getInstance()->keyPressed[key] = true;
-    }
-    if (action == GLFW_RELEASE) {
-        KeyboardListener::getInstance()->keyPressed[key] = false; 
-    }
+    ImGuiIO& io = ImGui::GetIO();
+        if (action == GLFW_PRESS) {        
+            KeyboardListener::getInstance()->keyPressed[key] = true;
+        }
+        if (action == GLFW_RELEASE) {
+            KeyboardListener::getInstance()->keyPressed[key] = false; 
+        }
+   
 }
 
 bool geProject::KeyboardListener::isKeyPressed(int key) {
