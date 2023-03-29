@@ -6,9 +6,9 @@ geProject::Physics::Physics(EntityManager& emanager):time(0), world(b2World(grav
 	position = 3.0f;
 	velocity = 8.0f;	
 	time = 0.0f;
-	eventSystem.subscribe(this, &Physics::updateRigidBody);
+	//eventSystem.subscribe(this, &Physics::updateRigidBody);
 	eventSystem.subscribe(this, &Physics::updateCircleCollider);
-	eventSystem.subscribe(this, &Physics::updateBoxCollider);
+	//eventSystem.subscribe(this, &Physics::updateBoxCollider);
 	eventSystem.subscribe(this, &Physics::deleteEntityPhysics);	
 	manager = &emanager;
 }
@@ -119,8 +119,8 @@ void geProject::Physics::update(float deltaTime){
 				b2Vec2 position = body.second->GetPosition();
 				double PI = 3.14159265;
 				float angle = (float)(body.second->GetAngle() * (180.0/ PI));
-				
-				printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
+				printf("%4.2f %4.2f\n", angle, body.second->GetMass());
+				//printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
 				/*
 				for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 					std::cout << count << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
@@ -150,6 +150,7 @@ void geProject::Physics::updateRigidBody(RigidEvent* e){
 		for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()){
 			fixture->SetDensity(e->rigidbody->density);		
 		}		
+		
 		//body->ResetMassData();
 		bodies[e->entityId] = body;
 	}
