@@ -120,11 +120,12 @@ void geProject::Physics::update(float deltaTime){
 				double PI = 3.14159265;
 				float angle = (float)(body.second->GetAngle() * (180.0/ PI));
 				
-				//printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
-				
+				printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
+				/*
 				for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 					std::cout << count << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
 				}
+				*/
 				count++;
 				
 				eventSystem.publishImmediately(new TransformEvent((int)body.first, position.x, position.y, angle));
