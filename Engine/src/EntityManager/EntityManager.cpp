@@ -1,23 +1,6 @@
 #include "EntityManager.h"
 
-geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntities), entityUpdated(false), numDeleted(0){
-	PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
-	PoolAllocator spritepool{ maxEntities, sizeof(SpriteRender) };
-	PoolAllocator animatePool{ maxEntities, sizeof(Animation)};
-	PoolAllocator rigidpool{ maxEntities, sizeof(Rigidbody) };
-
-	for (int i = 0; i < maxEntities - 1; ++i) {
-		componentTransforms.push_back(reinterpret_cast<Transform*>(transformpool.allocate(sizeof(Transform))));
-		componentTransforms[i]->id = 0;
-		//should i put this in a pool of objects, since there is a unordered map of vectors within?
-		componentAnimation.push_back(reinterpret_cast<Animation*>(animatePool.allocate(sizeof(Animation))));
-		componentAnimation[i]->id = 0;	
-		//componentAnimation.push_back(new Animation());
-		componentSpriteRender.push_back(reinterpret_cast<SpriteRender*>(spritepool.allocate(sizeof(SpriteRender))));
-		componentSpriteRender[i]->id = 0;
-		componentRigidBody.push_back(reinterpret_cast<Rigidbody*>(rigidpool.allocate(sizeof(Rigidbody))));
-		componentRigidBody[i]->id = 0;			
-	}
+geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntities), entityUpdated(false), entitiesDeleted(0){
 	eventSystem.subscribe(this, &EntityManager::updateTransform);
 	eventSystem.subscribe(this, &EntityManager::updateSprite);
 	eventSystem.subscribe(this, &EntityManager::updateRigidBody);
@@ -27,45 +10,56 @@ geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntiti
 
 geProject::EntityManager::~EntityManager(){}
 
-int geProject::EntityManager::addEntity() {
-	//add to component vector if new component	
-	Entity entity = Entity();	
+int geProject::EntityManager::addEntity(entityTypes type) {
+	Entity entity = Entity();
 	entity.compMask = 0;
-	if (numDeleted > 0 && entities.size() > 0) {
+	entity.type = type;
+	//check if a previously deleted pool is available
+	if (entitiesDeleted > 0 && entities.size() > 0) {
 		int index = 0;
-		while (entities[index].id > -1) {
+		while (entities[index]->id > -1) {
 			index++;
 		}
-		if (entities[index].id == -1) {
+		if (entities[index]->id == -1) {
 			entity.id = index;
-			entities[index] = entity;
-			numDeleted--;
-			return entities[index].id;
+			std::memcpy(entities[index], &entity, sizeof(Entity));
+			entitiesDeleted--;
+			return index;
 		}
 	}
 	else {
-		entity.id = entities.size();
-		entities.push_back(entity);
-		return entities.back().id;
+		//initialise all the pools for that entity
+		int index = entities.size();
+		entities.push_back(reinterpret_cast<Entity*>(entitypool.allocate(sizeof(Entity))));
+		entity.id = index;
+		componentTransforms.push_back(reinterpret_cast<Transform*>(transformpool.allocate(sizeof(Transform))));
+		componentTransforms[index]->id = 0;
+		componentAnimation.push_back(reinterpret_cast<Animation*>(animatePool.allocate(sizeof(Animation))));
+		componentAnimation[index]->id = 0;
+		componentSpriteRender.push_back(reinterpret_cast<SpriteRender*>(spritepool.allocate(sizeof(SpriteRender))));
+		componentSpriteRender[index]->id = 0;
+		componentRigidBody.push_back(reinterpret_cast<Rigidbody*>(rigidpool.allocate(sizeof(Rigidbody))));
+		componentRigidBody[index]->id = 0;
+		std::memcpy(entities[index], &entity, sizeof(Entity));
+		return index;
 	}
 	return -1;
-
 }
 
+
 void geProject::EntityManager::deleteEntity(int entityId){
-	entities[entityId].id = -1;
+	entities[entityId]->id = -1;
 	componentTransforms[entityId]->id = 0;
 	componentSpriteRender[entityId]->id = 0;
 	componentRigidBody[entityId]->id = 0;
 	componentCircleCollider[entityId].clear();
-	componentBoxCollider[entityId].clear();
-	numDeleted++;
-	
+	componentBoxCollider[entityId].clear();	
+	entitiesDeleted++;	
 }
 
 void geProject::EntityManager::copyEntity(int entityId){
-	unsigned int mask = entities[entityId].compMask;
-	int newEntityId = addEntity();
+	unsigned int mask = entities[entityId]->compMask;
+	int newEntityId = addEntity(entities[entityId]->type);
 	Transform newtransform = *getTransformComponent(entityId);	
 	newtransform.id = 0;
 	newtransform.position += 0.1f;
@@ -121,7 +115,7 @@ void geProject::EntityManager::assignTransform(int entityId, Transform transform
 		}
 		transform.dirtyFlag[0] = 1;
 		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));
-		entities[entityId].compMask = entities[entityId].compMask | transform.id;
+		entities[entityId]->compMask = entities[entityId]->compMask | transform.id;
 
 	}
 	else{
@@ -136,7 +130,7 @@ void geProject::EntityManager::assignSpriteRender(int entityId, SpriteRender spr
 		sprite.entityId = entityId;
 	
 		std::memcpy(componentSpriteRender[entityId], &sprite, sizeof(SpriteRender));	
-		entities[entityId].compMask = entities[entityId].compMask | sprite.id;
+		entities[entityId]->compMask = entities[entityId]->compMask | sprite.id;
 		componentTransforms[entityId]->dirtyFlag[0] = 1;
 		
 	}
@@ -149,7 +143,7 @@ void geProject::EntityManager::assignSpriteRender(int entityId, SpriteRender spr
 void geProject::EntityManager::assignRigidBody(int entityId, Rigidbody rbody) {
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentRigidBody[entityId], &rbody, sizeof(Rigidbody));
-		entities[entityId].compMask = entities[entityId].compMask | rbody.id;
+		entities[entityId]->compMask = entities[entityId]->compMask | rbody.id;
 		
 	}
 	else {
@@ -162,9 +156,9 @@ void geProject::EntityManager::assignCircleCollider(int entityId, CircleCollider
 	if (entityId < maxEntities && entityId >= 0) {
 		circle.entityAssigned = entityId;
 		componentCircleCollider[entityId].push_back(circle);		
-		if ((entities[entityId].compMask & CircleColliderType) != CircleColliderType) {
+		if ((entities[entityId]->compMask & CircleColliderType) != CircleColliderType) {
 			//no need to alter component mask if we already know that there is a circle component
-			entities[entityId].compMask = entities[entityId].compMask | circle.id;
+			entities[entityId]->compMask = entities[entityId]->compMask | circle.id;
 		}
 	}
 	else{
@@ -176,8 +170,8 @@ void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) 
 	if (entityId < maxEntities && entityId >= 0) {
 		box.entityAssigned = entityId;	
 		componentBoxCollider[entityId].push_back(box);
-		if ((entities[entityId].compMask & BoxColliderType) != BoxColliderType) {
-			entities[entityId].compMask = entities[entityId].compMask | box.id;
+		if ((entities[entityId]->compMask & BoxColliderType) != BoxColliderType) {
+			entities[entityId]->compMask = entities[entityId]->compMask | box.id;
 		}		
 	}
 	else{
@@ -191,7 +185,7 @@ void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) 
 void geProject::EntityManager::assignAnimation(int entityId, Animation animate) {
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentAnimation[entityId], &animate, sizeof(Animation));	
-		entities[entityId].compMask = entities[entityId].compMask | animate.id;	
+		entities[entityId]->compMask = entities[entityId]->compMask | animate.id;
 	}
 	else {
 		std::cout << "unable to assign animation" << std::endl;
@@ -223,7 +217,7 @@ void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 		default:
 			break;
 		}
-		entities[entityId].compMask = entities[entityId].compMask & ~componentId;
+		entities[entityId]->compMask = entities[entityId]->compMask & ~componentId;
 	
 	}
 }
@@ -266,15 +260,17 @@ std::vector <geProject::BoxCollider> geProject::EntityManager::getBoxColliderCom
 
 
 void geProject::EntityManager::reloadManager() {
-	for (int i = 0; i < entities.size(); i++) {
-		numDeleted = 0;
-		componentTransforms[i]->id = 0;
-		componentSpriteRender[i]->id = 0;
-		componentRigidBody[i]->id = 0;
-		componentAnimation[i]->id = 0;
-		componentCircleCollider.clear();
-		componentBoxCollider.clear();
-	}
+	entitiesDeleted = 0;
+	transformpool.reset();
+	componentTransforms.clear();
+	spritepool.reset();
+	componentSpriteRender.clear();
+	rigidpool.reset();
+	componentRigidBody.clear();
+	animatePool.reset();
+	componentAnimation.clear();
+	componentCircleCollider.clear();
+	componentBoxCollider.clear();
 	entities.clear();
 }
 
@@ -318,23 +314,23 @@ unsigned int geProject::EntityManager::getEntityNum() {
 
 geProject::Entity* geProject::EntityManager::getEntity(int entityId) {
 	if (entities.size() > 0) {
-		return &entities[entityId];
+		return entities[entityId];
 	}
 	return new Entity();
 }
 
-std::vector<geProject::Entity> geProject::EntityManager::getEntities() {
+std::vector<geProject::Entity*> geProject::EntityManager::getEntities() {
 	return entities;
 }
 
 void geProject::EntityManager::endFrame() {
 	int count = 0;
 	for (auto const& i : entities) {
-		if (i.id == -1) {
-			eventSystem.publishImmediately(new HierarchyEvent(count, i.compMask, componentTransforms[count]->name, false));
+		if (i->id == -1) {
+			eventSystem.publishImmediately(new HierarchyEvent(count, i->compMask, componentTransforms[count]->name, false));
 		}
 		else {
-			eventSystem.publishImmediately(new HierarchyEvent(i.id, i.compMask, componentTransforms[i.id]->name, true));
+			eventSystem.publishImmediately(new HierarchyEvent(i->id, i->compMask, componentTransforms[i->id]->name, true));
 		}
 		count++;
 	}	

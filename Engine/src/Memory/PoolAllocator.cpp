@@ -2,7 +2,7 @@
 
 
 PoolAllocator::PoolAllocator(size_t elNumber, size_t elSize) : element_number(elNumber), element_size(elSize), pool_size(elSize* elNumber), poolAddress(nullptr) {
-	U8* poolAddress = reinterpret_cast<U8*>(malloc(pool_size));	
+	poolAddress = reinterpret_cast<U8*>(malloc(pool_size));	
 	Node* nodes = reinterpret_cast<Node*>(poolAddress);
 	head = nodes;
 	//allocate the next pointers for each of the elements creating a pool of free elements
@@ -10,7 +10,6 @@ PoolAllocator::PoolAllocator(size_t elNumber, size_t elSize) : element_number(el
 		nodes->next = reinterpret_cast<Node*>(reinterpret_cast<char*>(nodes) + element_size);
 		nodes = nodes->next;
 	}
-
 	nodes->next = nullptr;
 }
 
@@ -36,6 +35,14 @@ void PoolAllocator::deAllocate(void* node) {
 }
 
 
-void PoolAllocator::reset() {
-	head = reinterpret_cast<Node*>(poolAddress);
+void PoolAllocator::reset() {	
+	Node* nodes = reinterpret_cast<Node*>(poolAddress);
+	head = nodes;
+	//allocate the next pointers for each of the elements creating a pool of free elements
+	for (size_t i = 0; i < element_number; i++) {
+		nodes->next = reinterpret_cast<Node*>(reinterpret_cast<char*>(nodes) + element_size);
+		nodes = nodes->next;
+	}
+	nodes->next = nullptr;
+	//allocate the next pointers for each of the elements creating a pool of free elements
 }

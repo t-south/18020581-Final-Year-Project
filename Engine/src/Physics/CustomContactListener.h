@@ -2,6 +2,7 @@
 #include <box2d/box2d.h>
 #include <glm/vec2.hpp>
 #include <ge_engine/Components.h>
+#include <ge_engine/Entity.h>
 
 namespace geProject {
 	//credit to box2d.org/documentation/md__d_1__git_hub_box2d_docs_dynamics.html#autotoc_md107

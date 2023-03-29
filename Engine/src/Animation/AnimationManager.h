@@ -10,11 +10,11 @@
 using json = nlohmann::json;
 namespace geProject {
 	enum AnimationState {
-		Default, Running, Dash
+		Default, Running, Dash, Idle
 	};
 
 	struct Frame {
-		float time;
+		float time{ 0 };
 		int sprite;
 	};
 	class AnimationManager {
@@ -24,6 +24,7 @@ namespace geProject {
 		void assignEntityAnimation(int entityId, std::string state);
 		void removeEntity();
 		void update(float deltaTime);
+		void addFrame(std::string state, int sprite);
 		void changeState(int entityId, std::string newState);
 		void serializeAnimations();
 	private:

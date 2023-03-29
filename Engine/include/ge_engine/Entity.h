@@ -1,8 +1,12 @@
 #pragma once
 namespace geProject {
-	struct Entity
-	{
-		int id{-1};
+	enum entityTypes {
+		player, enemy, environment
+	};
+
+	struct Entity	{
+		int id;
+		entityTypes type;
 		unsigned int compMask;
 	};
 

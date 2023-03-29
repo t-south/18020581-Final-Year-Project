@@ -21,7 +21,7 @@ void geProject::Scene::serialize(std::string filepath) {
 		json sceneData;
 		auto ent = manager->getEntities();
 		for (auto & i : ent) {
-			json entity = serializeEntity(i);
+			json entity = serializeEntity(*i);
 			if (entity != NULL) {
 				sceneData.push_back(entity);
 			}
@@ -40,6 +40,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 	//go through each of the components 
 	if (oFile.is_open() && entity.id > -1) {
 		json entityjson = json::object();
+		json entityType = json{"entityType", entity.type};
 		json transformData = json::object();
 		json rigidData = json::object();
 		json circleColliderData = json::object();
@@ -87,6 +88,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 				"Animation", 0
 			};
 		}
+		entityjson["entity"].push_back(entityType);
 		entityjson["entity"].push_back(transformData);
 		entityjson["entity"].push_back(spriteData);
 		entityjson["entity"].push_back(rigidData);
@@ -115,17 +117,18 @@ void geProject::Scene::deserialize(std::string filepath) {
 		if (iFile.is_open()) {
 			json data = json::parse(iFile);
 			for (const auto& i : data.items()) {
-				json transData = i.value().at("entity")[0];
-				json spritedata = i.value().at("entity")[1];		
-				json rigidData = i.value().at("entity")[2];
-				json circleData = i.value().at("entity")[3];
-				json boxData = i.value().at("entity")[4];
-				json animateData = i.value().at("entity")[5];
+				entityTypes entityType = i.value().at("entity")[0][1];
+				json transData = i.value().at("entity")[1];
+				json spritedata = i.value().at("entity")[2];		
+				json rigidData = i.value().at("entity")[3];
+				json circleData = i.value().at("entity")[4];
+				json boxData = i.value().at("entity")[5];
+				json animateData = i.value().at("entity")[6];
 				Transform trans = Transform();
 				SpriteRender sprite = SpriteRender();				
 				from_json(transData, trans);
 				from_json(spritedata, sprite);
-				int entityId = manager->addEntity();
+				int entityId = manager->addEntity(entityType);
 				manager->assignTransform(entityId, trans);
 				manager->assignSpriteRender(entityId, sprite);		
 				if (rigidData[1] != 0) {

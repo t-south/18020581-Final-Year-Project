@@ -6,6 +6,7 @@ geProject::Physics::Physics(EntityManager& emanager):time(0), world(b2World(grav
 	position = 3.0f;
 	velocity = 8.0f;	
 	time = 0.0f;
+	world.SetContactListener(&customCallback);
 	eventSystem.subscribe(this, &Physics::updateRigidBody);
 	eventSystem.subscribe(this, &Physics::updateCircleCollider);
 	eventSystem.subscribe(this, &Physics::updateBoxCollider);
@@ -32,7 +33,9 @@ void geProject::Physics::addEntity(Entity& entity) {
 		body.linearDamping = rigid->linearDamping;
 		body.fixedRotation = rigid->fixedRotate;
 		body.bullet = rigid->bullet;
-		body.userData.pointer = reinterpret_cast<uintptr_t>(&entity);
+		auto test = &entity;
+		body.userData.pointer = reinterpret_cast<uintptr_t>(&entity.type);
+		
 		switch (rigid->bodyType) {
 		case 0:
 			body.type = b2_kinematicBody;
@@ -63,7 +66,7 @@ void geProject::Physics::addEntity(Entity& entity) {
 }
 
 
-void geProject::Physics::addBoxCollider(BoxCollider& box) {
+void geProject::Physics::addBoxCollider(BoxCollider& box) {	
 	Transform transform = *manager->getTransformComponent(box.entityAssigned);
 	b2PolygonShape shape = b2PolygonShape();
 	Entity currentEntity = *manager->getEntity(box.entityAssigned);
@@ -71,7 +74,7 @@ void geProject::Physics::addBoxCollider(BoxCollider& box) {
 	b2FixtureDef shapeFixture;
 	shape.SetAsBox(box.boxSize[0] * 0.5f, box.boxSize[1] * 0.5f, b2Vec2(box.offset[0], box.offset[1]), 0);		
 	shapeFixture.shape = &shape;	
-	shapeFixture.density = 1;	
+	shapeFixture.density = 1;		
 	body.CreateFixture(&shapeFixture);
 	std::cout << "added physics objects: " << bodies.size() << std::endl;	
 	
@@ -93,7 +96,14 @@ void geProject::Physics::addCircleCollider(CircleCollider& circle) {
 
 
 void geProject::Physics::removeEntity(int entityId){
-	if (bodies[entityId] != NULL) {
+	if (bodies.find(entityId) != bodies.end()) {
+		for (b2Fixture* fixture = bodies[entityId]->GetFixtureList(); fixture->GetNext() != nullptr; fixture = fixture->GetNext()) {			
+			auto userData = &fixture->GetUserData().pointer;
+			if (*userData != 0) {
+				delete& userData;
+			}			
+			bodies[entityId]->DestroyFixture(fixture);			
+		}		
 		bodies.erase(entityId);
 		std::cout << "removed physics objects: " << bodies.size() << std::endl;
 	}
@@ -118,13 +128,14 @@ void geProject::Physics::update(float deltaTime){
 				float test = body.second->GetAngle();
 				b2Vec2 position = body.second->GetPosition();
 				double PI = 3.14159265;
+				
 				float angle = (float)(body.second->GetAngle() * (180.0/ PI));
 				
-				//printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
+				printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
 				
-				for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+				/*for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 					std::cout << count << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
-				}
+				}*/
 				count++;
 				
 				eventSystem.publishImmediately(new TransformEvent((int)body.first, position.x, position.y, angle));
@@ -183,6 +194,6 @@ void geProject::Physics::updateCircleCollider(CircleColliderEvent* e){
 
 
 
-void geProject::Physics::deleteEntityPhysics(DeleteEntityEvent* e){
+void geProject::Physics::deleteEntityPhysics(DeleteEntityEvent* e){	
 	removeEntity(e->entityId);
 }

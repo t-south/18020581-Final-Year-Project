@@ -1,1 +1,1 @@
-{"Running":[["Frame",{"frameTime":0.036374401301145554,"sprite":1}],["Frame",{"frameTime":0.0,"sprite":2}],["Frame",{"frameTime":0.0,"sprite":3}],["Frame",{"frameTime":0.0,"sprite":4}]]}
+{"Idle":[["Frame",{"sprite":0}]],"Running":[["Frame",{"sprite":1}],["Frame",{"sprite":2}],["Frame",{"sprite":3}]]}

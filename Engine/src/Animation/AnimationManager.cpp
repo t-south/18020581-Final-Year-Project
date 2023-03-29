@@ -12,9 +12,9 @@ geProject::AnimationManager::~AnimationManager(){
 
 void geProject::AnimationManager::update(float deltaTime){
 	for (const auto& i : entityManager->getEntities()) {
-		if ((i.compMask & 32) == 32 && i.id > -1) {					//check there is an animation assigned to entity, if so retrieve sprite and animation data
-			SpriteRender sprite = *entityManager->getSpriteComponent(i.id);
-			Animation& animation = *entityManager->getAnimationComponent(i.id);
+		if ((i->compMask & 32) == 32 && i->id > -1) {					//check there is an animation assigned to entity, if so retrieve sprite and animation data
+			SpriteRender sprite = *entityManager->getSpriteComponent(i->id);
+			Animation& animation = *entityManager->getAnimationComponent(i->id);
 			int& frame = animation.currentFrame;
 			auto& frameList = animationList[animation.state];
 			if (frame >= frameList.size()) {
@@ -24,15 +24,20 @@ void geProject::AnimationManager::update(float deltaTime){
 			Frame& currentFrame = frameList[frame];
 			auto playerSprites = resources->requestSpriteSheet(sprite.textureId);
 			auto& newSprite = playerSprites->getSprite(frame);				
-			entityManager->assignSpriteRender(i.id, newSprite);
+			entityManager->assignSpriteRender(i->id, newSprite);
 			currentFrame.time += deltaTime;
-			entityManager->assignSpriteRender(i.id, newSprite);
+			entityManager->assignSpriteRender(i->id, newSprite);
 			if (currentFrame.time >= animation.speed) {
 				frame++;
 				currentFrame.time = 0.0f;
 			}
 		}
 	}
+}
+
+void geProject::AnimationManager::addFrame(std::string state, int sprite){
+	Frame newFrame = Frame{ .sprite = {sprite} };
+	animationList[state].push_back(newFrame);
 }
 
 
@@ -81,8 +86,7 @@ void geProject::AnimationManager::to_json(json& data, std::string state){
 	for (auto& frame : animationList[state]) {
 		json FrameData = json::object();
 		FrameData = json{
-			"Frame", {
-				{"frameTime", frame.time},
+			"Frame", {				
 				{"sprite", frame.sprite}
 			}
 		};
@@ -90,8 +94,7 @@ void geProject::AnimationManager::to_json(json& data, std::string state){
 	}
 }
 
-void geProject::AnimationManager::from_json(json& data, Frame& comp){	
-	data[1].at("frameTime").get_to(comp.time);
+void geProject::AnimationManager::from_json(json& data, Frame& comp){		
 	data[1].at("sprite").get_to(comp.sprite);
 
 }

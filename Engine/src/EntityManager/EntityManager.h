@@ -27,13 +27,12 @@ namespace geProject {
 		EntityManager(uInt maxEntities);
 		~EntityManager();
 		//Entities
-		int addEntity();
-		
+		int addEntity(entityTypes type);
 		void deleteEntity(int entityId);
 		void copyEntity(int entityId);
 		uInt getEntityNum();
 		Entity* getEntity(int entityId);
-		std::vector<Entity> getEntities();
+		std::vector<Entity*> getEntities();
 		//Components
 		void assignTransform(int entityId, Transform transform);
 		void assignSpriteRender(int entityId, SpriteRender sprite);
@@ -64,14 +63,9 @@ namespace geProject {
 	private:		
 		bool entityUpdated;
 		uInt maxEntities;
-		std::vector<Transform*> componentTransforms;
-		std::vector <SpriteRender*> componentSpriteRender;
-		std::vector <Rigidbody*> componentRigidBody;
 		std::unordered_map<int, std::vector <BoxCollider>> componentBoxCollider;
 		std::unordered_map<int, std::vector <CircleCollider>> componentCircleCollider;
-		std::vector <Animation*> componentAnimation;
-		int playerId, numDeleted;
-		std::vector<Entity> entities;		
+		int playerId, entitiesDeleted;
 		//glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
 		void updateTransform(TransformEvent* event);
 		void updateSprite(SpriteEvent* event);
@@ -81,5 +75,16 @@ namespace geProject {
 		bool popup{ false };
 		bool textEdited{ false };
 
+		std::vector<Entity*> entities;		
+		std::vector<Transform*> componentTransforms;
+		std::vector <SpriteRender*> componentSpriteRender;
+		std::vector <Animation*> componentAnimation;
+		std::vector <Rigidbody*> componentRigidBody;
+
+		PoolAllocator entitypool{ maxEntities, sizeof(Entity) };
+		PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
+		PoolAllocator spritepool{ maxEntities, sizeof(SpriteRender) };
+		PoolAllocator animatePool{ maxEntities, sizeof(Animation) };
+		PoolAllocator rigidpool{ maxEntities, sizeof(Rigidbody) };
 	};
 }

@@ -164,18 +164,18 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 
 
 	for (const auto& i : manager->getEntities()) {
-		if (i.id > -1) {
-			auto trans = manager->getTransformComponent(i.id);
-			if ((i.compMask & 8) == 8) {
-				for (auto& circle : manager->getCircleColliderComponents(i.id)) {
+		if (i->id > -1) {
+			auto trans = manager->getTransformComponent(i->id);
+			if ((i->compMask & 8) == 8) {
+				for (auto& circle : manager->getCircleColliderComponents(i->id)) {
 					if (circle.id > 0) {
 						//multiply by 2 since box size is set to half width / height
 						editor->addCircle(trans->position + circle.offset, glm::vec3(0.0f, 1.0f, 0.0f), circle.radius, 16, 1);
 					}
 				}
 			}
-			if ((i.compMask & 16) == 16) {
-				for (auto& box : manager->getBoxColliderComponents(i.id)) {
+			if ((i->compMask & 16) == 16) {
+				for (auto& box : manager->getBoxColliderComponents(i->id)) {
 					if (box.id > 0) {
 						//multiply by 2 since box size is set to half width / height
 						editor->addBox(trans->position + box.offset, box.boxSize, glm::vec3(0.0f, 1.0f, 0.0f), trans->rotation, 1);
@@ -231,7 +231,7 @@ void geProject::LevelEditorScene::updateImgui() {
 				float spriteDim = 0.25f;
 				if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 					if (entityDrag == false) {
-						createEnvironmentBlock(&newSprite, spriteDim, spriteDim);
+						createEnvironmentBlock(&newSprite, spriteDim, spriteDim, entityTypes::environment);
 					}
 				}
 				ImGui::PopID();
@@ -251,11 +251,10 @@ void geProject::LevelEditorScene::updateImgui() {
 			ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);		
 			float spriteDim = 0.25f;
 			if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
-				if (entityDrag == false) {
-					createCharacterBlock(&newSprite, spriteDim, spriteDim);
+				if (entityDrag == false) {			
+					createCharacterBlock(&newSprite, spriteDim, spriteDim, entityTypes::player);
 				}
 			}
-
 			auto secondplayerspsrites = resourceManager->requestSpriteSheet(3);
 			auto secondPlayer = secondplayerspsrites->getSprite(0);
 			// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples			
@@ -263,7 +262,7 @@ void geProject::LevelEditorScene::updateImgui() {
 			ImVec2 uvplayer1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);			
 			if (ImGui::ImageButton((ImTextureID)secondPlayer.textureId, spriteDimensions, uvplayer0, uvplayer1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				if (entityDrag == false) {
-					createCharacterBlock(&secondPlayer, spriteDim, spriteDim);
+					createCharacterBlock(&secondPlayer, spriteDim, spriteDim, entityTypes::enemy);
 				}
 			}
 			ImGui::EndTabItem();
@@ -275,8 +274,8 @@ void geProject::LevelEditorScene::updateImgui() {
 
 
 
-unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY) {	
-	unsigned int entity = manager->addEntity();
+unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type) {
+	unsigned int entity = manager->addEntity(type);
 	//float y = camera->getCameraY();		
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
 	manager->assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY}});
@@ -287,13 +286,13 @@ unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* s
 	return entity;
 }
 
-unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY){
-	unsigned int entity = manager->addEntity();
+unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type){
+	unsigned int entity = manager->addEntity(type);
 	auto spriteSheet = resourceManager->requestSpriteSheet(sprite->spriteSheetId);
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
 	manager->assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY} });
 	manager->assignSpriteRender(entity, *sprite);	
-	animationManager->assignEntityAnimation(entity, "Running");
+	animationManager->assignEntityAnimation(entity, "Idle");
 	entityDrag = true;
 	setActiveEntity(entity);
 	return entity;

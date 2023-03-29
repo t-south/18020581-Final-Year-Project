@@ -32,8 +32,8 @@ namespace geProject {
 		unsigned int loopcount{ 0 };
 		unsigned int entity;
 		virtual void init() override;
-		unsigned int createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY);
-		unsigned int createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY);
+		unsigned int createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type);
+		unsigned int createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type);
 		void setGridLines();
 		virtual void saveGame(GameSaveEvent* save) override;
 		void changeSelectionView(GridToggleEvent* e);	

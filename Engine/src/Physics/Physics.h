@@ -1,11 +1,17 @@
 #pragma once
-
+#include "CustomContactListener.h"
 #include <box2d/box2d.h>
 #include <ge_engine/Core.h>
 #include <unordered_map>
 #include "../EntityManager/EntityManager.h"
 
 namespace geProject {
+	//credit to gamedev.stackexchange.com/questions/196951/how-do-i-correctly-use-userdata-in-box2d
+	struct FixtureUserData	{
+		int mObjectType{};
+		b2Fixture* mOwningFixture{};
+	};
+
 	class Physics {
 	public:
 		Physics(EntityManager& emanager);
@@ -26,6 +32,8 @@ namespace geProject {
 		int position;
 		std::unordered_map<int, b2Body*> bodies;
 		EntityManager* manager{ nullptr };	
+		std::vector<FixtureUserData> fixtureData;
+		CustomContactListener customCallback;
 		void updateRigidBody(RigidEvent* e);
 		void updateBoxCollider(BoxColliderEvent* e);
 		void updateCircleCollider(CircleColliderEvent* e);	
