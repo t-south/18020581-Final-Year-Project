@@ -10,6 +10,7 @@ geProject::CustomContactListener::~CustomContactListener(){
 }
 
 void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
+	/*
 	auto firstData = (Entity&)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
 	auto secondData = (Entity&)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
 
@@ -18,6 +19,7 @@ void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
 	glm::vec2 firstNormal = glm::vec2(manifold.normal.x, manifold.normal.y);
 	glm::vec2 secondNormal = -firstNormal;
 
+	*/
 		
 }
 
