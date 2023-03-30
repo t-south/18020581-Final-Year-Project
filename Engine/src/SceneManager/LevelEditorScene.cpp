@@ -123,7 +123,11 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		}		
 	}
 	//std::cout << activatedEntity << std::endl;
-	
+	if (physicsEnabled == true) {
+		physicsManager->update(deltaTime);
+	}
+
+
 	//UPDATES TO RENDERING
 	if (manager->hasUpdate()) {		
 		for (int i = 0; i < manager->getEntityNum(); i++) {	
@@ -154,9 +158,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	animationManager->update(deltaTime);
 	mouse->endFrame();
 	keyboard->endFrame();
-	if (physicsEnabled == true) {
-		physicsManager->update(deltaTime);
-	}
+
 	manager->endFrame();
 	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");	
 	editor->render(*(camera));

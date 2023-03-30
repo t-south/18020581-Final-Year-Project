@@ -1,5 +1,5 @@
 #pragma once
-
+#include <ge_engine/Entity.h>
 #include <ge_engine/Components.h>
 
 namespace geProject {
@@ -11,7 +11,8 @@ namespace geProject {
 		keyPressed, keyReleased,
 		mousePressed, mouseReleased, mouseMove, mouseScroll,
 		gameStart, gameStop, gameSave, gameLoad,
-		transForm, spriteRender, rigidBody, boxCollider, circleCollider
+		transForm, spriteRender, rigidBody, boxCollider, circleCollider,
+		beginContact, endContact, preSolve, postSolve
 	};
 	enum Context {
 		NoContext = 0,					/* 0b0000000000000000 */
@@ -21,7 +22,8 @@ namespace geProject {
 		KeyboardContext = (1 << 3),		/* 0b0000000000001000 */
 		MouseContext = (1 << 4),		/* 0b0000000000010000 */
 		MouseButtonContext = (1 << 5),  /* 0b0000000000100000 */
-		ImGuiContext = (1 << 6)			/* 0b0000000001000000 */
+		ImGuiContext = (1 << 6),			/* 0b0000000001000000 */
+		GameplayContext = (1 << 6)		/* 0b0000000010000000 */
 	};
 
 	class Event {
@@ -236,6 +238,45 @@ namespace geProject {
 		float windowPosX, windowPosY, windowSizeX, windowSizeY;
 	};
 
+	//PHYSICS EVENTS
 
+	class BeginContactEvent : public Event {
+	public:
+		BeginContactEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		static int getType() { return Type::beginContact; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		int addContext(Context context) { eventContext = getContext() & context; };
+		Entity* entityA;
+		Entity* entityB;
+	};
 
+	class EndContactEvent : public Event {
+	public:
+		EndContactEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		static int getType() { return Type::endContact; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		int addContext(Context context) { eventContext = getContext() & context; };
+		Entity* entityA;
+		Entity* entityB;
+	};
+
+	class PresolveEvent : public Event {
+	public:
+		PresolveEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		static int getType() { return Type::preSolve; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		int addContext(Context context) { eventContext = getContext() & context; };
+		Entity* entityA;
+		Entity* entityB;
+	};
+
+	class PostsolveEvent : public Event {
+	public:
+		PostsolveEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		static int getType() { return Type::postSolve; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		int addContext(Context context) { eventContext = getContext() & context; };
+		Entity* entityA;
+		Entity* entityB;
+	};
 }

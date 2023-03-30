@@ -40,13 +40,14 @@ namespace geProject {
 		void assignBoxCollider(int entityId, BoxCollider box);
 		void assignCircleCollider(int entityId, CircleCollider circle);
 		void assignAnimation(int entityId, Animation animate);
+		void assignController(int entityId, Controls control);
 
 		void deleteComponent(int entityId, uInt componentId);
 		std::vector<Transform*> getTransformComponents();
 		std::vector<SpriteRender*> getSpriteComponents();
 		std::vector <Rigidbody*> getRigidBodyComponents();	
 		std::vector<Animation*> getAnimationComponents();	
-
+		std::vector <Controls*> getControllerComponents();
 
 		Transform* getTransformComponent(int entityId);
 		SpriteRender* getSpriteComponent(int entityId);
@@ -54,6 +55,7 @@ namespace geProject {
 		std::vector<BoxCollider> getBoxColliderComponents(int entityId);
 		std::vector<CircleCollider> getCircleColliderComponents(int entityId);
 		Animation* getAnimationComponent(int entityId);
+		Controls* getControllerComponent(int entityId);
 
 		void updateImgui(int entityId);
 		bool hasUpdate();
@@ -72,6 +74,13 @@ namespace geProject {
 		void updateRigidBody(RigidEvent* event);
 		void updateBoxCollider(BoxColliderEvent* event);
 		void updateCircleCollider(CircleColliderEvent* event);
+		//BOX2D CALLBACKS
+		void BeginContact(BeginContactEvent* event);
+		void EndContact(EndContactEvent* event);
+		void PreSolve(PresolveEvent* event);
+		void PostSolve(PostsolveEvent* event);
+
+
 		bool popup{ false };
 		bool textEdited{ false };
 
@@ -80,11 +89,13 @@ namespace geProject {
 		std::vector <SpriteRender*> componentSpriteRender;
 		std::vector <Animation*> componentAnimation;
 		std::vector <Rigidbody*> componentRigidBody;
+		std::vector <Controls*> componentController;
 
 		PoolAllocator entitypool{ maxEntities, sizeof(Entity) };
 		PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
 		PoolAllocator spritepool{ maxEntities, sizeof(SpriteRender) };
 		PoolAllocator animatePool{ maxEntities, sizeof(Animation) };
 		PoolAllocator rigidpool{ maxEntities, sizeof(Rigidbody) };
+		PoolAllocator controllerpool{ maxEntities, sizeof(Controls) };
 	};
 }

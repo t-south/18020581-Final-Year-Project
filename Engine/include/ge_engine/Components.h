@@ -65,8 +65,11 @@ namespace geProject {
 		std::string state;
 	};
 
-	struct EntityType {
-
+	struct Controls {
+		unsigned int id = 64;
+		float runspeed{ 1.0f };
+		float speedModifier;
+		float direction;
 	};
 	
 	

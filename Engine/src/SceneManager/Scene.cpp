@@ -46,6 +46,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		json circleColliderData = json::object();
 		json boxColliderData = json::object();
 		json animateData = json::object();
+		json controllerData = json::object();
 		Transform transform = *manager->getTransformComponent(entity.id);
 		to_json(transformData, transform);
 		json spriteData = json::object();
@@ -83,11 +84,24 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 			Animation animate = *manager->getAnimationComponent(entity.id);
 			to_json(animateData, animate);
 		}
+
 		else {
 			animateData = json{
 				"Animation", 0
 			};
 		}
+
+		if ((entity.compMask & 1 << 6) == 1 << 6) {
+			Controls control = *manager->getControllerComponent(entity.id);
+			to_json(controllerData, control);
+		}
+		else {
+			controllerData = json{
+				"Controller", 0
+			};
+		}
+
+
 		entityjson["entity"].push_back(entityType);
 		entityjson["entity"].push_back(transformData);
 		entityjson["entity"].push_back(spriteData);
@@ -95,6 +109,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		entityjson["entity"].push_back(circleColliderData);
 		entityjson["entity"].push_back(boxColliderData);
 		entityjson["entity"].push_back(animateData);
+		entityjson["entity"].push_back(controllerData);
 		return entityjson;
 	}
 
@@ -124,6 +139,7 @@ void geProject::Scene::deserialize(std::string filepath) {
 				json circleData = i.value().at("entity")[4];
 				json boxData = i.value().at("entity")[5];
 				json animateData = i.value().at("entity")[6];
+				json controllerData = i.value().at("entity")[7];
 				Transform trans = Transform();
 				SpriteRender sprite = SpriteRender();				
 				from_json(transData, trans);
@@ -143,8 +159,7 @@ void geProject::Scene::deserialize(std::string filepath) {
 						manager->assignCircleCollider(entityId, circle);
 					}
 				}
-				if (boxData.empty() == 0) {
-					
+				if (boxData.empty() == 0) {					
 					for (const auto& i : boxData.find("EntityBoxCollider").value().items()) {
 						
 						BoxCollider box = BoxCollider();
@@ -156,6 +171,11 @@ void geProject::Scene::deserialize(std::string filepath) {
 					Animation animation = Animation();
 					from_json(animateData, animation);
 					manager->assignAnimation(entityId, animation);
+				}
+				if (controllerData[1] != 0) {
+					Controls control = Controls();
+					from_json(controllerData, control);
+					manager->assignController(entityId, control);
 				}
 				addEntityToScene(entityId);		
 			}
@@ -253,6 +273,18 @@ void geProject::Scene::to_json(json& data, BoxCollider& comp) {
 }
 
 
+void geProject::Scene::to_json(json& data, Controls& comp) {
+	data = json{
+		"Controller", {
+			{"runspeed", comp.runspeed},
+			{"speedMod", comp.speedModifier},
+			{"controldirection", comp.direction}
+		}
+	};
+}
+
+
+
 
 void geProject::Scene::from_json(json& data, Animation& comp) {
 	data[1].at("speed").get_to(comp.speed);
@@ -346,6 +378,16 @@ void geProject::Scene::from_json(json& data, Rigidbody& comp) {
 	}
 }
 
+void geProject::Scene::from_json(json& data, Controls& comp) {
+	if (data[1] == 0) {
+		comp.id = 0;
+	}
+	else {
+		data[1].at("runspeed").get_to(comp.runspeed);
+		data[1].at("speedMod").get_to(comp.speedModifier);
+		data[1].at("controldirection").get_to(comp.direction);		
+	}
+}
 
 
 

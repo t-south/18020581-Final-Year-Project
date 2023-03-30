@@ -1,0 +1,14 @@
+#pragma once
+
+namespace geProject {
+	class Controller {	
+		virtual ~Controller() {};
+	public:
+		virtual void dash() = 0;
+		virtual void attack() = 0;
+		virtual void specialAttack() = 0;
+		virtual void shield() = 0;
+		virtual void switchAbility() = 0;
+		virtual void moveTo() = 0;
+	};
+}

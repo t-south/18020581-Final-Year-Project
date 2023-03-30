@@ -1,5 +1,6 @@
 #pragma once
 #include "CustomContactListener.h"
+#include "RayCastListener.h"
 #include <box2d/box2d.h>
 #include <ge_engine/Core.h>
 #include <unordered_map>
@@ -34,9 +35,12 @@ namespace geProject {
 		EntityManager* manager{ nullptr };	
 		std::vector<FixtureUserData> fixtureData;
 		CustomContactListener customCallback;
+		
 		void updateRigidBody(RigidEvent* e);
 		void updateBoxCollider(BoxColliderEvent* e);
 		void updateCircleCollider(CircleColliderEvent* e);	
-		void deleteEntityPhysics(DeleteEntityEvent* e);
+		void deleteEntityPhysics(DeleteEntityEvent* e);	
+
+		RayCastListener* rayCast(int entityId, const b2Vec2& origin, const b2Vec2& target);
 	};
 }

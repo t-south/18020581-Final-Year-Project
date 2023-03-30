@@ -53,6 +53,7 @@ namespace geProject {
 		static Physics* physicsManager;
 		static EntityManager* manager;
 		static AnimationManager* animationManager;
+
 		Camera* camera;
 		Renderer* renderer{ nullptr };
 		FrameBuffer* selectionTextures{ nullptr };
@@ -71,12 +72,15 @@ namespace geProject {
 		void to_json(json& data, Rigidbody& comp);
 		void to_json(json& data, CircleCollider& comp);
 		void to_json(json& data, BoxCollider& comp);
+		void to_json(json& data, Controls& comp);
+
 		void from_json(json& data, Animation& comp);
 		void from_json(json& data, SpriteRender& comp);
 		void from_json(json& data, Transform& comp);
 		void from_json(json& data, Rigidbody& comp);
 		void from_json(json& data, CircleCollider& comp);
 		void from_json(json& data, BoxCollider& comp);
+		void from_json(json& data, Controls& comp);
 
 		//event listeners
 		virtual void saveGame(GameSaveEvent* save) = 0;
