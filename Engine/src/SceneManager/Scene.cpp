@@ -7,6 +7,10 @@ geProject::ResourceManager* geProject::Scene::resourceManager;
 geProject::Physics* geProject::Scene::physicsManager;
 geProject::EntityManager* geProject::Scene::manager;
 geProject::AnimationManager* geProject::Scene::animationManager;
+geProject::Receiver* geProject::Scene::controlManager;
+
+//PLAYER
+geProject::PlayerController* geProject::Scene::player;
 
 std::string geProject::Scene::getFilePath()
 {

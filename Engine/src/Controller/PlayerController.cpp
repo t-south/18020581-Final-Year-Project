@@ -27,5 +27,5 @@ void geProject::PlayerController::moveTo(){
 	Controls* control = eManager.getControllerComponent(entityId);
 	trans->position[0] += control->runspeed;
 	trans->position[1] += control->runspeed;
-	eManager.assignTransform(trans);
+	eManager.assignTransform(entityId, *trans);
 }

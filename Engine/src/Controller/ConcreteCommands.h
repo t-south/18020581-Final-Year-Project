@@ -28,7 +28,7 @@ namespace geProject {
 		virtual void execute(Controller& entity) override { entity.switchAbility(); };
 	};
 
-	class MoveCommandCommand : public Command {
+	class MoveCommand : public Command {
 	public:
 		virtual void execute(Controller& entity) override { entity.moveTo(); };
 	};

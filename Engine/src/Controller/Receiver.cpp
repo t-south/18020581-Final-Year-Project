@@ -1,15 +1,15 @@
 #include "Receiver.h"
 
 geProject::Receiver::Receiver(){
-	leftClick;
-	rightClick;
-	buttonShift;
-	buttonW;
-	buttonA;
-	buttonS;
-	buttonD;
-	buttonF = new ;
-	buttonTab = new SwitchAbility();
+	leftClick = new AttackCommand();
+	rightClick = new ShieldCommand();
+	buttonShift = new DashCommand();
+	buttonW = new MoveCommand();;
+	buttonA = new MoveCommand();;
+	buttonS = new MoveCommand();;
+	buttonD = new MoveCommand();
+	buttonF = new SpecialAttackCommand();
+	buttonTab = new SwitchAbilityCommand();
 	eventSystem.subscribe(this, &Receiver::updateKeyButtonPress);
 	eventSystem.subscribe(this, &Receiver::updateMouseButtonPress);
 }
@@ -27,11 +27,13 @@ geProject::Command* geProject::Receiver::action(){
 	return nullptr;
 }
 
-bool geProject::Receiver::buttonPressed(int button){		
-	if (buttonevents[button] == true) {
-		buttonevents[button] = false;
-		return true;
-	}	
+bool geProject::Receiver::buttonPressed(int button){	
+	if (buttonevents.size() > 0) {
+		if (buttonevents[button] == true) {
+			buttonevents[button] = false;
+			return true;
+		}
+	}
 	return false;
 }
 

@@ -2,8 +2,8 @@
 
 namespace geProject {
 	class Controller {	
-		virtual ~Controller() {};
 	public:
+		virtual ~Controller() {};
 		virtual void dash() = 0;
 		virtual void attack() = 0;
 		virtual void specialAttack() = 0;

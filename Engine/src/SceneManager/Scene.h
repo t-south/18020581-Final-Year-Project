@@ -10,8 +10,9 @@
 #include "../Render/FrameBuffer.h"
 #include "../Physics/Physics.h"
 #include "../Animation/AnimationManager.h"
-
-
+#include "../Controller/Command.h"
+#include "../Controller/PlayerController.h"#
+#include "../Controller/Receiver.h"
 
 
 using json = nlohmann::json;
@@ -53,6 +54,8 @@ namespace geProject {
 		static Physics* physicsManager;
 		static EntityManager* manager;
 		static AnimationManager* animationManager;
+		static Receiver* controlManager;
+		static PlayerController* player;
 
 		Camera* camera;
 		Renderer* renderer{ nullptr };

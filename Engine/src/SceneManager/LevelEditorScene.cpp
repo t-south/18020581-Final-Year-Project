@@ -1,6 +1,7 @@
 #include "LevelEditorScene.h"
 
 geProject::LevelEditorScene::LevelEditorScene() {
+	player = nullptr;
 	gridWidth = 0.25f;
 	gridHeight = 0.25f;
 	resourceManager = new ResourceManager();
@@ -127,6 +128,13 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		physicsManager->update(deltaTime);
 	}
 
+	if (player != nullptr) {
+		Command* command = controlManager->action();
+		if (command)
+		{
+			command->execute(*player);
+		}
+	}
 
 	//UPDATES TO RENDERING
 	if (manager->hasUpdate()) {		
@@ -221,10 +229,10 @@ void geProject::LevelEditorScene::updateImgui() {
 			ImGui::Text("Manually wrapping:");
 			ImGuiStyle& style = ImGui::GetStyle();
 			float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
-			auto spriteSheet = resourceManager->requestSpriteSheet(1);
+			std::shared_ptr<SpriteSheet> spriteSheet = resourceManager->requestSpriteSheet(1);
 			unsigned int spriteSize = spriteSheet->getSpriteSize();
 			for (int i = 0; i < spriteSize; i++) {
-				auto newSprite = spriteSheet->getSprite(i);
+				SpriteRender newSprite = spriteSheet->getSprite(i);
 				// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
 				ImVec2 spriteDimensions(32, 32);
 				ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
@@ -244,24 +252,27 @@ void geProject::LevelEditorScene::updateImgui() {
 			}
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("Characters")) {			
-			auto playerSprites = resourceManager->requestSpriteSheet(2);
-			auto newSprite = playerSprites->getSprite(0);
-			// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+		if (ImGui::BeginTabItem("Characters")) {
 			ImVec2 spriteDimensions(32, 32);
-			ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
-			ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);		
 			float spriteDim = 0.25f;
-			if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
-				if (entityDrag == false) {			
-					createCharacterBlock(&newSprite, spriteDim, spriteDim, entityTypes::player);
+			if (player == nullptr) {
+				std::shared_ptr<SpriteSheet> playerSprites = resourceManager->requestSpriteSheet(2);
+				SpriteRender newSprite = playerSprites->getSprite(0);
+				// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+				ImVec2 uv0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
+				ImVec2 uv1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);
+				if (ImGui::ImageButton((ImTextureID)newSprite.textureId, spriteDimensions, uv0, uv1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+					if (entityDrag == false) {						
+						createCharacterBlock(&newSprite, spriteDim, spriteDim, entityTypes::player);
+					}
 				}
 			}
-			auto secondplayerspsrites = resourceManager->requestSpriteSheet(3);
-			auto secondPlayer = secondplayerspsrites->getSprite(0);
+
+			std::shared_ptr<SpriteSheet> secondplayerspsrites = resourceManager->requestSpriteSheet(3);
+			SpriteRender secondPlayer = secondplayerspsrites->getSprite(0);
 			// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples			
-			ImVec2 uvplayer0(newSprite.texturePos[2].x, newSprite.texturePos[0].y);
-			ImVec2 uvplayer1(newSprite.texturePos[0].x, newSprite.texturePos[2].y);			
+			ImVec2 uvplayer0(secondPlayer.texturePos[2].x, secondPlayer.texturePos[0].y);
+			ImVec2 uvplayer1(secondPlayer.texturePos[0].x, secondPlayer.texturePos[2].y);			
 			if (ImGui::ImageButton((ImTextureID)secondPlayer.textureId, spriteDimensions, uvplayer0, uvplayer1, 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				if (entityDrag == false) {
 					createCharacterBlock(&secondPlayer, spriteDim, spriteDim, entityTypes::enemy);
@@ -290,6 +301,9 @@ unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* s
 
 unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type){
 	unsigned int entity = manager->addEntity(type);
+	if (type == entityTypes::player) {
+		player = new PlayerController(*manager, entity);
+	}
 	auto spriteSheet = resourceManager->requestSpriteSheet(sprite->spriteSheetId);
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
 	manager->assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY} });
