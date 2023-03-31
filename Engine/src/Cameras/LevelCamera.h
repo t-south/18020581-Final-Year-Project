@@ -5,6 +5,6 @@ namespace geProject {
 	class LevelCamera : public Camera {
 	public:
 		LevelCamera(glm::vec2 pos);
-		void update(float dt);
+		
 	};
 }

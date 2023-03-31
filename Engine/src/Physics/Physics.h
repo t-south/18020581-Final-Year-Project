@@ -22,10 +22,13 @@ namespace geProject {
 		void addCircleCollider(CircleCollider& circle);
 		void removeEntity(int  entityId);
 		void clear();
-		void update(float deltaTime);
+		void update(float deltaTime); 
+		b2Body& getPhysicsBody(int entityId);
+		void applyLinearImpulse(int entityId, float x, float y);
+		void applyRotation(int entityId, float angle);
 		//b2RayCastOutput getRayCast(int entityId, float coordAx, float coordAy, float coordBx, float coordBy);
 	private:
-		b2Vec2 gravity{0, -10.0f};
+		b2Vec2 gravity{0, 0};
 		b2World world;
 		float time;
 		float timeStep;
@@ -34,8 +37,7 @@ namespace geProject {
 		std::unordered_map<int, b2Body*> bodies;
 		EntityManager* manager{ nullptr };	
 		std::vector<FixtureUserData> fixtureData;
-		CustomContactListener customCallback;
-		
+		CustomContactListener customCallback;		
 		void updateRigidBody(RigidEvent* e);
 		void updateBoxCollider(BoxColliderEvent* e);
 		void updateCircleCollider(CircleColliderEvent* e);	

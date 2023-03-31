@@ -19,6 +19,7 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 	Entity entity = Entity();
 	entity.compMask = 0;
 	entity.type = type;
+
 	//check if a previously deleted pool is available
 	if (entitiesDeleted > 0 && entities.size() > 0) {
 		int index = 0;
@@ -29,6 +30,9 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 			entity.id = index;
 			std::memcpy(entities[index], &entity, sizeof(Entity));
 			entitiesDeleted--;
+			if (type == 0) {
+				playerId = index;
+			}
 			return index;
 		}
 	}
@@ -47,7 +51,14 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 		componentRigidBody[index]->id = 0;
 		componentController.push_back(reinterpret_cast<Controls*>(controllerpool.allocate(sizeof(Controls))));
 		componentController[index]->id = 0;
+		componentHealth.push_back(reinterpret_cast<Health*>(healthpool.allocate(sizeof(Health))));
+		componentHealth[index]->id = 0;
+		componentDamage.push_back(reinterpret_cast<Damage*>(damagepool.allocate(sizeof(Damage))));
+		componentDamage[index]->id = 0;
 		std::memcpy(entities[index], &entity, sizeof(Entity));
+		if (type == 0) {
+			playerId = index;
+		}
 		return index;
 	}
 	return -1;
@@ -62,6 +73,8 @@ void geProject::EntityManager::deleteEntity(int entityId){
 	componentCircleCollider[entityId].clear();
 	componentBoxCollider[entityId].clear();	
 	componentController[entityId] = 0;
+	componentHealth[entityId] = 0;
+	componentDamage[entityId] = 0;
 	entitiesDeleted++;	
 }
 
@@ -97,12 +110,21 @@ void geProject::EntityManager::copyEntity(int entityId){
 		case 64:
 			assignController(newEntityId, *getControllerComponent(entityId));
 			break;
+
+		case 128:
+			assignHealth(newEntityId, *getHealthComponent(entityId));
+			break;
+
+		case 256:
+			assignDamage(newEntityId, *getDamageComponent(entityId));
+			break;
+
 		default:
 			break;
 		}
 
 	}
-	eventSystem.publishImmediately(new CopyEntityEvent(newEntityId));
+	eventSystem.publishImmediately(new CopyEntityEvent(EditorContext | ImGuiContext, newEntityId));
 }
 
 bool geProject::EntityManager::hasUpdate() {
@@ -211,6 +233,26 @@ void geProject::EntityManager::assignController(int entityId, Controls control){
 
 }
 
+void geProject::EntityManager::assignHealth(int entityId, Health health){
+	if (entityId < maxEntities && entityId >= 0) {
+		std::memcpy(componentHealth[entityId], &health, sizeof(Health));
+		entities[entityId]->compMask = entities[entityId]->compMask | health.id;
+	}
+	else {
+		std::cout << "unable to assign health component" << std::endl;
+	}
+}
+
+void geProject::EntityManager::assignDamage(int entityId, Damage dmg){
+	if (entityId < maxEntities && entityId >= 0) {
+		std::memcpy(componentDamage[entityId], &dmg, sizeof(Damage));
+		entities[entityId]->compMask = entities[entityId]->compMask | dmg.id;
+	}
+	else {
+		std::cout << "unable to assign damage component" << std::endl;
+	}
+}
+
 
 void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 	if(entityId < maxEntities && entityId >= 0){
@@ -235,6 +277,12 @@ void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 			break;
 		case 64:
 			componentController[entityId]->id = 0;
+			break;
+		case 128:
+			componentHealth[entityId]->id = 0;
+			break;
+		case 256:
+			componentDamage[entityId]->id = 0;
 			break;
 		default:
 			break;
@@ -262,6 +310,16 @@ std::vector<geProject::Controls*> geProject::EntityManager::getControllerCompone
 	return componentController;
 }
 
+std::vector<geProject::Health*> geProject::EntityManager::getHealthComponents()
+{
+	return componentHealth;
+}
+
+std::vector<geProject::Damage*> geProject::EntityManager::getDamageComponents()
+{
+	return componentDamage;
+}
+
 
 
 geProject::Transform* geProject::EntityManager::getTransformComponent(int entityId) {
@@ -279,6 +337,16 @@ geProject::Animation* geProject::EntityManager::getAnimationComponent(int entity
 
 geProject::Controls* geProject::EntityManager::getControllerComponent(int entityId){
 	return componentController[entityId];
+}
+
+geProject::Health* geProject::EntityManager::getHealthComponent(int entityId)
+{
+	return componentHealth[entityId];
+}
+
+geProject::Damage* geProject::EntityManager::getDamageComponent(int entityId)
+{
+	return componentDamage[entityId];
 }
 
 std::vector<geProject::CircleCollider> geProject::EntityManager::getCircleColliderComponents(int entityId) {
@@ -348,23 +416,23 @@ void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event) 
 //PHYSICS EVENT LISTENERS
 void geProject::EntityManager::BeginContact(BeginContactEvent* event){
 	std::cout << "begin contact" << std::endl;
-	switch (event->entityA->type) {
-	case entityTypes::player:
-		break;
+	switch (event->entityA->type) {	
+		case entityTypes::player:
+			break;
 
-	case entityTypes::enemy:
-		break;
+		case entityTypes::enemy:
+			break;
 		
-	case entityTypes::environment:
-		if (event->entityB->type == player) {
-			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 0, 0, 1);
-			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
-		}
-		break;
+		case entityTypes::environment:
+			if (event->entityB->type == player) {
+				componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 0, 0, 1);
+				componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
+			}
+			break;
 
-	default:
-		break;
-	}
+		default:
+			break;
+		}
 
 }
 
@@ -400,6 +468,11 @@ void geProject::EntityManager::PostSolve(PostsolveEvent* event){
 
 }
 
+int geProject::EntityManager::getPlayerId()
+{
+	return playerId;
+}
+
 
 
 unsigned int geProject::EntityManager::getEntityNum() {
@@ -421,10 +494,10 @@ void geProject::EntityManager::endFrame() {
 	int count = 0;
 	for (auto const& i : entities) {
 		if (i->id == -1) {
-			eventSystem.publishImmediately(new HierarchyEvent(count, i->compMask, componentTransforms[count]->name, false));
+			eventSystem.publishImmediately(new HierarchyEvent(EditorContext | ImGuiContext, count, i->compMask, componentTransforms[count]->name, false));
 		}
 		else {
-			eventSystem.publishImmediately(new HierarchyEvent(i->id, i->compMask, componentTransforms[i->id]->name, true));
+			eventSystem.publishImmediately(new HierarchyEvent(EditorContext | ImGuiContext, i->id, i->compMask, componentTransforms[i->id]->name, true));
 		}
 		count++;
 	}	
@@ -456,7 +529,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 				ImGui::SameLine();
 				if (ImGui::Button("Delete", ImVec2(100, 50))) {
 					deleteEntity(entityId);
-					eventSystem.publishImmediately(new DeleteEntityEvent(entityId, trans->dirtyFlag[1], trans->dirtyFlag[2]));
+					eventSystem.publishImmediately(new DeleteEntityEvent(EditorContext | ImGuiContext, entityId, trans->dirtyFlag[1], trans->dirtyFlag[2]));
 				}
 				ImGui::EndTabItem();
 			}
@@ -470,8 +543,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 				eventSystem.setContext(ImGuiContext);
 			}
 			else {
-				memset(&newName[0], 0, sizeof(newName));
-				eventSystem.setContext(AppContext);
+				memset(&newName[0], 0, sizeof(newName));				
 			}
 
 			if (ImGui::DragFloat("positonX", &positionX), 0.01f, 1.0f, "%.3f") {
@@ -520,7 +592,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 				}
 			}
 			if (transformUpdate) {
-				eventSystem.publishImmediately(new TransformEvent(entityId, trans->position[0], trans->position[1], trans->rotation));
+				eventSystem.publishImmediately(new TransformEvent(EditorContext | ImGuiContext, entityId, trans->position[0], trans->position[1], trans->rotation));
 			}
 			ImGui::EndTabItem();
 		}
@@ -641,7 +713,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 						deleteComponent(entityId, 4);
 					}
 					if (rigidUpdate) {
-						eventSystem.publishImmediately(new RigidEvent(entityId, *rigid));
+						eventSystem.publishImmediately(new RigidEvent(EditorContext | ImGuiContext, entityId, *rigid));
 					}
 					ImGui::EndTabItem();
 				}
@@ -755,7 +827,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 							
 						}
 						if (boxUpdate) {
-							eventSystem.publishImmediately(new BoxColliderEvent(entityId, boxCollider.offset[0], boxCollider.offset[1],
+							eventSystem.publishImmediately(new BoxColliderEvent(EditorContext | ImGuiContext, entityId, boxCollider.offset[0], boxCollider.offset[1],
 							boxCollider.boxSize[0], boxCollider.boxSize[1], boxCollider.origin[0], boxCollider.origin[1]));
 						}						
 						ImGui::PopID();

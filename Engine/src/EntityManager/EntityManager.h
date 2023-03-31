@@ -41,13 +41,19 @@ namespace geProject {
 		void assignCircleCollider(int entityId, CircleCollider circle);
 		void assignAnimation(int entityId, Animation animate);
 		void assignController(int entityId, Controls control);
+		void assignHealth(int entityId, Health health);
+		void assignDamage(int entityId, Damage dmg);
+
 
 		void deleteComponent(int entityId, uInt componentId);
+
 		std::vector<Transform*> getTransformComponents();
 		std::vector<SpriteRender*> getSpriteComponents();
 		std::vector <Rigidbody*> getRigidBodyComponents();	
 		std::vector<Animation*> getAnimationComponents();	
 		std::vector <Controls*> getControllerComponents();
+		std::vector<Health*> getHealthComponents();
+		std::vector <Damage*> getDamageComponents();
 
 		Transform* getTransformComponent(int entityId);
 		SpriteRender* getSpriteComponent(int entityId);
@@ -56,30 +62,35 @@ namespace geProject {
 		std::vector<CircleCollider> getCircleColliderComponents(int entityId);
 		Animation* getAnimationComponent(int entityId);
 		Controls* getControllerComponent(int entityId);
+		Health* getHealthComponent(int entityId);
+		Damage* getDamageComponent(int entityId);
 
 		void updateImgui(int entityId);
 		bool hasUpdate();
 		void endFrame();
 		void reloadManager();
 		void assignUpdate();
+		int getPlayerId();
 	private:		
 		bool entityUpdated;
 		uInt maxEntities;
-		std::unordered_map<int, std::vector <BoxCollider>> componentBoxCollider;
-		std::unordered_map<int, std::vector <CircleCollider>> componentCircleCollider;
-		int playerId, entitiesDeleted;
-		//glm::vec2 getCentre(glm::vec2 bLeft, glm::vec2 tRight);
+
+		int playerId{ -1 };
+		int entitiesDeleted{ 0 };
+
+
 		void updateTransform(TransformEvent* event);
 		void updateSprite(SpriteEvent* event);
 		void updateRigidBody(RigidEvent* event);
 		void updateBoxCollider(BoxColliderEvent* event);
 		void updateCircleCollider(CircleColliderEvent* event);
+
+
 		//BOX2D CALLBACKS
 		void BeginContact(BeginContactEvent* event);
 		void EndContact(EndContactEvent* event);
 		void PreSolve(PresolveEvent* event);
 		void PostSolve(PostsolveEvent* event);
-
 
 		bool popup{ false };
 		bool textEdited{ false };
@@ -90,6 +101,8 @@ namespace geProject {
 		std::vector <Animation*> componentAnimation;
 		std::vector <Rigidbody*> componentRigidBody;
 		std::vector <Controls*> componentController;
+		std::vector <Health*> componentHealth;
+		std::vector <Damage*> componentDamage;
 
 		PoolAllocator entitypool{ maxEntities, sizeof(Entity) };
 		PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
@@ -97,5 +110,11 @@ namespace geProject {
 		PoolAllocator animatePool{ maxEntities, sizeof(Animation) };
 		PoolAllocator rigidpool{ maxEntities, sizeof(Rigidbody) };
 		PoolAllocator controllerpool{ maxEntities, sizeof(Controls) };
+		PoolAllocator healthpool{ maxEntities, sizeof(Health) };
+		PoolAllocator damagepool{ maxEntities, sizeof(Damage) };
+
+		//stored in unordered maps instead of pool allocators, due to varying memory amounts per component
+		std::unordered_map<int, std::vector <BoxCollider>> componentBoxCollider;
+		std::unordered_map<int, std::vector <CircleCollider>> componentCircleCollider;
 	};
 }

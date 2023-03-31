@@ -16,7 +16,7 @@ void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
 	contact->GetWorldManifold(&manifold);
 	glm::vec2 firstNormal = glm::vec2(manifold.normal.x, manifold.normal.y);
 	glm::vec2 secondNormal = -firstNormal;
-	eventSystem.publishImmediately(new BeginContactEvent(firstData, secondData));
+	eventSystem.publishImmediately(new BeginContactEvent(GameplayContext | ImGuiContext, firstData, secondData, true));
 	//put callbacks into handler queue instead of publishing immediately due to multiple collisions occuring per frame 		
 }
 
@@ -28,7 +28,7 @@ void geProject::CustomContactListener::EndContact(b2Contact* contact) {
 	contact->GetWorldManifold(&manifold);
 	glm::vec2 firstNormal = glm::vec2(manifold.normal.x, manifold.normal.y);
 	glm::vec2 secondNormal = -firstNormal;
-	eventSystem.publishImmediately(new EndContactEvent(firstData, secondData));}
+	eventSystem.publishImmediately(new EndContactEvent(GameplayContext | ImGuiContext, firstData, secondData));}
 
 
 
@@ -40,7 +40,7 @@ void geProject::CustomContactListener::PreSolve(b2Contact* contact, const b2Mani
 	contact->GetWorldManifold(&manifold);
 	glm::vec2 firstNormal = glm::vec2(manifold.normal.x, manifold.normal.y);
 	glm::vec2 secondNormal = -firstNormal;
-	eventSystem.publish(new PresolveEvent(firstData, secondData));
+	eventSystem.publish(new PresolveEvent(GameplayContext | ImGuiContext, firstData, secondData));
 
 
 }
@@ -54,7 +54,7 @@ void geProject::CustomContactListener::PostSolve(b2Contact* contact, const b2Con
 	contact->GetWorldManifold(&manifold);
 	glm::vec2 firstNormal = glm::vec2(manifold.normal.x, manifold.normal.y);
 	glm::vec2 secondNormal = -firstNormal;
-	eventSystem.publish(new PostsolveEvent(firstData, secondData));
+	eventSystem.publish(new PostsolveEvent(GameplayContext | ImGuiContext, firstData, secondData));
 
 }
 

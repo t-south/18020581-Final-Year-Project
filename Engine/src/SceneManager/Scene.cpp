@@ -51,6 +51,8 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		json boxColliderData = json::object();
 		json animateData = json::object();
 		json controllerData = json::object();
+		json healthData = json::object();
+		json damageData = json::object();
 		Transform transform = *manager->getTransformComponent(entity.id);
 		to_json(transformData, transform);
 		json spriteData = json::object();
@@ -105,6 +107,27 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 			};
 		}
 
+		if ((entity.compMask & 1 << 7) == 1 << 7) {
+			Health health = *manager->getHealthComponent(entity.id);
+			to_json(healthData, health);
+		}
+		else {
+			healthData = json{
+				"Health", 0
+			};
+		}
+
+
+		if ((entity.compMask & 1 << 8) == 1 << 8) {
+			Damage damage = *manager->getDamageComponent(entity.id);
+			to_json(damageData, damage);
+		}
+		else {
+			damageData = json{
+				"Damage", 0
+			};
+		}
+
 
 		entityjson["entity"].push_back(entityType);
 		entityjson["entity"].push_back(transformData);
@@ -114,6 +137,8 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		entityjson["entity"].push_back(boxColliderData);
 		entityjson["entity"].push_back(animateData);
 		entityjson["entity"].push_back(controllerData);
+		entityjson["entity"].push_back(healthData);
+		entityjson["entity"].push_back(damageData);
 		return entityjson;
 	}
 
@@ -144,6 +169,8 @@ void geProject::Scene::deserialize(std::string filepath) {
 				json boxData = i.value().at("entity")[5];
 				json animateData = i.value().at("entity")[6];
 				json controllerData = i.value().at("entity")[7];
+				json healthData = i.value().at("entity")[8];
+				json damageData = i.value().at("entity")[9];
 				Transform trans = Transform();
 				SpriteRender sprite = SpriteRender();				
 				from_json(transData, trans);
@@ -181,6 +208,19 @@ void geProject::Scene::deserialize(std::string filepath) {
 					from_json(controllerData, control);
 					manager->assignController(entityId, control);
 				}
+				if (healthData[1] != 0) {
+					Health health = Health();
+					from_json(healthData, health);
+					manager->assignHealth(entityId, health);
+				}
+				if (damageData[1] != 0) {
+					Damage dmg = Damage();
+					from_json(damageData, dmg);
+					manager->assignDamage(entityId, dmg);
+				}
+
+
+
 				addEntityToScene(entityId);		
 			}
 			iFile.close();
@@ -287,6 +327,28 @@ void geProject::Scene::to_json(json& data, Controls& comp) {
 	};
 }
 
+void geProject::Scene::to_json(json& data, Health& comp){
+	data = json{
+	"Health", {
+		{"maxHealth", comp.maxHealth},
+		{"currHealth", comp.currentHealth},
+		{"invincible", comp.invincible}
+	}
+	};
+
+}
+
+void geProject::Scene::to_json(json& data, Damage& comp){
+	data = json{
+	"Damage", {
+		{"dmgAtk", comp.dmgAtk},
+		{"dmgModifier", comp.dmgModifier},
+		{"dmgType", comp.dmgType}
+	}
+	};
+
+}
+
 
 
 
@@ -390,6 +452,28 @@ void geProject::Scene::from_json(json& data, Controls& comp) {
 		data[1].at("runspeed").get_to(comp.runspeed);
 		data[1].at("speedMod").get_to(comp.speedModifier);
 		data[1].at("controldirection").get_to(comp.direction);		
+	}
+}
+
+void geProject::Scene::from_json(json& data, Health& comp){
+	if (data[1] == 0) {
+		comp.id = 0;
+	}
+	else {
+		data[1].at("maxHealth").get_to(comp.maxHealth);
+		data[1].at("currHealth").get_to(comp.currentHealth);
+		data[1].at("invincible").get_to(comp.invincible);
+	}
+}
+
+void geProject::Scene::from_json(json& data, Damage& comp){
+	if (data[1] == 0) {
+		comp.id = 0;
+	}
+	else {
+		data[1].at("dmgAtk").get_to(comp.dmgAtk);
+		data[1].at("dmgModifier").get_to(comp.dmgModifier);
+		data[1].at("dmgType").get_to(comp.dmgType);	
 	}
 }
 

@@ -71,7 +71,21 @@ namespace geProject {
 		float speedModifier;
 		float direction;
 	};
+
+	struct Health {
+		unsigned int id = 128;
+		int maxHealth;
+		int currentHealth;
+		bool invincible;
+	};
 	
+
+	struct Damage {
+		unsigned int id = 256;
+		int dmgAtk;
+		int dmgModifier;
+		int dmgType;
+	};
 	
 }
 

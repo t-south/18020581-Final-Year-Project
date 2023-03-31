@@ -69,23 +69,23 @@ void geProject::ImguiWindow::gameViewWindow() {
 	ImVec2 vPos = viewPos;
 	ImVec2 vSize = viewSize;
 	ImGui::BeginMainMenuBar();
-	if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
-		eventSystem.publish(new GameStartEvent());
+	if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {				
+		eventSystem.publish(new GameStartEvent(ImGuiContext));
 		windowRunning = true;
 	}
-	if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {	
-		eventSystem.publish(new GameStopEvent());
+	if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {			
+		eventSystem.publish(new GameStopEvent(ImGuiContext));
 		windowRunning = false;
 	}
-	if (ImGui::Button("Save")) {
-		eventSystem.publish(new GameSaveEvent());
+	if (ImGui::Button("Save")) {		
+		eventSystem.publish(new GameSaveEvent(ImGuiContext));
 	}
 	if (ImGui::MenuItem("Editor", "", loadLevel, !loadLevel)) {
-		eventSystem.publish(new GameLoadEvent(1));
+		eventSystem.publish(new GameLoadEvent(ImGuiContext, 1));
 		loadLevel = false;
 	}
 	if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
-		eventSystem.publish(new GameLoadEvent(2));
+		eventSystem.publish(new GameLoadEvent(ImGuiContext, 2));
 		loadLevel = false;
 	
 	}
@@ -105,12 +105,17 @@ void geProject::ImguiWindow::gameViewWindow() {
 
 	ImGui::Begin("Config");
 	if (ImGui::Checkbox("grid", &gridSelection)) {
-		eventSystem.publishImmediately(new GridToggleEvent(gridSelection));
+		eventSystem.publishImmediately(new GridToggleEvent(EditorContext, gridSelection));
 	}
 	ImGui::End();	
 	if (vPos.x != viewPos.x || vPos.y != viewPos.y || vSize.x != viewSize.x || vSize.y != viewSize.y) {
-		eventSystem.publishImmediately(new ViewPortEvent(viewPos.x, viewPos.y, viewSize.x, viewSize.y));
+		eventSystem.publishImmediately(new ViewPortEvent(EditorContext | GameplayContext, viewPos.x, viewPos.y, viewSize.x, viewSize.y));
 	}
+
+
+
+
+
 }
 
 ImVec2 geProject::ImguiWindow::getViewPos() { return viewPos; }

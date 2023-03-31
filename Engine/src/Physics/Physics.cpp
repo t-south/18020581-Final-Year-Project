@@ -4,7 +4,7 @@
 geProject::Physics::Physics(EntityManager& emanager):time(0), world(b2World(gravity)) {
 	timeStep = 1.0f / 60.0f;
 	position = 3.0f;
-	velocity = 8.0f;	
+	velocity = 0.0f;	
 	time = 0.0f;
 	world.SetContactListener(&customCallback);
 	eventSystem.subscribe(this, &Physics::updateRigidBody);
@@ -130,6 +130,9 @@ void geProject::Physics::update(float deltaTime){
 		if (bodies.size() > 0) {
 			int count = 0;
 			for (auto &body : bodies) {
+				if (body.second->GetType() == b2_dynamicBody) {
+					
+				}
 				float test = body.second->GetAngle();
 				b2Vec2 position = body.second->GetPosition();
 				double PI = 3.14159265;
@@ -143,13 +146,26 @@ void geProject::Physics::update(float deltaTime){
 				}*/
 				count++;
 				
-				eventSystem.publishImmediately(new TransformEvent((int)body.first, position.x, position.y, angle));
+				eventSystem.publishImmediately(new TransformEvent(ImGuiContext | GameplayContext, (int)body.first, position.x, position.y, angle));
 			}
 		}		
 	}
 	//publish events from earlier callbacks
 	//eventSystem.handleEvents(beginContact);
 	//eventSystem.handleEvents(endContact);
+}
+
+b2Body& geProject::Physics::getPhysicsBody(int entityId)
+{
+	return *bodies[entityId];
+}
+
+void geProject::Physics::applyLinearImpulse(int entityId, float x, float y){
+	bodies[entityId]->ApplyLinearImpulse(b2Vec2(x, y), bodies[entityId]->GetWorldCenter(), true);
+}
+
+void geProject::Physics::applyRotation(int entityId, float angle){
+	bodies[entityId]->SetTransform(bodies[entityId]->GetPosition(), angle);
 }
 
 

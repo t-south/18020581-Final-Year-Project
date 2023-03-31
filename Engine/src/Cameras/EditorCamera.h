@@ -7,8 +7,7 @@ namespace geProject {
 	class EditorCamera : public Camera {
 	public:	
 		EditorCamera(glm::vec2 pos);		
-		void cameraMouseButton(MouseButtonEvent* mouse);
-		void cameraMouseScrolled(MouseScrollEvent* scroll);
+		void cameraMouseButton(MouseButtonEvent* mouse);		
 		void mouseMoved(MouseMoveEvent* event);	
 		float prevX{ 0 };
 		float prevY{ 0 };

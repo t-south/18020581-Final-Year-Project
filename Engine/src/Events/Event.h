@@ -16,35 +16,26 @@ namespace geProject {
 	};
 	enum Context {
 		NoContext = 0,					/* 0b0000000000000000 */
-		AppContext = (1 << 0),			/* 0b0000000000000001 */
-		EditorContext = (1 << 1),       /* 0b0000000000000010 */
-		InputContext = (1 << 2),		/* 0b0000000000000100 */
-		KeyboardContext = (1 << 3),		/* 0b0000000000001000 */
-		MouseContext = (1 << 4),		/* 0b0000000000010000 */
-		MouseButtonContext = (1 << 5),  /* 0b0000000000100000 */
-		ImGuiContext = (1 << 6),			/* 0b0000000001000000 */
-		GameplayContext = (1 << 6)		/* 0b0000000010000000 */
+		EditorContext = (1 << 0),       /* 0b0000000000000001 */
+		ImGuiContext = (1 << 1),		/* 0b0000000000000010 */
+		GameplayContext = (1 << 2)		/* 0b0000000000000100 */
 	};
 
 	class Event {
-	protected:		
-		typedef unsigned int uInt;
+	protected:	
+		Event(int context) : eventContext(context) {};
 		unsigned int eventContext{ NoContext };
 		bool eventHandled{ false };			
 		int getContext() { return eventContext; };
 		bool isEventHandled(){ return eventHandled; };
 		void setHandled(){ eventHandled = true; };
-	
 	};
-
-
 
 	//EDITOR EVENTS
 
 	class GridToggleEvent : public Event {
-	public:
-		
-		GridToggleEvent(bool toggled) : toggled(toggled) { eventContext = EditorContext | AppContext; };
+	public:		
+		GridToggleEvent(int context, bool toggled) : Event(context), toggled(toggled) {};
 		static int getType() { return Type::gridToggle; };
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -53,7 +44,7 @@ namespace geProject {
 
 	class CopyEntityEvent : public Event {
 	public:
-		CopyEntityEvent(unsigned int id): newId(id) { eventContext = EditorContext | AppContext; };
+		CopyEntityEvent(int context, unsigned int id): Event(context), newId(id) {};
 		static int getType() { return Type::copyEntity; };
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -63,7 +54,7 @@ namespace geProject {
 
 	class DeleteEntityEvent : public Event {
 	public:
-		DeleteEntityEvent(unsigned int id, unsigned int batch, unsigned int index) : entityId(id), renderBatch(batch), renderIndex(index) { eventContext = EditorContext | AppContext; };
+		DeleteEntityEvent(int context, unsigned int id, unsigned int batch, unsigned int index) : Event(context), entityId(id), renderBatch(batch), renderIndex(index) {};
 		static int getType() { return Type::deleteEntity; };
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -72,7 +63,7 @@ namespace geProject {
 
 	class HierarchyEvent : public Event {
 	public:
-		HierarchyEvent(int id, unsigned int mask, std::string name, bool available) : entityId(id), compmask(mask), availability(available), entityName(name) { eventContext = EditorContext | AppContext; };
+		HierarchyEvent(int context, int id, unsigned int mask, std::string name, bool available) : Event(context), entityId(id), compmask(mask), availability(available), entityName(name) {};
 		static int getType() { return Type::sceneHier; };
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -87,7 +78,7 @@ namespace geProject {
 
 	class GameStartEvent : public Event {
 	public:	
-		GameStartEvent() { eventContext = AppContext; };
+		GameStartEvent(int context): Event(context){};
 		static int getType() { return Type::gameStart; };	
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -95,7 +86,7 @@ namespace geProject {
 
 	class GameStopEvent : public Event {
 	public:
-		GameStopEvent() { eventContext = AppContext; }
+		GameStopEvent(int context): Event(context) {}
 		static int getType() { return Type::gameStop; };	
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -103,7 +94,7 @@ namespace geProject {
 
 	class GameSaveEvent : public Event {
 	public:
-		GameSaveEvent() { eventContext = AppContext; };
+		GameSaveEvent(int context): Event(context) {};
 		static int getType() { return Type::gameSave; };		
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -111,7 +102,7 @@ namespace geProject {
 
 	class GameLoadEvent : public Event {
 	public:
-		GameLoadEvent(unsigned int id) : sceneId(id){ eventContext = AppContext; };
+		GameLoadEvent(int context, unsigned int id) : Event(context), sceneId(id){};
 		static int getType() { return Type::gameLoad; };
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -124,20 +115,30 @@ namespace geProject {
 
 	class KeyPressedEvent : public Event {
 	public:
-		KeyPressedEvent(int kcode, int pressedCount, bool press) : keycode(kcode), pressedCount(pressedCount), pressed(press) { eventContext = KeyboardContext | InputContext | AppContext; };
+		KeyPressedEvent(int context, int kcode, int pressedCount) : Event(context), keycode(kcode), pressedCount(pressedCount) {};
 		static int getType() { return Type::keyPressed; };	
 		int addContext(Context context) { eventContext = getContext() & context; };
 		inline int getPressedCount() const { return pressedCount; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
-		int pressedCount, keycode;
-		bool pressed;
+		int pressedCount, keycode;	
+	};
+
+
+	class KeyReleasedEvent : public Event {
+	public:
+		KeyReleasedEvent(int context, int kcode, int pressedCount) : Event(context), keycode(kcode), pressedCount(pressedCount) {};
+		static int getType() { return Type::keyReleased; };
+		int addContext(Context context) { eventContext = getContext() & context; };
+		inline int getPressedCount() const { return pressedCount; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		int pressedCount, keycode;		
 	};
 
 	//MOUSE EVENTS
 
 	class MouseMoveEvent : public Event {
 	public:
-		MouseMoveEvent(float posX, float posY) : posX(posX), posY(posY) { eventContext = MouseContext | InputContext | AppContext; };
+		MouseMoveEvent(int context, float posX, float posY) : Event(context), posX(posX), posY(posY) {};
 		float posX, posY;
 		static int getType() { return Type::mouseMove; };
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -149,7 +150,7 @@ namespace geProject {
 
 	class MouseScrollEvent : public Event {
 	public:
-		MouseScrollEvent(float xOffset, float yOffset, float screenx, float screeny) : xScroll(xOffset), yScroll(yOffset), screenX(screenx), screenY(screeny) { eventContext = MouseContext | InputContext | AppContext; };
+		MouseScrollEvent(int context, float xOffset, float yOffset, float screenx, float screeny) : Event(context), xScroll(xOffset), yScroll(yOffset), screenX(screenx), screenY(screeny) {};
 		static int getType() { return Type::mouseScroll; };
 		int addContext(Context context) { eventContext = getContext() & context; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
@@ -158,7 +159,7 @@ namespace geProject {
 
 	class MouseButtonEvent : public Event {
 	public:
-		MouseButtonEvent(int button, bool mouseDown, float posX, float posY) : mouseButton(button), mouseButtonDown(mouseDown), mouseX(posX), mouseY(posY){ eventContext = MouseContext | InputContext | MouseButtonContext | AppContext; };
+		MouseButtonEvent(int context, int button, bool mouseDown, float posX, float posY) : Event(context), mouseButton(button), mouseButtonDown(mouseDown), mouseX(posX), mouseY(posY){};
 		static int getType() { return Type::mousePressed; };	
 		bool contextCheck(Context cat) { return getContext() & cat; };
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -171,9 +172,11 @@ namespace geProject {
 
 	class TransformEvent : public Event {
 	public:
-		TransformEvent(int id, float posx, float posy, float rotate) : entityId(id), posX(posx), posY(posy), rotation(rotate) { eventContext = AppContext; };
+		TransformEvent(int context, int id, float posx, float posy, float rotate) : Event(context), entityId(id), posX(posx), posY(posy), rotation(rotate) {};
 		static int getType() { return Type::transForm; };		
-		bool contextCheck(Context cat) { return getContext() & cat; }
+		bool contextCheck(Context cat) { 
+			return getContext() & cat; 
+		}
 		int addContext(Context context) { eventContext = getContext() & context; };
 		int entityId;
 		float posX, posY, rotation;
@@ -181,7 +184,7 @@ namespace geProject {
 
 	class SpriteEvent : public Event {
 	public:
-		SpriteEvent(int id, SpriteRender& spr) : entityId(id), sprite(&spr) { eventContext = AppContext; };
+		SpriteEvent(int context, int id, SpriteRender& spr) : Event(context), entityId(id), sprite(&spr) {};
 		static int getType() { return Type::spriteRender; };		
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -191,7 +194,7 @@ namespace geProject {
 
 	class RigidEvent : public Event {
 	public:
-		RigidEvent(unsigned int id, Rigidbody& rigid) : entityId(id), rigidbody(&rigid) { eventContext = AppContext; };
+		RigidEvent(int context, unsigned int id, Rigidbody& rigid) : Event(context), entityId(id), rigidbody(&rigid) {};
 		static int getType() { return Type::rigidBody; };		
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -201,8 +204,8 @@ namespace geProject {
 
 	class BoxColliderEvent : public Event {
 	public:
-		BoxColliderEvent(unsigned int id, float offX, float offY, float sizeX, float sizeY, float origX, float origY) 
-			: entityId(id), offSetX(offX), offsetY(offY), boxSizeX(sizeX), boxSizeY(sizeY), originX(origX), originY(origY){	eventContext = AppContext;};
+		BoxColliderEvent(int context, unsigned int id, float offX, float offY, float sizeX, float sizeY, float origX, float origY)
+			: Event(context), entityId(id), offSetX(offX), offsetY(offY), boxSizeX(sizeX), boxSizeY(sizeY), originX(origX), originY(origY){};
 		static int getType() { return Type::boxCollider; };		
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -212,7 +215,7 @@ namespace geProject {
 
 	class CircleColliderEvent : public Event {
 	public:
-		CircleColliderEvent(int id, CircleCollider& circle) : entityId(id), circlecollider(&circle) { eventContext = AppContext; };
+		CircleColliderEvent(int context, int id, CircleCollider& circle) : Event(context), entityId(id), circlecollider(&circle) {};
 		static int getType() { return Type::circleCollider; };		
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -222,7 +225,7 @@ namespace geProject {
 
 	class ProjectionEvent : public Event {
 	public:
-		ProjectionEvent(glm::mat4 pinv, glm::mat4 vinv) : projInv(pinv), viewInv(vinv) { eventContext = AppContext; };
+		ProjectionEvent(int context, glm::mat4 pinv, glm::mat4 vinv) : Event(context), projInv(pinv), viewInv(vinv) {};
 		static int getType() { return Type::projection; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -231,7 +234,7 @@ namespace geProject {
 
 	class ViewPortEvent : public Event {
 	public:
-		ViewPortEvent(float winposX, float winposY, float winsizeX, float winsizeY): windowPosX(winposX), windowPosY(winposY), windowSizeX(winsizeX), windowSizeY(winsizeY){ eventContext = AppContext; };
+		ViewPortEvent(int context, float winposX, float winposY, float winsizeX, float winsizeY): Event(context), windowPosX(winposX), windowPosY(winposY), windowSizeX(winsizeX), windowSizeY(winsizeY){};
 		static int getType() { return Type::viewPort; };		
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -242,17 +245,18 @@ namespace geProject {
 
 	class BeginContactEvent : public Event {
 	public:
-		BeginContactEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		BeginContactEvent(int context, Entity* entitya, Entity* entityb, bool contact) : Event(context), entityA(entitya), entityB(entityb), deadly(contact) {};
 		static int getType() { return Type::beginContact; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
 		Entity* entityA;
 		Entity* entityB;
+		bool deadly;
 	};
 
 	class EndContactEvent : public Event {
 	public:
-		EndContactEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		EndContactEvent(int context, Entity* entitya, Entity* entityb) : Event(context), entityA(entitya), entityB(entityb) {};
 		static int getType() { return Type::endContact; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -262,7 +266,7 @@ namespace geProject {
 
 	class PresolveEvent : public Event {
 	public:
-		PresolveEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		PresolveEvent(int context, Entity* entitya, Entity* entityb) : Event(context), entityA(entitya), entityB(entityb) {};
 		static int getType() { return Type::preSolve; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
@@ -272,7 +276,7 @@ namespace geProject {
 
 	class PostsolveEvent : public Event {
 	public:
-		PostsolveEvent(Entity* entitya, Entity* entityb) : entityA(entitya), entityB(entityb) { eventContext = AppContext; };
+		PostsolveEvent(int context, Entity* entitya, Entity* entityb) : Event(context), entityA(entitya), entityB(entityb) {};
 		static int getType() { return Type::postSolve; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };

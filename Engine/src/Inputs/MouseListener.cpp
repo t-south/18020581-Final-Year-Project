@@ -26,35 +26,31 @@ geProject::MouseListener* geProject::MouseListener::getInstance() {
 }
 
 void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, double newX, double newY) {
-    eventSystem.publish(new MouseMoveEvent(MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
+    Context currentContext = eventSystem.getContext();
+    eventSystem.publish(new MouseMoveEvent(currentContext, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
     MouseListener::getInstance()->xPrev = MouseListener::getInstance()->xPos;
     MouseListener::getInstance()->yPrev = MouseListener::getInstance()->yPos;
     MouseListener::getInstance()->xPos = newX;
     MouseListener::getInstance()->yPos = newY;
- 
-    //std::cout << "x pos: " << geProject::MouseListener::getInstance()->getXpos() << "  y pos:  " << geProject::MouseListener::getInstance()->getYpos() << std::endl;
 
 }
 
 void geProject::MouseListener::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-
-    //std::cout << "ViewPos X: " << geProject::MouseListener::getInstance()->viewPos[0] << "ViewPos Y: " << geProject::MouseListener::getInstance()->viewPos[1] << std::endl;
-    //std::cout << " ViewSize X: " << geProject::MouseListener::getInstance()->viewSize[0] << " ViewSize Y: " << geProject::MouseListener::getInstance()->viewSize[1] << std::endl;
-
-    if (action == GLFW_PRESS) {    
-        eventSystem.publish(new MouseButtonEvent(button, GLFW_PRESS, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
-        geProject::MouseListener::getInstance()->mouseButton[button] = true;
+    Context currentContext = eventSystem.getContext();
+    if (action == GLFW_PRESS) { 
+        eventSystem.publish(new MouseButtonEvent(currentContext, button, GLFW_PRESS, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
+        geProject::MouseListener::getInstance()->mouseButton[button] = true;        
     }
     else if (action == GLFW_RELEASE) {
-        eventSystem.publish(new MouseButtonEvent(button, GLFW_RELEASE, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
+        eventSystem.publish(new MouseButtonEvent(currentContext, button, GLFW_RELEASE, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
         geProject::MouseListener::getInstance()->mouseButton[button] = false;
         geProject::MouseListener::getInstance()->isDragging = false;
     }
 }
 
 void geProject::MouseListener::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) { 
-    
-    eventSystem.publishImmediately(new MouseScrollEvent(xoffset, yoffset, MouseListener::getInstance()->getScreenXpos(), MouseListener::getInstance()->getScreenYpos()));
+    Context currentContext = eventSystem.getContext();
+    eventSystem.publishImmediately(new MouseScrollEvent(currentContext, xoffset, yoffset, MouseListener::getInstance()->getScreenXpos() , MouseListener::getInstance()->getScreenYpos()));
     MouseListener::getInstance()->xScroll = xoffset;
     MouseListener::getInstance()->yScroll = yoffset;
 }

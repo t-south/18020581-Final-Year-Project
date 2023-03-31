@@ -6,7 +6,5 @@ geProject::LevelCamera::LevelCamera(glm::vec2 pos) {
 	projectionUpdate();
 }
 
-void geProject::LevelCamera::update(float dt) {
-	deltaTime = dt;
-}
+
 

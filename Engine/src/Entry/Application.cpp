@@ -33,7 +33,7 @@ namespace geProject {
 		int height = gameWindow->getHeight();
 		auto window = gameWindow->getWindow();
 		imguiWindow = new ImguiWindow(window, width, height, frameBuffer);
-		imguiWindow->start(width, height, sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());
+		imguiWindow->start(width, height, sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());		
 		loop();
 	}
 
@@ -46,6 +46,8 @@ namespace geProject {
 		//SceneSerialize serial = SceneSerialize(sceneManager->getCurrentScene());
 		//serial.deserialize("jsonTest.json");
 		while (!glfwWindowShouldClose(gameWindow->getWindow())) {
+			eventSystem.handleEvents(Type::keyPressed);
+			eventSystem.handleEvents(Type::keyReleased);
 			glfwPollEvents();
 			auto scene = sceneManager->getCurrentScene();
 			//TEXTURE SELECTION UPDATES
@@ -70,7 +72,7 @@ namespace geProject {
 			//std::cout << "Frame time: " << deltaTime << std::endl;
 			if (timePerSec > 1) {
 				//std::cout << "FPS1: " << loopCount << std::endl;
-				//std::cout << "FPS2: " << 1 / deltaTime << std::endl;
+				std::cout << "FPS2: " << 1 / deltaTime << std::endl;
 				timePerSec = 0;
 				loopCount = 0;
 			}
@@ -89,7 +91,7 @@ namespace geProject {
 			scene->serialize(scene->getFilePath());
 			scene->serialize("../../../../Game/assets/levels/levelEditor.json");
 			scene->setPhysics(true);
-			//scene->init();
+			eventSystem.setContext(GameplayContext);
 			scene->setActiveEntity(-1);				
 		}
 	}
@@ -102,6 +104,7 @@ namespace geProject {
 			scene->setPhysics(false);
 			scene = sceneManager->getCurrentScene();			
 			scene->deserialize(scene->getFilePath());
+			eventSystem.setContext(EditorContext);
 			scene->setActiveEntity(-1);
 		}
 	}

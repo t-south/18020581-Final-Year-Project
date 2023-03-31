@@ -15,7 +15,7 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	animationManager = new AnimationManager(*manager, *resourceManager);
 	renderer = new Renderer(*(resourceManager));
 	//shader = new geProject::Shader("../../../../Game/assets/shaders/defaultVertexShader.glsl", );
-	camera = new EditorCamera(glm::vec2(-250.0f, 0.0f));	
+	camera = new EditorCamera(glm::vec2(-3.0f, 0.0f));	
 	mouse->setInverses(getCamera()->getProjectionInverse(), getCamera()->getViewMatrixInverse());
 	//testTexture = new Texture("../../../../Game/assets/images/container.jpg");
 	resourceManager->loadShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl", "../../../../Game/assets/shaders/FragmentShaderDefault.glsl");
@@ -32,6 +32,8 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	resourceManager->loadSpriteSheet("../../../../Game/assets/images/spritesheets/pipes.png", 6, 16, 16, 0, 0);
 	selectionTextures = new FrameBuffer(1920, 1080, true);
 	physicsManager = new Physics(*manager);
+	controlManager = new Receiver();
+
 	
 	init();
 }
@@ -59,6 +61,11 @@ void geProject::LevelEditorScene::init() {
 			}
 		}		
 	}
+	int playerId = manager->getPlayerId();
+	if (playerId > -1) {
+		
+		player = new PlayerController(*manager, *camera, *physicsManager, playerId);
+	}
 }
 
 size_t geProject::LevelEditorScene::addEntityToScene(unsigned int entityId){
@@ -75,10 +82,30 @@ void geProject::LevelEditorScene::reAssignEntityToScene(unsigned int entityScene
 
 void geProject::LevelEditorScene::update(float deltaTime) {			
 	camera->update(deltaTime);	
+	//if mouse is out of game view then set the event system to only take imgui callbacks
+	if (loopcount > 1) {	
+		if ((mouse->getScreenXpos() <= 1920.0f && mouse->getScreenXpos() >= 0.0f) && (mouse->getScreenYpos() <= 1080.0f && mouse->getScreenYpos() >= 0.0f)) {
+			if (physicsEnabled) {
+		
+				eventSystem.setContext(GameplayContext);
+			}
+			else {
+		
+				eventSystem.setContext(EditorContext);
+			}
+		}
+		else {
+		
+			eventSystem.setContext(ImGuiContext);
+		}
+	}
+	
 	if (gridSelected) {
 		setGridLines();
 	}
 	/*
+	camera->projectionUpdate();
+	
 	if (loopcount % 100 == 0) {		
 		std::cout << "View X: " << mouse->getViewXsize() << " View Y: " << mouse->getViewYsize() << std::endl;
 		std::cout << "Mouse X: " << mouse->getXpos() << " Mouse Y: " << mouse->getYpos() << std::endl;
@@ -86,8 +113,8 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		std::cout << "Camera X: " << mouse->getCameraMouseX() << " Camera Y: " << mouse->getCameraMouseY() << std::endl;
 		std::cout << mouse->checkMouseBoundaries() << std::endl;
 	}
+	//std::cout << "current context " << eventSystem.getContext() << std::endl;
 	*/
-	
 	//DEBUG DRAWING FOR PHYSICS
 
 	/*
@@ -128,8 +155,10 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		physicsManager->update(deltaTime);
 	}
 
-	if (player != nullptr) {
+
+	if(player != nullptr){		
 		Command* command = controlManager->action();
+		player->update(deltaTime);
 		if (command)
 		{
 			command->execute(*player);
@@ -165,6 +194,9 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	}
 	animationManager->update(deltaTime);
 	mouse->endFrame();
+
+
+
 	keyboard->endFrame();
 
 	manager->endFrame();
@@ -255,7 +287,7 @@ void geProject::LevelEditorScene::updateImgui() {
 		if (ImGui::BeginTabItem("Characters")) {
 			ImVec2 spriteDimensions(32, 32);
 			float spriteDim = 0.25f;
-			if (player == nullptr) {
+			if (manager->getPlayerId() == -1) {
 				std::shared_ptr<SpriteSheet> playerSprites = resourceManager->requestSpriteSheet(2);
 				SpriteRender newSprite = playerSprites->getSprite(0);
 				// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
@@ -301,8 +333,10 @@ unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* s
 
 unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type){
 	unsigned int entity = manager->addEntity(type);
+	
 	if (type == entityTypes::player) {
-		player = new PlayerController(*manager, entity);
+		player = new PlayerController(*manager, *camera, *physicsManager, entity);
+		manager->assignController(entity, Controls());
 	}
 	auto spriteSheet = resourceManager->requestSpriteSheet(sprite->spriteSheetId);
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 #include "Event.h"
 #include <functional>
 
@@ -26,7 +26,10 @@ namespace geProject {
 		CallBackFunction callback;
 		bool functionAssigned{ false };
 		virtual void callFunction() override { 
-			if (functionAssigned) { (instance->*callback)(static_cast<U*>(eventClass)); functionAssigned = false; }
+
+			if (functionAssigned) { 
+				(instance->*callback)(static_cast<U*>(eventClass)); functionAssigned = false; 
+			}
 		};
 
 		virtual void setEvent(Event* event) override { 

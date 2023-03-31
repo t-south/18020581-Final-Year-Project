@@ -5,6 +5,7 @@ geProject::LevelScene::LevelScene(){
 	std::cout << "Level Scene!" << std::endl;
 	camera = new LevelCamera(glm::vec2(-250.0f, 0.0f));
 	filePath = "../../../../Game/assets/levels/level1.json";
+
 }
 
 geProject::LevelScene::~LevelScene(){}

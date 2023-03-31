@@ -20,6 +20,12 @@ int geProject::SceneStates::addScene(std::shared_ptr<Scene> scene) {
 void geProject::SceneStates::switchScene(int id) {
 	if (id <= sceneCount && id > 0) 
 		currentSceneId = id;
+	if (currentSceneId == 1) {
+		eventSystem.setContext(Context::EditorContext);
+	}
+	else if (currentSceneId > 1) {
+		eventSystem.setContext(Context::GameplayContext);
+	}
 }
 
 void geProject::SceneStates::removeScene(int id) {

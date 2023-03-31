@@ -8,12 +8,14 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <ge_engine/Core.h>
 #include <iostream>
+#include <cmath>
 
 //orthographic camera for 2d games
 //converts from world coordinates to normalised device coordinates
 namespace geProject {
 	class Camera {
 	public:		
+		Camera();
 		virtual ~Camera();
 		void projectionUpdate();
 		glm::mat4 getViewMatrix();
@@ -26,7 +28,10 @@ namespace geProject {
 		void setPosition(glm::vec2 pos);
 		void setScroll(float scale);
 		float getScroll();	
-		virtual void update(float dt) = 0;		
+		void cameraMouseScrolled(MouseScrollEvent* scroll);
+		void setCentredPosition(float x, float y);
+		virtual void update(float dt);		
+		glm::vec2 getCentredPosition();
 	protected:		
 		//camera facing direction		
 		glm::vec3 position;
@@ -44,6 +49,7 @@ namespace geProject {
 		float drag{ 0.0f };
 		float scroll{ 1.0f };
 		float deltaTime{ 0.0f };
-		bool mouseDown{ false };			
+		bool mouseDown{ false };
+		bool scrollTest;
 	};
 }
