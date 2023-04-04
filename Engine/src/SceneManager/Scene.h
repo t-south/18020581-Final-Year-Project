@@ -13,7 +13,7 @@
 #include "../Controller/Command.h"
 #include "../Controller/PlayerController.h"#
 #include "../Controller/Receiver.h"
-
+#include "../AI/WorldStates.h"
 
 using json = nlohmann::json;
 namespace geProject {
@@ -22,8 +22,7 @@ namespace geProject {
 		virtual void update(float deltaTime) = 0;
 		virtual void init() = 0;
 		virtual size_t addEntityToScene(unsigned int entityId) = 0;
-		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) = 0;
-		Camera* getCamera();
+		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) = 0;		
 		virtual void updateImgui() = 0;
 		virtual void updateSceneImgui() = 0;
 		virtual void render(std::string shaderPath) = 0;	
@@ -47,17 +46,15 @@ namespace geProject {
 	protected:
 		std::unordered_map<int, Entity*> entities;		
 		static Window* gameWindow;
-		MouseListener* mouse;
-		KeyboardListener* keyboard;
+		static MouseListener* mouse;
+		static KeyboardListener* keyboard;
 		//MANAGERS
 		static ResourceManager* resourceManager;
 		static Physics* physicsManager;
 		static EntityManager* manager;
 		static AnimationManager* animationManager;
 		static Receiver* controlManager;
-		static PlayerController* player;
-
-		Camera* camera;
+		static WorldState* world;
 		Renderer* renderer{ nullptr };
 		FrameBuffer* selectionTextures{ nullptr };
 		//(de)serialisation

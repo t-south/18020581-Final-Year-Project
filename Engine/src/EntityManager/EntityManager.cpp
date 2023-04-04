@@ -52,6 +52,8 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 		componentController.push_back(reinterpret_cast<Controls*>(controllerpool.allocate(sizeof(Controls))));
 		componentController[index]->id = 0;
 		componentHealth.push_back(reinterpret_cast<Health*>(healthpool.allocate(sizeof(Health))));
+ 
+
 		componentHealth[index]->id = 0;
 		componentDamage.push_back(reinterpret_cast<Damage*>(damagepool.allocate(sizeof(Damage))));
 		componentDamage[index]->id = 0;
@@ -67,6 +69,7 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 
 void geProject::EntityManager::deleteEntity(int entityId){
 	entities[entityId]->id = -1;
+	entities[entityId]->compMask = 0;
 	componentTransforms[entityId]->id = 0;
 	componentSpriteRender[entityId]->id = 0;
 	componentRigidBody[entityId]->id = 0;
@@ -75,6 +78,7 @@ void geProject::EntityManager::deleteEntity(int entityId){
 	componentController[entityId] = 0;
 	componentHealth[entityId] = 0;
 	componentDamage[entityId] = 0;
+
 	entitiesDeleted++;	
 }
 
@@ -415,7 +419,7 @@ void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event) 
 
 //PHYSICS EVENT LISTENERS
 void geProject::EntityManager::BeginContact(BeginContactEvent* event){
-	std::cout << "begin contact" << std::endl;
+	//std::cout << "begin contact" << std::endl;
 	switch (event->entityA->type) {	
 		case entityTypes::player:
 			break;
@@ -437,7 +441,7 @@ void geProject::EntityManager::BeginContact(BeginContactEvent* event){
 }
 
 void geProject::EntityManager::EndContact(EndContactEvent* event){
-	std::cout << "end contact" << std::endl;
+	//std::cout << "end contact" << std::endl;
 	switch (event->entityA->type) {
 	case entityTypes::player:
 		break;
@@ -599,7 +603,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 		//SPRITE IMGUI updates
 		if (ImGui::BeginTabItem("Sprite")) {
 			int zIndex = sprite->zIndex;
-			if (ImGui::DragInt("zIndex", &zIndex, 1, 0, 10, "%d", 1)) {
+			if (ImGui::InputInt("zIndex", &zIndex, 1, 0,1)) {
 				if (zIndex != sprite->zIndex) {
 					sprite->zIndex = zIndex;
 					trans->dirtyFlag[0] = 1;

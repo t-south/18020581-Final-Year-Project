@@ -27,21 +27,48 @@ unsigned int geProject::Renderer::getZindexBatch(unsigned int zIndex) {
 		if (size == 0) {
 			renderList.push_back(RenderBatch(maxBatch, zIndex, *resourceManager));			
 		}
+		
 		else {
-			while (index <= size && zIndex > renderList[index].getZindex()) {
+			while (index < size && zIndex > renderList[index].getZindex()) {
 				index++;
 			}
 			//if renderbatch is full for that zindex then create a new one
-			while (renderList[index].isBatchFull()) {
+			while (index < size && renderList[index].isBatchFull()) {
 				index++;
 			}
 			//create a new batch if one is not already made
-			if (index < size && renderList[index].getZindex() != zIndex) {
+			if (index == size || (index < size && renderList[index].getZindex() != zIndex)) {
 				renderList.insert(renderList.begin() + index, RenderBatch(maxBatch, zIndex, *resourceManager));
 			}
 		}
 	}
 	return index;
+}
+
+void geProject::Renderer::renderMap(int mapId){
+	std::shared_ptr<SpriteSheet> mapSprites = resourceManager->requestSpriteSheet(mapId);
+	unsigned int spriteSize = mapSprites->getSpriteSize();
+	int height = mapSprites->getSpriteSheetHeight();
+	int width = mapSprites->getSpriteSheetWidth();
+	float x = 0.25f;
+	float y = height * 0.25f;
+	int count = 0;
+	int layer = getZindexBatch(10);
+	for (int i = 0; i < spriteSize; i++) {
+		if (width <= count) {
+			x = 0.25f;
+			y -= 0.25f;
+			count = 0;
+		}
+		
+		std::cout << "X: " << x << " Y: " << y << " layer: " << layer << std::endl;
+
+		renderList[layer].addMapTile(mapSprites->getSprite(i), x, y, layer);
+		x += 0.25f;
+		count++;
+		//renderer->addSpriteToBatch(sprite, 4);
+	}
+	
 }
 
 void geProject::Renderer::addSpriteToBatch(SpriteRender* sprite, Transform* transform) {
@@ -102,8 +129,17 @@ void geProject::Renderer::render(Camera& camera, std::string shaderPath) {
 	//std::cout << "number of batches" << renderList.size() << std::endl;
 	//iterate backward through list to allow layers with lower z index to be towards the front
 	
-	for (int i = renderList.size() - 1; i >= 0 ;i--) {
-		renderList[i].render(camera, shaderPath);
+	for (int i = renderList.size() - 1; i >= 0; i--) {
+
+		if (renderList[i].getSpriteNum() > 0 && renderList[i].getZindex() < 10) {
+			renderList[i].render(camera, shaderPath);			
+		}
+		else if (renderList[i].getZindex() == 10 && shaderPath != "../../../../Game/assets/shaders/SelectionVertexShader.glsl") {
+			//offloading tile map into layer 10 of the renderer, also prevents selection of these textures
+			renderList[i].render(camera, shaderPath);
+		}
+
+	
 	}
 }
 

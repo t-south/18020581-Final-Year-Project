@@ -23,8 +23,7 @@ geProject::ImguiWindow::~ImguiWindow() {}
 void geProject::ImguiWindow::start(int display_w, int display_h, float mouse_x, float mouse_y) {
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2(display_w, display_h);
-	io.MousePos = ImVec2(mouse_x, mouse_y);
-	sceneHierarchy = new HierarchyWindow();
+	io.MousePos = ImVec2(mouse_x, mouse_y);	
 }
 
 
@@ -37,8 +36,7 @@ void geProject::ImguiWindow::update(float deltaTime, std::shared_ptr<Scene> scen
 	ImGui_ImplGlfw_NewFrame();	
 	dockWindow();
 	scene->updateSceneImgui();	
-	gameViewWindow();
-	sceneHierarchy->imguiUpdate();
+	gameViewWindow();	
 	//ImGui::Text("io.WantCaptureMouse = %d", io.WantCaptureMouse);
 	ImGui::End();
 	ImGui::Render();
@@ -81,7 +79,7 @@ void geProject::ImguiWindow::gameViewWindow() {
 		eventSystem.publish(new GameSaveEvent(ImGuiContext));
 	}
 	if (ImGui::MenuItem("Editor", "", loadLevel, !loadLevel)) {
-		eventSystem.publish(new GameLoadEvent(ImGuiContext, 1));
+		eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1));
 		loadLevel = false;
 	}
 	if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
@@ -103,11 +101,7 @@ void geProject::ImguiWindow::gameViewWindow() {
 	ImGui::SetCursorPos(position);	
 	ImGui::End();
 
-	ImGui::Begin("Config");
-	if (ImGui::Checkbox("grid", &gridSelection)) {
-		eventSystem.publishImmediately(new GridToggleEvent(EditorContext, gridSelection));
-	}
-	ImGui::End();	
+
 	if (vPos.x != viewPos.x || vPos.y != viewPos.y || vSize.x != viewSize.x || vSize.y != viewSize.y) {
 		eventSystem.publishImmediately(new ViewPortEvent(EditorContext | GameplayContext, viewPos.x, viewPos.y, viewSize.x, viewSize.y));
 	}

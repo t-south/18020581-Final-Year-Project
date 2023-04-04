@@ -18,6 +18,6 @@ namespace geProject {
 		
 	private:
 		std::vector<SpriteRender> sprites;
-		unsigned int spriteNum, spriteHeight, spriteWidth, border;
+		unsigned int spriteNum, spriteHeight, spriteWidth, border, sSheetHeight, sSheetWidth;
 	};
 }

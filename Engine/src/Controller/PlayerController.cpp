@@ -52,6 +52,9 @@ void geProject::PlayerController::rotateToCursor(MouseMoveEvent* mouseMove){
 
 void geProject::PlayerController::update(float deltaTime){
 	dt = deltaTime;
+	if (entityId == -1) {
+		entityId = eManager.getPlayerId();
+	}
 	if (eventSystem.getContext() == GameplayContext) {
 		Transform* trans = eManager.getTransformComponent(entityId);
 		playerCamera.setCentredPosition(trans->position[0], trans->position[1]);

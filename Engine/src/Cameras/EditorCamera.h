@@ -10,8 +10,7 @@ namespace geProject {
 		void cameraMouseButton(MouseButtonEvent* mouse);		
 		void mouseMoved(MouseMoveEvent* event);	
 		float prevX{ 0 };
-		float prevY{ 0 };
-		void update(float dt);
+		float prevY{ 0 };		
 		glm::vec2 cameraPos;
 		void updateKeyPress(KeyPressedEvent* e);		
 	};

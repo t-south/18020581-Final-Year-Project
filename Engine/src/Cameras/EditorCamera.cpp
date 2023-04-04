@@ -10,13 +10,7 @@ geProject::EditorCamera::EditorCamera(glm::vec2 pos){
 	projectionUpdate();
 }
 
-void geProject::EditorCamera::update(float dt) {
-	deltaTime = dt;
-	eventSystem.handleEvents(Type::mousePressed);
-	eventSystem.handleEvents(Type::mouseMove);
-	eventSystem.handleEvents(Type::mouseScroll);
 
-}
 
 
 

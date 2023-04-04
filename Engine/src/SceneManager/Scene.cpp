@@ -8,9 +8,8 @@ geProject::Physics* geProject::Scene::physicsManager;
 geProject::EntityManager* geProject::Scene::manager;
 geProject::AnimationManager* geProject::Scene::animationManager;
 geProject::Receiver* geProject::Scene::controlManager;
-
-//PLAYER
-geProject::PlayerController* geProject::Scene::player;
+geProject::MouseListener* geProject::Scene::mouse;
+geProject::KeyboardListener* geProject::Scene::keyboard;
 
 std::string geProject::Scene::getFilePath()
 {
@@ -513,9 +512,7 @@ void geProject::Scene::reloadLevel(std::string filepath) {
 	manager->reloadManager();	
 }
 
-geProject::Camera* geProject::Scene::getCamera(){
-	return camera;
-}
+
 
 
 void geProject::Scene::setPhysics(bool check) {

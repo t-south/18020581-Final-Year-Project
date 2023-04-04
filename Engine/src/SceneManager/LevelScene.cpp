@@ -3,15 +3,16 @@
 
 geProject::LevelScene::LevelScene(){	
 	std::cout << "Level Scene!" << std::endl;
-	camera = new LevelCamera(glm::vec2(-250.0f, 0.0f));
+	camera = new LevelCamera(glm::vec2(0.0f, 0.0f));
 	filePath = "../../../../Game/assets/levels/level1.json";
-
+	player = new PlayerController(*manager, *camera, *physicsManager, manager->getPlayerId());
 }
 
 geProject::LevelScene::~LevelScene(){}
 
 void geProject::LevelScene::init() {
 	manager->assignUpdate();	
+	camera->setPosition(glm::vec2(0, 0));
 }
 
 size_t geProject::LevelScene::addEntityToScene(unsigned int entityId) { return 1; }
@@ -21,30 +22,46 @@ void geProject::LevelScene::reAssignEntityToScene(unsigned int entitySceneId, un
 
 
 void geProject::LevelScene::update(float deltaTime){
+
+	camera->update(deltaTime);
 	physicsManager->update(deltaTime);
+	if (player != nullptr) {
+		Command* command = controlManager->action();
+		player->update(deltaTime);
+		if (command)
+		{
+			command->execute(*player);
+		}
+	}
 	
 	//UPDATES TO RENDERING
 	if (manager->hasUpdate()) {
 		entities.clear();
 		for (int i = 0; i < manager->getEntityNum(); i++) {
-			
 			auto ent = manager->getEntity(i);
-			entities[ent->id] = ent;
-			// only sprites that have not been added to the renderer previously will be set to 0
-			auto trans = manager->getTransformComponent(ent->id);
-			auto sprite = manager->getSpriteComponent(ent->id);
-			//transform dirtyflag for render index is by default set to -1 when first created
-			if (trans->dirtyFlag[2] == -1) {
-				renderer->addSpriteToBatch(sprite, trans);
-				trans->dirtyFlag[0] = 0;
-			}
-			//if there has been any updates the dirty flag in transform component will be set to 1
-			else if (trans->dirtyFlag[0] == 1) {
-				renderer->updateSprite(sprite, trans);
+			if (ent->compMask > 0 && ent->id > -1) {
+				entities[ent->id] = ent;
+				// only sprites that have not been added to the renderer previously will be set to 0
+				auto trans = manager->getTransformComponent(ent->id);
+				auto sprite = manager->getSpriteComponent(ent->id);
+				//transform dirtyflag for render index is by default set to -1 when first created
+				if (trans->dirtyFlag[2] == -1) {
+					renderer->addSpriteToBatch(sprite, trans);
+					trans->dirtyFlag[0] = 0;
+				}
+				//if there has been any updates the dirty flag in transform component will be set to 1
+				else if (trans->dirtyFlag[0] == 1) {
+					renderer->updateSprite(sprite, trans);
+				}
 			}
 		}
 		manager->endFrame();
 	}
+
+
+	animationManager->update(deltaTime);
+	keyboard->endFrame();
+	manager->endFrame();
 	mouse->endFrame();
 	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 }

@@ -19,10 +19,15 @@ geProject::KeyboardListener* geProject::KeyboardListener::getInstance() {
 void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
     ImGuiIO& io = ImGui::GetIO();
     Context currentContext = eventSystem.getContext();
-
+    
     if (action == GLFW_PRESS) {        
-        eventSystem.publishImmediately(new KeyPressedEvent(GameplayContext | ImGuiContext, key, 0));
-        KeyboardListener::getInstance()->keyPressed[key] = true;
+        if (key == GLFW_KEY_C) {
+            eventSystem.publishImmediately(new KeyPressedEvent(EditorContext | ImGuiContext, key, 0));           
+        }
+        else {
+            eventSystem.publishImmediately(new KeyPressedEvent(GameplayContext | ImGuiContext, key, 0));
+            KeyboardListener::getInstance()->keyPressed[key] = true;
+        }
     }
     if (action == GLFW_RELEASE) {
         eventSystem.publishImmediately(new KeyReleasedEvent(GameplayContext | ImGuiContext, key, 0));

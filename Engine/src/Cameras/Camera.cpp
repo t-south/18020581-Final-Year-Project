@@ -13,7 +13,7 @@ glm::mat4 geProject::Camera::getViewMatrix(){
 	return view; 
 }
 
-void geProject::Camera::projectionUpdate() {	
+void geProject::Camera::projectionUpdate() {
 	projection = glm::mat4(1.0f);	
 	projection = glm::ortho(0.0f, projSize[0] * scroll, 0.0f, projSize[1] * scroll);	
 	projInv = glm::inverse(projection);	
@@ -88,5 +88,8 @@ glm::vec2 geProject::Camera::getCentredPosition(){
 
 void geProject::Camera::update(float dt) {
 	deltaTime = dt;
+	eventSystem.handleEvents(Type::mousePressed);
+	eventSystem.handleEvents(Type::mouseMove);
+	eventSystem.handleEvents(Type::mouseScroll);
 }
 

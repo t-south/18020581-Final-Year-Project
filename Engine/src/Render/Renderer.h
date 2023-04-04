@@ -19,6 +19,7 @@ namespace geProject {
 		void updateSprite(SpriteRender* sprite, Transform* transform);
 		static void render(Camera& camera, std::string shaderPath);
 		unsigned int getZindexBatch(unsigned int zIndex);
+		void renderMap(int mapId);
 		void clear();
 	private:
 		ResourceManager* resourceManager;	

@@ -7,6 +7,7 @@ geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum
 	
 	x = 0;
 	y = 1;
+	int height = 0;	
 	for (int i = 0; i < spriteNum; i++) {
 		SpriteRender textureUv = SpriteRender();
 		textureUv.texturePos[0] = glm::vec2(x + (spriteWidth / textureWidth), y);										//topRight
@@ -14,22 +15,28 @@ geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum
 		textureUv.texturePos[2] = glm::vec2(x , y - (spriteHeight / textureHeight));									//bottomLeft
 		textureUv.texturePos[3] = glm::vec2(x , y);																		//topLeft
 		//move along x coordinate until it reaches end of row
-		if (i == 13){
-			float test = x + spriteWidth + border;
-		}
-		if (x + (spriteWidth / textureWidth) + border >= 1) {
+
+		if (x + (spriteWidth / textureWidth) + border >= 1) {		
+			if (height == 0) {
+				sSheetWidth = i + 1;
+			}
+			height++;
+			
 			//set x back to beginning of spritesheet and move y down to next row
 			x = 0;
 			y -= ((spriteHeight / textureHeight ) + border);
 		}
-		else {
+		else {			
 			x += (spriteWidth / textureWidth) + border;
 		}
 		textureUv.textureId = getTextureId();
 		textureUv.spriteSheetId = sprites.size() + 1;
 		textureUv.zIndex = zIndex;
 		sprites.push_back(textureUv);
+		
 	}
+	sSheetHeight = height + 1;
+	
 	/*			
 (0,1)	|			|			|			| (1,1)
 	---------------------------------------------
@@ -60,5 +67,5 @@ unsigned int geProject::SpriteSheet::getSpriteSize() {
 
 unsigned int geProject::SpriteSheet::getSpriteWidth() { return spriteWidth; }
 unsigned int geProject::SpriteSheet::getSpriteHeight() { return spriteHeight; }
-unsigned int geProject::SpriteSheet::getSpriteSheetHeight() { return (spriteHeight + border) * spriteNum; }
-unsigned int geProject::SpriteSheet::getSpriteSheetWidth() { return (spriteWidth + border) * spriteNum; }
+unsigned int geProject::SpriteSheet::getSpriteSheetHeight() { return sSheetHeight; }
+unsigned int geProject::SpriteSheet::getSpriteSheetWidth() { return sSheetWidth; }

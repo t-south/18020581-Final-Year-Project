@@ -33,14 +33,6 @@ namespace geProject {
 
 	//EDITOR EVENTS
 
-	class GridToggleEvent : public Event {
-	public:		
-		GridToggleEvent(int context, bool toggled) : Event(context), toggled(toggled) {};
-		static int getType() { return Type::gridToggle; };
-		int addContext(Context context) { eventContext = getContext() & context; };
-		bool contextCheck(Context cat) { return getContext() & cat; }
-		bool toggled;
-	};
 
 	class CopyEntityEvent : public Event {
 	public:

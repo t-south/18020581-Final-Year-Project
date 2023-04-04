@@ -26,6 +26,7 @@ namespace geProject {
 		bool isBatchFull();
 		bool isTextureFull(unsigned int id);
 		void addSprite(SpriteRender* sprite, Transform* transform);
+		void addMapTile(SpriteRender sprite, float x, float y, int layer);
 		void updateSprite(SpriteRender* sprite, Transform* transform);
 		void render(Camera& camera, std::string shaderPath);
 		unsigned int getSpriteNum();
@@ -40,7 +41,7 @@ namespace geProject {
 		std::vector<float> vertices;
 		std::shared_ptr<geProject::Texture> textures[8]{nullptr};
 		std::vector<unsigned int> createIndexes();
-		void createVertices(SpriteRender* sprite, Transform* transform, unsigned int index);
+		void createVertices(SpriteRender* sprite, float x, float y, float scaleX, float scaleY, float rotation, unsigned int index);
 		void init();
 		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);			
 	};
