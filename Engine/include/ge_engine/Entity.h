@@ -1,5 +1,8 @@
 #pragma once
+
+
 namespace geProject {
+
 	enum entityTypes {
 		player, enemy, environment
 	};

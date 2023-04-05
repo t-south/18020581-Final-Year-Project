@@ -67,11 +67,24 @@ unsigned int geProject::ResourceManager::loadSpriteSheet(std::string guId, unsig
 	return id;
 }
 
+unsigned int geProject::ResourceManager::loadMap(std::string guId, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex){
+	std::shared_ptr<SpriteSheet> spritesheet = std::make_shared<SpriteSheet>(guId.c_str(), spriteNum, spriteWidth, spriteHeight, borderspacing, zIndex);
+	unsigned int id = maps.size() + 1;		
+	maps.insert(std::make_pair(id, spritesheet));	
+	return id;
+}
+
 void geProject::ResourceManager::unloadSpriteSheet(unsigned int guId) {}
 
 
 std::shared_ptr<geProject::SpriteSheet> geProject::ResourceManager::requestSpriteSheet(unsigned int guId) {
 	if (spritesheets.contains(guId)) {
 		return spritesheets.at(guId);
+	}
+}
+
+std::shared_ptr<geProject::SpriteSheet> geProject::ResourceManager::requestLevelMap(unsigned int guid){
+	if (maps.contains(guid)) {
+		return maps.at(guid);
 	}
 }

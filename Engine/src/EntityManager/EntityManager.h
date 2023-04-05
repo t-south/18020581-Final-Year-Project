@@ -1,12 +1,12 @@
 #pragma once
-
-#include <ge_engine/Core.h>
-#include <vector>
 #include <ge_engine/Entity.h>
 #include <ge_engine/Components.h>
+#include <ge_engine/Core.h>
+#include <vector>
 #include <iostream>
-#include "../Memory/PoolAllocator.h"
 #include <imgui.h>
+
+
 
 //data driven aproach. An entity will contain components. Each component will have its own id and be stored in a memory pool of each 
 //type of component. The entity ID will be used to access the index of each component to get each entities components.
@@ -24,14 +24,15 @@ namespace geProject {
 	class EntityManager {
 		typedef unsigned int uInt;
 	public:
-		EntityManager(uInt maxEntities);
+		EntityManager(uInt max);
 		~EntityManager();
 		//Entities
 		int addEntity(entityTypes type);
 		void deleteEntity(int entityId);
 		void copyEntity(int entityId);
-		uInt getEntityNum();
+		int getEntityNum();
 		Entity* getEntity(int entityId);
+
 		std::vector<Entity*> getEntities();
 		//Components
 		void assignTransform(int entityId, Transform transform);
@@ -43,8 +44,6 @@ namespace geProject {
 		void assignController(int entityId, Controls control);
 		void assignHealth(int entityId, Health health);
 		void assignDamage(int entityId, Damage dmg);
-
-
 		void deleteComponent(int entityId, uInt componentId);
 
 		std::vector<Transform*> getTransformComponents();
@@ -71,11 +70,13 @@ namespace geProject {
 		void reloadManager();
 		void assignUpdate();
 		int getPlayerId();
+		std::vector<int> getEnemyIds();
 	private:		
 		bool entityUpdated;
 		uInt maxEntities;
 
 		int playerId{ -1 };
+		std::vector<int> enemyIds;
 		int entitiesDeleted{ 0 };
 
 

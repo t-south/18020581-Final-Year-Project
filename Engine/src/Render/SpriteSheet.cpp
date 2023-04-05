@@ -35,7 +35,7 @@ geProject::SpriteSheet::SpriteSheet(const char* filePath, unsigned int spriteNum
 		sprites.push_back(textureUv);
 		
 	}
-	sSheetHeight = height + 1;
+	sSheetHeight = height;
 	
 	/*			
 (0,1)	|			|			|			| (1,1)

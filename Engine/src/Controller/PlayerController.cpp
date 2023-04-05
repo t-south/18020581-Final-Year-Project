@@ -1,7 +1,7 @@
 #include "PlayerController.h"
 
 
-geProject::PlayerController::PlayerController(EntityManager& manager, Camera& camera, Physics& pManager,  int entity): eManager(manager), playerCamera(camera), physicsManager(pManager),  entityId(entity){
+geProject::PlayerController::PlayerController(EntityManager& emanager, Physics& pmanager, Camera& camera, int entity): entitymanager(emanager), physicsmanager(pmanager),playerCamera(camera), entityId(entity){
 	eventSystem.subscribe(this, &PlayerController::rotateToCursor);
 }
 
@@ -26,37 +26,33 @@ void geProject::PlayerController::switchAbility()
 }
 
 void geProject::PlayerController::moveTo(float x, float y){	
-	/*Transform* trans = eManager.getTransformComponent(entityId);
-	Controls* control = eManager.getControllerComponent(entityId);
-
-	trans->position[0] += newX;
-	trans->position[1] += newY;
-	*/
 	float newX = x * dt;
 	float newY = y * dt;
-	physicsManager.applyLinearImpulse(entityId, newX, newY);
-	//playerCamera.setPosition(glm::vec2(trans->position[0], trans->position[1]));
-	//eManager.assignTransform(entityId, *trans);	
+	physicsmanager.applyLinearImpulse(entityId, newX, newY);
 }
 
 void geProject::PlayerController::rotateToCursor(MouseMoveEvent* mouseMove){
 	if (mouseMove->contextCheck(GameplayContext)) {
 		//PI / 2 = 1.571 Rad
-		Transform* trans = eManager.getTransformComponent(entityId);
+		Transform* trans = entitymanager.getTransformComponent(entityId);
 		float rotate = atan2((mouseMove->posY - trans->position[1]), (mouseMove->posX - trans->position[0]));		
-		physicsManager.applyRotation(entityId, rotate - 1.571);
+		physicsmanager.applyRotation(entityId, rotate - 1.571);
 
 	}
+}
+
+void geProject::PlayerController::rotateTo(float rotate)
+{
 }
 
 
 void geProject::PlayerController::update(float deltaTime){
 	dt = deltaTime;
 	if (entityId == -1) {
-		entityId = eManager.getPlayerId();
+		entityId = entitymanager.getPlayerId();
 	}
 	if (eventSystem.getContext() == GameplayContext) {
-		Transform* trans = eManager.getTransformComponent(entityId);
+		Transform* trans = entitymanager.getTransformComponent(entityId);
 		playerCamera.setCentredPosition(trans->position[0], trans->position[1]);
 	}
 }

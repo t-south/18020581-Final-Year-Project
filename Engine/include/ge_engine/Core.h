@@ -1,8 +1,13 @@
 #pragma once
-
 #include "../../src/Events/EventHandler.h"
-#include "../../src/Events/Event.h"
+#include "../../src/Events/Event.h" 
+#include "../../src/ResourceManager/ResourceManager.h"
+#include "../../src/AI/WorldStates.h"
+
+
 extern geProject::EventHandler eventSystem;
+extern geProject::ResourceManager resourcemanager;
+extern geProject::WorldState worldstate;
 
 
 #ifdef GE_PLATFORM_WINDOWS

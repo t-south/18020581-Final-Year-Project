@@ -1,8 +1,8 @@
 #pragma once
 #include <unordered_map>
 #include <string>
-#include "WorldStates.h"
 #include <ge_engine/Components.h>
+#include <ge_engine/Core.h>
 namespace geProject {
 	class Action {
 	public:

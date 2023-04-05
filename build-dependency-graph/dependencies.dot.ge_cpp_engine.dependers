@@ -1,0 +1,8 @@
+digraph "ge_cpp_engine" {
+node [
+  fontsize = "12"
+];
+    "node3" [ label = "ge_cpp_engine", shape = octagon ];
+    "node2" [ label = "ge_cpp_application", shape = egg ];
+    "node2" -> "node3" [ style = dotted ] // ge_cpp_application -> ge_cpp_engine
+}

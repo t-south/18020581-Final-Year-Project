@@ -3,14 +3,15 @@
 geProject::Window* geProject::Scene::gameWindow;
 
 //MANAGERS
-geProject::ResourceManager* geProject::Scene::resourceManager;
-geProject::Physics* geProject::Scene::physicsManager;
-geProject::EntityManager* geProject::Scene::manager;
 geProject::AnimationManager* geProject::Scene::animationManager;
 geProject::Receiver* geProject::Scene::controlManager;
 geProject::MouseListener* geProject::Scene::mouse;
 geProject::KeyboardListener* geProject::Scene::keyboard;
 
+
+geProject::Physics* geProject::Scene::physicsmanager;
+geProject::EntityManager* geProject::Scene::entitymanager;
+geProject::Renderer* geProject::Scene::rendermanager;
 std::string geProject::Scene::getFilePath()
 {
 	return filePath;
@@ -22,7 +23,7 @@ void geProject::Scene::serialize(std::string filepath) {
 		//std::cout << "File is open" << std::endl;
 		//serialize each entity into json
 		json sceneData;
-		auto ent = manager->getEntities();
+		auto ent = entitymanager->getEntities();
 		for (auto & i : ent) {
 			json entity = serializeEntity(*i);
 			if (entity != NULL) {
@@ -52,13 +53,13 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		json controllerData = json::object();
 		json healthData = json::object();
 		json damageData = json::object();
-		Transform transform = *manager->getTransformComponent(entity.id);
+		Transform transform = *entitymanager->getTransformComponent(entity.id);
 		to_json(transformData, transform);
 		json spriteData = json::object();
-		SpriteRender sprite = *manager->getSpriteComponent(entity.id);
+		SpriteRender sprite = *entitymanager->getSpriteComponent(entity.id);
 		to_json(spriteData, sprite);
 		if ((entity.compMask & 1 << 2) == 1 << 2) {			
-			Rigidbody rigid = *manager->getRigidBodyComponent(entity.id);
+			Rigidbody rigid = *entitymanager->getRigidBodyComponent(entity.id);
 			to_json(rigidData, rigid);
 		}
 		else {			
@@ -67,7 +68,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 			};
 		}
 		if ((entity.compMask & 1 << 3) == 1 << 3) {					
-			for (auto& circle : manager->getCircleColliderComponents(entity.id)){
+			for (auto& circle : entitymanager->getCircleColliderComponents(entity.id)){
 				json circleData = json::object();
 				to_json(circleData, circle);
 				circleColliderData["EntityCircleCollider"].push_back(circleData);
@@ -77,7 +78,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 
 		
 		if ((entity.compMask & 1 << 4) == 1 << 4) {				
-			for (auto& box : manager->getBoxColliderComponents(entity.id)) {
+			for (auto& box : entitymanager->getBoxColliderComponents(entity.id)) {
 				json boxData = json::object();
 				to_json(boxData, box);
 				boxColliderData["EntityBoxCollider"].push_back(boxData);
@@ -86,7 +87,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 
 		
 		if ((entity.compMask & 1 << 5) == 1 << 5) {
-			Animation animate = *manager->getAnimationComponent(entity.id);
+			Animation animate = *entitymanager->getAnimationComponent(entity.id);
 			to_json(animateData, animate);
 		}
 
@@ -97,7 +98,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		}
 
 		if ((entity.compMask & 1 << 6) == 1 << 6) {
-			Controls control = *manager->getControllerComponent(entity.id);
+			Controls control = *entitymanager->getControllerComponent(entity.id);
 			to_json(controllerData, control);
 		}
 		else {
@@ -107,7 +108,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		}
 
 		if ((entity.compMask & 1 << 7) == 1 << 7) {
-			Health health = *manager->getHealthComponent(entity.id);
+			Health health = *entitymanager->getHealthComponent(entity.id);
 			to_json(healthData, health);
 		}
 		else {
@@ -118,7 +119,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 
 
 		if ((entity.compMask & 1 << 8) == 1 << 8) {
-			Damage damage = *manager->getDamageComponent(entity.id);
+			Damage damage = *entitymanager->getDamageComponent(entity.id);
 			to_json(damageData, damage);
 		}
 		else {
@@ -174,19 +175,19 @@ void geProject::Scene::deserialize(std::string filepath) {
 				SpriteRender sprite = SpriteRender();				
 				from_json(transData, trans);
 				from_json(spritedata, sprite);
-				int entityId = manager->addEntity(entityType);
-				manager->assignTransform(entityId, trans);
-				manager->assignSpriteRender(entityId, sprite);		
+				int entityId = entitymanager->addEntity(entityType);
+				entitymanager->assignTransform(entityId, trans);
+				entitymanager->assignSpriteRender(entityId, sprite);
 				if (rigidData[1] != 0) {
 					Rigidbody rigid = Rigidbody();
 					from_json(rigidData, rigid);
-					manager->assignRigidBody(entityId, rigid);
+					entitymanager->assignRigidBody(entityId, rigid);
 				}
 				if (circleData.empty() == 0) {
 					for (const auto& i : circleData.find("EntityCircleCollider").value().items()) {
 						CircleCollider circle = CircleCollider();
 						from_json(i.value(), circle);
-						manager->assignCircleCollider(entityId, circle);
+						entitymanager->assignCircleCollider(entityId, circle);
 					}
 				}
 				if (boxData.empty() == 0) {					
@@ -194,28 +195,28 @@ void geProject::Scene::deserialize(std::string filepath) {
 						
 						BoxCollider box = BoxCollider();
 						from_json(i.value(), box);
-						manager->assignBoxCollider(entityId, box);
+						entitymanager->assignBoxCollider(entityId, box);
 					}
 				}
 				if (animateData[1] != 0) {
 					Animation animation = Animation();
 					from_json(animateData, animation);
-					manager->assignAnimation(entityId, animation);
+					entitymanager->assignAnimation(entityId, animation);
 				}
 				if (controllerData[1] != 0) {
 					Controls control = Controls();
 					from_json(controllerData, control);
-					manager->assignController(entityId, control);
+					entitymanager->assignController(entityId, control);
 				}
 				if (healthData[1] != 0) {
 					Health health = Health();
 					from_json(healthData, health);
-					manager->assignHealth(entityId, health);
+					entitymanager->assignHealth(entityId, health);
 				}
 				if (damageData[1] != 0) {
 					Damage dmg = Damage();
 					from_json(damageData, dmg);
-					manager->assignDamage(entityId, dmg);
+					entitymanager->assignDamage(entityId, dmg);
 				}
 
 
@@ -507,9 +508,9 @@ geProject::MouseListener* geProject::Scene::getMouseListener() {
 }
 
 void geProject::Scene::reloadLevel(std::string filepath) {
-	physicsManager->clear();
-	renderer->clear();
-	manager->reloadManager();	
+	physicsmanager->clear();
+	rendermanager->clear();
+	entitymanager->reloadManager();
 }
 
 

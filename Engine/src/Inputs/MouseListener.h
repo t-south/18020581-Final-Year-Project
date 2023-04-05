@@ -14,7 +14,7 @@ namespace geProject {
 		static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 		static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-		
+
 		void endFrame();
 		//getters
 		float getXpos();
@@ -45,7 +45,7 @@ namespace geProject {
 		MouseListener(const MouseListener& obj) = delete;
 		~MouseListener();
 		static MouseListener* instance;
-		double xPos, yPos, xPrev, yPrev, xScroll, yScroll;
+		float xPos, yPos, xPrev, yPrev, xScroll, yScroll;
 		bool isDragging = false;
 		int windowWidth, windowHeight;
 		bool mouseButton[3] = { false, false, false };

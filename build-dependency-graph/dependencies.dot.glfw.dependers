@@ -1,0 +1,12 @@
+digraph "glfw" {
+node [
+  fontsize = "12"
+];
+    "node5" [ label = "glfw", shape = octagon ];
+    "node3" [ label = "ge_cpp_engine", shape = octagon ];
+    "node3" -> "node5"  // ge_cpp_engine -> glfw
+    "node2" [ label = "ge_cpp_application", shape = egg ];
+    "node2" -> "node3" [ style = dotted ] // ge_cpp_application -> ge_cpp_engine
+    "node14" [ label = "testbed", shape = egg ];
+    "node14" -> "node5" [ style = dotted ] // testbed -> glfw
+}

@@ -1,8 +1,8 @@
 #pragma once
+
 #include "Command.h"
 #include "ConcreteCommands.h"
-#include <ge_engine/Core.h>
-#include <GLFW/glfw3.h>
+
 
 namespace geProject {
 

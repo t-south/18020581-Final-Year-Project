@@ -29,10 +29,18 @@ namespace geProject {
 	};
 
 	class MoveCommand : public Command {
-	public:
+	public:		
 		virtual void execute(Controller& entity) override { entity.moveTo(x, y); };	
-		int x;
-		int y;
+		float x;
+		float y;
 	};
+
+	class RotateCommand : public Command {
+	public:
+		virtual void execute(Controller& entity) override { entity.rotateTo(rotate); };
+		float rotate;
+	};
+
+
 
 }

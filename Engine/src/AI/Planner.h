@@ -4,7 +4,9 @@
 #include "Goals.h"
 #include <string>
 #include <unordered_map>
-#include 
+#include "WorldStates.h"
+
+
 namespace geProject {
 	struct asNode {
 		// pair of bools are used to check the same value for both goal values and current values
@@ -20,11 +22,8 @@ namespace geProject {
 	};
 	class Planner {
 	public:
-		std::vector<Action> createPlan(Goal& goal, unsigned int agentBeliefState, std::vector<Actions> actionsAvailable);
-		std::vector<Action> recreate
-		void addState(int stateId, bool value);
-		void removeState(int stateId);
-		void changeState(int stateId, bool value);
-		unsigned int getStates();
+		std::vector<Action> createPlan(Goal& goal, unsigned int agentBeliefState, std::vector<Action> actionsAvailable);
+		std::vector<Action> recreate;
+
 	};
 }

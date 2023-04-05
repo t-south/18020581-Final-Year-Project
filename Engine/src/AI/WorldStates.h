@@ -1,5 +1,6 @@
 #pragma once 
-
+#include <vector>
+#include <iostream>
 namespace geProject {
 	enum WorldStates {
 		ENEMY_VISIBLE    = 0x00001,
@@ -20,25 +21,18 @@ namespace geProject {
 		WIND_ENERGY      = 0x08000
 	};
 
-	struct WorldNode {
-		float x, y;		
-		float gValue{ 0 };
-		float fValue{ 0 };
-		float heuristic{ 0 };
-
-		std::vector<WorldNode*> neighbours;
-		WorldNode* parent{ nullptr };
-	};
 
 	class WorldState {
-	public:
+	public:		
 		unsigned int worldState{ 0x00000 };
-		int fireEnergy;
-		int waterEnergy;
-		int earthEnergy;
-		int windEnergy;
-		unsigned int getWorldState() { return worldState; };
-		void updateWorldState(unsigned int newState) { worldState = worldState & newState; };
-		void addToMap(float x, float y){}
+		int worldWidth;
+		int worldHeight;
+		std::vector<std::vector<int>> worldMap;
+		void addToMap(int x, int y, int accessible);
+		void generateWorldMap(int worldWidth, int worldHeight);
+		unsigned int getWorldState();
+		void updateWorldState(unsigned int newState);
+		void testWorldMap();
+		bool getTile(int x, int y);
 	};
 }

@@ -2,30 +2,28 @@
 
 std::vector<geProject::RenderBatch> geProject::Renderer::renderList;
 
-geProject::Renderer::Renderer(geProject::ResourceManager& resources){
+
+geProject::Renderer::Renderer()
+{
 	eventSystem.subscribe(this, &Renderer::deleteEntity);
-	resourceManager = &resources;
 	int zIndexRange = 10;
 	//instantiate 10 zindex batches
 	for (int i = 0; i <= zIndexRange; i++) {
-		renderList.push_back(RenderBatch(maxBatch, i, *resourceManager));
+		renderList.push_back(RenderBatch(maxBatch, i));
 	}
 	//renderList.push_back(RenderBatch(maxBatch, 0, *resourceManager));
 }
 
-geProject::Renderer::~Renderer(){}
-	
-void geProject::Renderer::init() {	
-	
-}
-void geProject::Renderer::shutdown() {}
+geProject::Renderer::~Renderer(){}	
+
+
 
 unsigned int geProject::Renderer::getZindexBatch(unsigned int zIndex) {
 	int index = 0;	
 	int size = renderList.size();
 	if (size > -1) {	
 		if (size == 0) {
-			renderList.push_back(RenderBatch(maxBatch, zIndex, *resourceManager));			
+			renderList.push_back(RenderBatch(maxBatch, zIndex));			
 		}
 		
 		else {
@@ -38,7 +36,7 @@ unsigned int geProject::Renderer::getZindexBatch(unsigned int zIndex) {
 			}
 			//create a new batch if one is not already made
 			if (index == size || (index < size && renderList[index].getZindex() != zIndex)) {
-				renderList.insert(renderList.begin() + index, RenderBatch(maxBatch, zIndex, *resourceManager));
+				renderList.insert(renderList.begin() + index, RenderBatch(maxBatch, zIndex));
 			}
 		}
 	}
@@ -46,7 +44,7 @@ unsigned int geProject::Renderer::getZindexBatch(unsigned int zIndex) {
 }
 
 void geProject::Renderer::renderMap(int mapId){
-	std::shared_ptr<SpriteSheet> mapSprites = resourceManager->requestSpriteSheet(mapId);
+	std::shared_ptr<SpriteSheet> mapSprites = resourcemanager.requestLevelMap(mapId);
 	unsigned int spriteSize = mapSprites->getSpriteSize();
 	int height = mapSprites->getSpriteSheetHeight();
 	int width = mapSprites->getSpriteSheetWidth();
@@ -59,11 +57,11 @@ void geProject::Renderer::renderMap(int mapId){
 			x = 0.25f;
 			y -= 0.25f;
 			count = 0;
+		}		
+		if (renderList[layer].isBatchFull()) {
+			layer = getZindexBatch(10);
 		}
-		
-		std::cout << "X: " << x << " Y: " << y << " layer: " << layer << std::endl;
-
-		renderList[layer].addMapTile(mapSprites->getSprite(i), x, y, layer);
+		renderList[layer].addMapTile(mapSprites->getSprite(i), mapId, x, y, 10);
 		x += 0.25f;
 		count++;
 		//renderer->addSpriteToBatch(sprite, 4);

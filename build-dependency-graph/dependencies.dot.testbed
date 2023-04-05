@@ -1,0 +1,18 @@
+digraph "testbed" {
+node [
+  fontsize = "12"
+];
+    "node14" [ label = "testbed", shape = egg ];
+    "node1" [ label = "box2d", shape = octagon ];
+    "node14" -> "node1" [ style = dotted ] // testbed -> box2d
+    "node4" [ label = "glad", shape = octagon ];
+    "node14" -> "node4" [ style = dotted ] // testbed -> glad
+    "node5" [ label = "glfw", shape = octagon ];
+    "node14" -> "node5" [ style = dotted ] // testbed -> glfw
+    "node6" [ label = "Threads::Threads", shape = pentagon ];
+    "node5" -> "node6" [ style = dotted ] // glfw -> Threads::Threads
+    "node11" [ label = "imgui", shape = octagon ];
+    "node14" -> "node11" [ style = dotted ] // testbed -> imgui
+    "node12" [ label = "sajson", shape = octagon ];
+    "node14" -> "node12" [ style = dotted ] // testbed -> sajson
+}

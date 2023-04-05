@@ -29,7 +29,7 @@ namespace geProject {
 	struct Rigidbody {
 		unsigned int id = 4;
 		int collider{ 0 };
-		float friction{ 0.8 };
+		float friction{ 0.8f };
 		float angularDamping{0.0f};
 		float linearDamping{ 0.0f };
 		float density{ 0.0f };

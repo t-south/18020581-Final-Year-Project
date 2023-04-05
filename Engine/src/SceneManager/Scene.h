@@ -11,9 +11,10 @@
 #include "../Physics/Physics.h"
 #include "../Animation/AnimationManager.h"
 #include "../Controller/Command.h"
-#include "../Controller/PlayerController.h"#
+#include "../Controller/PlayerController.h"
 #include "../Controller/Receiver.h"
-#include "../AI/WorldStates.h"
+#include "../EntityManager/EntityManager.h"
+
 
 using json = nlohmann::json;
 namespace geProject {
@@ -49,19 +50,17 @@ namespace geProject {
 		static MouseListener* mouse;
 		static KeyboardListener* keyboard;
 		//MANAGERS
-		static ResourceManager* resourceManager;
-		static Physics* physicsManager;
-		static EntityManager* manager;
+		static Physics* physicsmanager;
+		static EntityManager* entitymanager;
 		static AnimationManager* animationManager;
-		static Receiver* controlManager;
-		static WorldState* world;
-		Renderer* renderer{ nullptr };
+		static Receiver* controlManager;		
+		static Renderer* rendermanager;
+
 		FrameBuffer* selectionTextures{ nullptr };
 		//(de)serialisation
 		std::string filePath;
 		std::ofstream oFile;		
 		bool physicsEnabled{ false };
-
 
 
 		json serializeEntity(Entity& entity);

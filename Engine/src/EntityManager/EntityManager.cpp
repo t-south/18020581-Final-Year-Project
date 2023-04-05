@@ -1,6 +1,8 @@
 #include "EntityManager.h"
 
-geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntities), entityUpdated(false), entitiesDeleted(0){
+
+geProject::EntityManager::EntityManager(uInt max): maxEntities(max), entityUpdated(false), entitiesDeleted(0)
+{	
 	eventSystem.subscribe(this, &EntityManager::updateTransform);
 	eventSystem.subscribe(this, &EntityManager::updateSprite);
 	eventSystem.subscribe(this, &EntityManager::updateRigidBody);
@@ -13,13 +15,14 @@ geProject::EntityManager::EntityManager(uInt maxEntities): maxEntities(maxEntiti
 	eventSystem.subscribe(this, &EntityManager::PostSolve);
 }
 
-geProject::EntityManager::~EntityManager(){}
+geProject::EntityManager::~EntityManager()
+{
+}
 
 int geProject::EntityManager::addEntity(entityTypes type) {
 	Entity entity = Entity();
 	entity.compMask = 0;
 	entity.type = type;
-
 	//check if a previously deleted pool is available
 	if (entitiesDeleted > 0 && entities.size() > 0) {
 		int index = 0;
@@ -32,6 +35,9 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 			entitiesDeleted--;
 			if (type == 0) {
 				playerId = index;
+			}
+			else if (type == 1) {
+				enemyIds.push_back(index);
 			}
 			return index;
 		}
@@ -60,6 +66,9 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 		std::memcpy(entities[index], &entity, sizeof(Entity));
 		if (type == 0) {
 			playerId = index;
+		}
+		else if (type == 1) {
+			enemyIds.push_back(index);
 		}
 		return index;
 	}
@@ -141,6 +150,7 @@ bool geProject::EntityManager::hasUpdate() {
 }
 
 void geProject::EntityManager::assignTransform(int entityId, Transform transform) {
+
 	if (entityId < maxEntities && entityId >= 0) {
 		if (componentTransforms[entityId]->id > 0) {
 			transform.dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
@@ -153,6 +163,10 @@ void geProject::EntityManager::assignTransform(int entityId, Transform transform
 		}
 		transform.dirtyFlag[0] = 1;
 		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));
+		if (entities[entityId]->type == entityTypes::environment) {
+			//make that position inaccessible on the map
+			worldstate.addToMap((int)(transform.position[0] * 4), (int)(transform.position[1] * 4), 0);
+		}
 		entities[entityId]->compMask = entities[entityId]->compMask | transform.id;
 
 	}
@@ -432,6 +446,10 @@ void geProject::EntityManager::BeginContact(BeginContactEvent* event){
 				componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 0, 0, 1);
 				componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
 			}
+			if (event->entityB->type == enemy) {
+				componentSpriteRender[event->entityA->id]->color = glm::vec4(0, 1, 0, 1);
+				componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
+			}
 			break;
 
 		default:
@@ -454,6 +472,10 @@ void geProject::EntityManager::EndContact(EndContactEvent* event){
 			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 1, 1, 1);
 			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
 		}
+		if (event->entityB->type == enemy) {
+			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 1, 1, 1);
+			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
+		}
 		break;
 
 	default:
@@ -472,14 +494,17 @@ void geProject::EntityManager::PostSolve(PostsolveEvent* event){
 
 }
 
-int geProject::EntityManager::getPlayerId()
-{
+int geProject::EntityManager::getPlayerId(){
 	return playerId;
+}
+
+std::vector<int> geProject::EntityManager::getEnemyIds(){
+	return enemyIds;
 }
 
 
 
-unsigned int geProject::EntityManager::getEntityNum() {
+int geProject::EntityManager::getEntityNum() {
 	return entities.size();
 }
 

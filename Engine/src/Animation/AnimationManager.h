@@ -3,9 +3,8 @@
 #include <unordered_map>
 #include <ge_engine/Components.h>
 #include <ge_engine/Core.h>
-#include "../EntityManager/EntityManager.h"
-#include "../ResourceManager/ResourceManager.h"
 #include <ge_engine/json.hpp>
+#include "../EntityManager/EntityManager.h"
 
 using json = nlohmann::json;
 namespace geProject {
@@ -19,7 +18,7 @@ namespace geProject {
 	};
 	class AnimationManager {
 	public:
-		AnimationManager(EntityManager& manager, ResourceManager& resources);
+		AnimationManager(EntityManager& emanager);
 		~AnimationManager();
 		void assignEntityAnimation(int entityId, std::string state);
 		void removeEntity();
@@ -29,13 +28,12 @@ namespace geProject {
 		void serializeAnimations();
 	private:
 		std::unordered_map<std::string, std::vector<Frame>> animationList; // animation state -- key,  vector of frames containing the sprite and how much time to keep that sprite on screen
-		std::unordered_map<std::string, std::vector<std::string>> availableStates;    // a mapping of states to all available other states
-		EntityManager* entityManager;
-		ResourceManager* resources;
+		std::unordered_map<std::string, std::vector<std::string>> availableStates;   // a mapping of states to all available other states	
 		void deserializeAnimations();
 		void to_json(json& data, std::string state);
 		void from_json(json& data, Frame& comp);
 		std::string filePath{ "../../../../Game/assets/levels/animations.json" };
 		std::ofstream oFile;
+		EntityManager* entitymanager;
 	};
 }

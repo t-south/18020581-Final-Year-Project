@@ -1,8 +1,7 @@
 #include "RenderBatch.h"
 
 
-geProject::RenderBatch::RenderBatch(int maxSize, unsigned int zIndex, ResourceManager& resources) : zIndex(zIndex),maxBatch(maxSize), vertSize(10), vao(0), vbo(0), spriteNum(0) {
-	resourceManager = &resources;	
+geProject::RenderBatch::RenderBatch(int maxSize, unsigned int zIndex) : zIndex(zIndex),maxBatch(maxSize), vertSize(10), vao(0), vbo(0), spriteNum(0) {		
 	// vector size will be the size of a quad of vertices multiplied by the max size of the batch
 	int vectorSize = maxBatch * vertSize * 4;	
 	//initialise vector for later use
@@ -26,7 +25,7 @@ bool geProject::RenderBatch::isTextureFull(unsigned int id) {
 		return false;
 	}
 	else {
-		auto tex = resourceManager->requestTexture(id);
+		auto tex = resourcemanager.requestTexture(id);
 		for (auto const& i : textures) {
 			if (i == tex) {
 				return false;
@@ -69,33 +68,39 @@ void geProject::RenderBatch::init() {
 void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transform) {	
 	if (spriteNum <= maxBatch && sprite->zIndex == zIndex) {
 		int index = spriteNum * 4 * vertSize;
+		std::cout << index << std::endl;
 		if (vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] != 0.0f) { // get the index where the object id is stored
 			index = getUnusedRenderSection();
 		}	
 		//load in new texture into texture array if not present, leave 0th element for normal colors		
 		if (sprite->spriteSheetId == 0 && sprite->textureId > 0 && textures[sprite->textureId] == nullptr) {
-			textures[sprite->textureId] = resourceManager->requestTexture(sprite->textureId);
+			textures[sprite->textureId] = resourcemanager.requestTexture(sprite->textureId);
 		}
 		else if (sprite->spriteSheetId > 0) {
-			textures[sprite->textureId] = resourceManager->requestSpriteSheet(sprite->textureId);
+			textures[sprite->textureId] = resourcemanager.requestSpriteSheet(sprite->textureId);
 		}		
 		transform->dirtyFlag[2] = index;	
 		transform->dirtyFlag[0] = 0;	
+		if (index == -1) {
+			std::cout << "test error" << std::endl;
+		}
 		createVertices(sprite, transform->position[0], transform->position[1], transform->scale[0], transform->scale[1], transform->rotation, index);
 		hasUpdate = true;
 		spriteNum++;
 	}
 }
 
-void geProject::RenderBatch::addMapTile(SpriteRender sprite, float x, float y, int layer)
+void geProject::RenderBatch::addMapTile(SpriteRender sprite, int ssId, float x, float y, int layer)
 {
 	if (spriteNum <= maxBatch && layer == zIndex) {
 		int index = spriteNum * 4 * vertSize;
 		if (vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] != 0.0f) { // get the index where the object id is stored
 			index = getUnusedRenderSection();
 		}
-		//load in new texture into texture array if not present, leave 0th element for normal colors			
-		textures[sprite.textureId] = resourceManager->requestSpriteSheet(sprite.textureId);		
+		//load in new texture into texture array if not present, leave 0th element for normal colors		
+		auto map = resourcemanager.requestLevelMap(ssId);
+		
+		textures[map->getTextureId()] = map;
 		createVertices(&sprite, x, y, 0.25f, 0.25f, 0, index);
 		spriteNum++;
 	}
@@ -165,7 +170,7 @@ void geProject::RenderBatch::removeVertices(unsigned int index) {
 std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 	std::vector<unsigned int> elementOrder;
 	// 0 1 3 -- 1 2 3 indices ordering  4 5 7 -- 5 6 7
-	for (int i = 0; i < maxBatch; i++) {
+	for (unsigned int i = 0; i < maxBatch; i++) {
 		//First triangle indices order
 		unsigned int offset = i * 4;
 		elementOrder.push_back(offset);		// 0
@@ -182,8 +187,10 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {	
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-	
-	auto shader = resourceManager->requestShader(shaderPath);
+	//if (shaderPath == "../../../../Game/assets/shaders/SelectionVertexShader.glsl") {
+	//	glClear(GL_COLOR_BUFFER_BIT);
+	//}
+	auto shader = resourcemanager.requestShader(shaderPath);
 	camera.projectionUpdate();
 	shader->setMat4f("uProjMat", camera.getProjection());
 	shader->setMat4f("uViewMat", camera.getViewMatrix());	
@@ -232,9 +239,6 @@ int geProject::RenderBatch::getUnusedRenderSection() {
 	while ((static_cast<unsigned long long>(count) * verticesSize) < vertices.size() && vertices[(static_cast<std::vector<float, std::allocator<float>>::size_type>(count) * verticesSize) + 9] != 0) {
 		count++;
 	}
-	if ((static_cast<unsigned long long>(count) * verticesSize) < vertices.size()) {
-		return -1;
-	}
 	return count * verticesSize;
 }
 
@@ -247,7 +251,8 @@ unsigned int geProject::RenderBatch::getZindex() {
 }
 
 glm::vec2 geProject::RenderBatch::rotate(glm::vec2 vert, glm::vec2 centre, float rotation) {
-	rotation = rotation * PI / 180.0;
+	double pi = 3.14159265;
+	rotation = rotation * pi / 180.0;
 	return glm::vec2((cos(rotation) * (vert.x - centre.x) - sin(rotation) * (vert.y - centre.y) + centre.x), (sin(rotation) * (vert.x - centre.x) + cos(rotation) * (vert.y - centre.y) + centre.y));
 }
 

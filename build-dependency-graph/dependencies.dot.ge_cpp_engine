@@ -1,0 +1,26 @@
+digraph "ge_cpp_engine" {
+node [
+  fontsize = "12"
+];
+    "node3" [ label = "ge_cpp_engine", shape = octagon ];
+    "node0" [ label = "ImGui", shape = octagon ];
+    "node3" -> "node0"  // ge_cpp_engine -> ImGui
+    "node1" [ label = "box2d", shape = octagon ];
+    "node3" -> "node1"  // ge_cpp_engine -> box2d
+    "node4" [ label = "glad", shape = octagon ];
+    "node3" -> "node4"  // ge_cpp_engine -> glad
+    "node5" [ label = "glfw", shape = octagon ];
+    "node3" -> "node5"  // ge_cpp_engine -> glfw
+    "node6" [ label = "Threads::Threads", shape = pentagon ];
+    "node5" -> "node6" [ style = dotted ] // glfw -> Threads::Threads
+    "node7" [ label = "glm\n(glm::glm)", shape = pentagon ];
+    "node3" -> "node7"  // ge_cpp_engine -> glm
+    "node8" [ label = "glu32", shape = septagon ];
+    "node3" -> "node8"  // ge_cpp_engine -> glu32
+    "node9" [ label = "opengl32", shape = septagon ];
+    "node3" -> "node9"  // ge_cpp_engine -> opengl32
+    "node10" [ label = "spdlog\n(spdlog::spdlog)", shape = octagon ];
+    "node3" -> "node10"  // ge_cpp_engine -> spdlog
+    "node6" [ label = "Threads::Threads", shape = pentagon ];
+    "node10" -> "node6"  // spdlog -> Threads::Threads
+}

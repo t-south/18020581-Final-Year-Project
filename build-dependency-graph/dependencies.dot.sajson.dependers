@@ -1,0 +1,8 @@
+digraph "sajson" {
+node [
+  fontsize = "12"
+];
+    "node12" [ label = "sajson", shape = octagon ];
+    "node14" [ label = "testbed", shape = egg ];
+    "node14" -> "node12" [ style = dotted ] // testbed -> sajson
+}

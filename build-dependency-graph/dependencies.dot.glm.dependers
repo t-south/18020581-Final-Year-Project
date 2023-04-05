@@ -1,0 +1,10 @@
+digraph "glm" {
+node [
+  fontsize = "12"
+];
+    "node7" [ label = "glm\n(glm::glm)", shape = pentagon ];
+    "node3" [ label = "ge_cpp_engine", shape = octagon ];
+    "node3" -> "node7"  // ge_cpp_engine -> glm
+    "node2" [ label = "ge_cpp_application", shape = egg ];
+    "node2" -> "node3" [ style = dotted ] // ge_cpp_application -> ge_cpp_engine
+}

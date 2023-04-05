@@ -1,19 +1,18 @@
 #pragma once
+
+#include <ge_engine/Core.h>
 #include <vector>
 #include <memory>
 #include "RenderBatch.h"
-#include "../EntityManager/EntityManager.h"
-#include "../ResourceManager/ResourceManager.h"
-#include "../Cameras/Camera.h"
+
 
 
 namespace geProject {
 	class Renderer {
-	public:
-		Renderer(ResourceManager& resources);
+	public:		
+		Renderer();
 		~Renderer();
-		static void init();
-		static void shutdown();
+
 		//static void BeginScene(const OrthographicCamera& camera);
 		void addSpriteToBatch(SpriteRender* sprite, Transform* transform);
 		void updateSprite(SpriteRender* sprite, Transform* transform);
@@ -22,7 +21,6 @@ namespace geProject {
 		void renderMap(int mapId);
 		void clear();
 	private:
-		ResourceManager* resourceManager;	
 		static std::vector<RenderBatch> renderList;
 		static const unsigned int maxBatch{ 500 };
 		void deleteEntity(DeleteEntityEvent* e);

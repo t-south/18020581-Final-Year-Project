@@ -3,7 +3,8 @@
 
 
 std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsigned int currentState, std::vector<Action> actionsAvailable) {
-    std::vector<Action> actionPlan;
+	return std::vector<geProject::Action>();
+    /*std::vector<Action> actionPlan;
     std::vector<asNode*> openList;
     std::vector<asNode*> closedList;
 
@@ -11,7 +12,7 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 	unsigned int goalCondition = goal.getCondition();
 	asNode* startNode = new asNode();
 
-	if (currentState & goalConditon != goalCondition) {
+	if ((currentState & goalCondition) != goalCondition) {
 		startNode->currentState = currentState;
 		startNode->goalState = currentState | goalCondition;
 	}
@@ -24,7 +25,7 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 		expandedNode = openList[0];
 		for (auto& node : openList) {
 			if (node->fValue < expandedNode->fValue) {
-				expandedNode = *node;
+				expandedNode = node;
 			}
 		}		
 		openList.erase(std::remove(openList.begin(), openList.end(), *expandedNode), openList.end());
@@ -34,7 +35,7 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 		if (expandedNode->currentState == expandedNode->goalState) {
 			//create the action plan by following the nodes parents back to the origin node
 			while (expandedNode->parent != nullptr) {
-				actionPlan.push_back(expandedNode);
+				actionPlan.push_back(*expandedNode->actionTaken);
 				expandedNode = expandedNode->parent;
 			}
 			return actionPlan;
@@ -46,7 +47,7 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 			if ((newAction.getEffects() & expandedNode->goalState) == newAction.getEffects()) {
 				asNode* neighbour = new asNode();				
 				neighbour->currentState = expandedNode->goalState;
-				neighbour->actionTaken = newAction;
+				neighbour->actionTaken = &newAction;
 				unsigned int precon = newAction.getPreconditions();				
 				//fill in precondition values for action 
 				neighbour->currentState = neighbour->goalState;
@@ -57,7 +58,7 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 
 		for (auto& neighbour : expandedNode->neighbours) {
 			//add cost to take action from current node to current accumulated action cost
-			float gValue = expandedNode->gValue + neighbour->actionTaken->getCost();
+			float gValue = 0;// expandedNode->gValue + neighbour->actionTaken->getCost();
 			//heuristic is the number of state differences left till starting state
 			int count = 0;
 			for (int i = 0; i < 32; i++) {
@@ -65,10 +66,11 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 					count++;
 				}
 			}
-			float heuristic = count;
+			int heuristic = count;
+			
 			float fValue = gValue + heuristic;
-			bool neighbourclosed = neighbour->std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end();
-			bool neighbouropen = neighbour->std::find(openList.begin(), openList.end(), neighbour) != openList.end();
+			bool neighbourclosed = std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end();
+			bool neighbouropen = std::find(openList.begin(), openList.end(), neighbour) != openList.end();
 			if (gValue < expandedNode->gValue && neighbourclosed) {
 				neighbour->fValue = fValue;
 				neighbour->gValue = gValue;
@@ -84,29 +86,5 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 			}
 		}
     }
-	return actionPlan;
-}
-
-
-
-void geProject::Planner::addState(int stateId, bool value){
-	if (worldState.count(stateId) == 0) {
-		worldState[stateId] = value;
-	}
-}
-
-void geProject::Planner::removeState(int stateId){
-	if (worldState.count(stateId) == 1) {
-		worldState.erase(stateId);
-	}
-}
-
-void geProject::Planner::changeState(int stateId, bool value){
-	if (worldState.count(stateId) == 1) {
-		worldState[stateId] = value;
-	}
-}
-
-std::unordered_map<int, bool> geProject::Planner::getStates(){
-	return worldState;
+	return actionPlan;*/
 }

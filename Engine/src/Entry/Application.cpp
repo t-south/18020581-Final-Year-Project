@@ -1,6 +1,8 @@
 #include "Application.h"
 
 geProject::EventHandler eventSystem;
+geProject::ResourceManager resourcemanager;
+geProject::WorldState worldstate;
 
 namespace geProject {
 	Application::Application() {
@@ -33,7 +35,7 @@ namespace geProject {
 		int height = gameWindow->getHeight();
 		auto window = gameWindow->getWindow();
 		imguiWindow = new ImguiWindow(window, width, height, frameBuffer);
-		imguiWindow->start(width, height, sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());		
+		imguiWindow->start(width, height, sceneManager->getCurrentScene()->getMouseX(), sceneManager->getCurrentScene()->getMouseY());
 		loop();
 	}
 
@@ -51,18 +53,18 @@ namespace geProject {
 			glfwPollEvents();
 			auto scene = sceneManager->getCurrentScene();
 			//TEXTURE SELECTION UPDATES
-			scene->setPicking();	
+			scene->setPicking();
 			frameBuffer->bind();
 			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT );
+			glClear(GL_COLOR_BUFFER_BIT);
 			//SCENE UPDATES
 			scene->update(deltaTime);
 			frameBuffer->unBind();
 			//inverse for view has to be taken after render
 			//IMGUI UPDATES
-		
+
 			imguiWindow->update(deltaTime, scene);
-	
+
 			//imguiwindow->render(width, height);
 			glfwSwapBuffers(gameWindow->getWindow());
 			gameClock->updateTime();
@@ -85,14 +87,14 @@ namespace geProject {
 	}
 
 	void geProject::Application::startGamePlay(GameStartEvent* start) {
-		if (start->getType() == Type::gameStart) {			
+		if (start->getType() == Type::gameStart) {
 			std::cout << "starting play" << std::endl;
 			auto scene = sceneManager->getCurrentScene();
 			scene->serialize(scene->getFilePath());
 			scene->serialize("../../../../Game/assets/levels/levelEditor.json");
 			scene->setPhysics(true);
 			eventSystem.setContext(GameplayContext);
-			scene->setActiveEntity(-1);				
+			scene->setActiveEntity(-1);
 		}
 	}
 
@@ -100,9 +102,9 @@ namespace geProject {
 		if (stop->getType() == Type::gameStop) {
 			std::cout << "stopping play" << std::endl;
 			auto scene = sceneManager->getCurrentScene();
-			scene->reloadLevel(scene->getFilePath());	
+			scene->reloadLevel(scene->getFilePath());
 			scene->setPhysics(false);
-			scene = sceneManager->getCurrentScene();			
+			scene = sceneManager->getCurrentScene();
 			scene->deserialize(scene->getFilePath());
 			eventSystem.setContext(EditorContext);
 			scene->setActiveEntity(-1);
@@ -122,6 +124,3 @@ namespace geProject {
 
 
 }
-
-
-

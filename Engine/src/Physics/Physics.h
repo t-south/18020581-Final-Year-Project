@@ -2,9 +2,10 @@
 #include "CustomContactListener.h"
 #include "RayCastListener.h"
 #include <box2d/box2d.h>
-#include <ge_engine/Core.h>
 #include <unordered_map>
+#include <ge_engine/Core.h>
 #include "../EntityManager/EntityManager.h"
+
 
 namespace geProject {
 	//credit to gamedev.stackexchange.com/questions/196951/how-do-i-correctly-use-userdata-in-box2d
@@ -15,7 +16,7 @@ namespace geProject {
 
 	class Physics {
 	public:
-		Physics(EntityManager& emanager);
+		Physics(EntityManager& eManager);
 		~Physics();
 		void addEntity(Entity& entity);
 		void addBoxCollider(BoxCollider& box);
@@ -32,17 +33,16 @@ namespace geProject {
 		b2World world;
 		float time;
 		float timeStep;
-		int velocity;
-		int position;
-		std::unordered_map<int, b2Body*> bodies;
-		EntityManager* manager{ nullptr };	
+		float velocity;
+		float position;
+		std::unordered_map<int, b2Body*> bodies;		
 		std::vector<FixtureUserData> fixtureData;
 		CustomContactListener customCallback;		
 		void updateRigidBody(RigidEvent* e);
 		void updateBoxCollider(BoxColliderEvent* e);
 		void updateCircleCollider(CircleColliderEvent* e);	
 		void deleteEntityPhysics(DeleteEntityEvent* e);	
-
+		EntityManager* entitymanager{ nullptr };
 		RayCastListener* rayCast(int entityId, const b2Vec2& origin, const b2Vec2& target);
 	};
 }

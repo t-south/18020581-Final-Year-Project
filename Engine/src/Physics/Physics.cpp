@@ -1,17 +1,17 @@
 #include "Physics.h"
 
 
-geProject::Physics::Physics(EntityManager& emanager):time(0), world(b2World(gravity)) {
+geProject::Physics::Physics(EntityManager& emanager): time(0), world(b2World(gravity)) {
 	timeStep = 1.0f / 60.0f;
 	position = 3.0f;
-	velocity = 0.0f;	
+	velocity = 0.0f;
 	time = 0.0f;
 	world.SetContactListener(&customCallback);
 	eventSystem.subscribe(this, &Physics::updateRigidBody);
 	eventSystem.subscribe(this, &Physics::updateCircleCollider);
 	eventSystem.subscribe(this, &Physics::updateBoxCollider);
-	eventSystem.subscribe(this, &Physics::deleteEntityPhysics);	
-	manager = &emanager;
+	eventSystem.subscribe(this, &Physics::deleteEntityPhysics);
+	entitymanager = &emanager;
 }
 
 geProject::Physics::~Physics(){}
@@ -22,11 +22,11 @@ void geProject::Physics::addEntity(Entity& entity) {
 	//std::cout << bodies.count(entity.id) << std::endl;
 	if (entity.id > -1 && bodies.count(entity.id) == 0 && (entity.compMask & 4) == 4) {		
 		//if there is a rigidbody make a new body		
-		auto rigid = manager->getRigidBodyComponent(entity.id);
-		auto transform = manager->getTransformComponent(entity.id);
+		auto rigid = entitymanager->getRigidBodyComponent(entity.id);
+		auto transform = entitymanager->getTransformComponent(entity.id);
 		b2BodyDef body;
-		double PI = 3.14159265;
-		float angle = transform->rotation * PI / 180.0;
+		double pi = 3.14159265;
+		float angle = transform->rotation * pi / 180.0;
 		body.angle = angle;
 		body.position.Set(transform->position.x, transform->position.y);
 		body.angularDamping = rigid->angularDamping;
@@ -51,12 +51,12 @@ void geProject::Physics::addEntity(Entity& entity) {
 		bodies[entity.id] = worldBody;
 		
 		if ((entity.compMask & 8) == 8) {					//Circle collider
-			for (auto& circle: manager->getCircleColliderComponents(entity.id)) {
+			for (auto& circle: entitymanager->getCircleColliderComponents(entity.id)) {
 				addCircleCollider(circle);
 			}
 		}
 		if ((entity.compMask & 16) == 16) {			//Box collider
-			for (auto& box : manager->getBoxColliderComponents(entity.id)) {
+			for (auto& box : entitymanager->getBoxColliderComponents(entity.id)) {
 				addBoxCollider(box);				
 			}
 		}
@@ -65,10 +65,10 @@ void geProject::Physics::addEntity(Entity& entity) {
 
 
 void geProject::Physics::addBoxCollider(BoxCollider& box) {	
-	Transform transform = *manager->getTransformComponent(box.entityAssigned);
-	Rigidbody rigid = *manager->getRigidBodyComponent(box.entityAssigned);
+	Transform transform = *entitymanager->getTransformComponent(box.entityAssigned);
+	Rigidbody rigid = *entitymanager->getRigidBodyComponent(box.entityAssigned);
 	b2PolygonShape shape = b2PolygonShape();
-	Entity currentEntity = *manager->getEntity(box.entityAssigned);
+	Entity currentEntity = *entitymanager->getEntity(box.entityAssigned);
 	b2Body& body = *bodies[currentEntity.id];
 	b2FixtureDef shapeFixture;
 	shape.SetAsBox(box.boxSize[0] * 0.5f, box.boxSize[1] * 0.5f, b2Vec2(box.offset[0], box.offset[1]), 0);		
@@ -83,7 +83,7 @@ void geProject::Physics::addBoxCollider(BoxCollider& box) {
 
 void geProject::Physics::addCircleCollider(CircleCollider& circle) {
 	b2CircleShape shape = b2CircleShape();
-	Entity currentEntity = *manager->getEntity(circle.entityAssigned);	
+	Entity currentEntity = *entitymanager->getEntity(circle.entityAssigned);
 	b2Body& body = *bodies[currentEntity.id];
 	b2FixtureDef shapeFixture;
 	shape.m_p.Set(circle.offset[0], circle.offset[1]);
@@ -135,9 +135,9 @@ void geProject::Physics::update(float deltaTime){
 				}
 				float test = body.second->GetAngle();
 				b2Vec2 position = body.second->GetPosition();
-				double PI = 3.14159265;
+				double pi = 3.14159265;
 				
-				float angle = (float)(body.second->GetAngle() * (180.0/ PI));
+				float angle = (float)(body.second->GetAngle() * (180.0/ pi));
 				
 				//printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
 				

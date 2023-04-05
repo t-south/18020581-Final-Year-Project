@@ -1,16 +1,15 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
+#include <ge_engine/Core.h>
 #include "Line.h"
-#include "Shader.h"
-#include "../ResourceManager/ResourceManager.h"
 #include "../Cameras/Camera.h"
 
 
 namespace geProject {
 	class EditorRender {
 	public:
-		EditorRender(ResourceManager& resources);
+		EditorRender();
 		~EditorRender();
 		void render(Camera& camera);
 		void lineCheck();
@@ -23,7 +22,6 @@ namespace geProject {
 	private:
 		unsigned int vao, vbo, vertSize, index, renderSize;
 		std::vector<Line*> lines;
-		std::vector<float> vertices;
-		ResourceManager* resourceManager;
+		std::vector<float> vertices;	
 	};
 }

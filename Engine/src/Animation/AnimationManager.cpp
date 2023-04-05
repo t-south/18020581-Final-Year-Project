@@ -2,8 +2,8 @@
 
 
 
-geProject::AnimationManager::AnimationManager(EntityManager& manager, ResourceManager& resources): entityManager(&manager), resources(&resources){
-	deserializeAnimations();
+geProject::AnimationManager::AnimationManager(EntityManager& emanager): entitymanager(&emanager) {
+	deserializeAnimations();	
 	
 }
 
@@ -11,10 +11,10 @@ geProject::AnimationManager::~AnimationManager(){
 }
 
 void geProject::AnimationManager::update(float deltaTime){
-	for (const auto& i : entityManager->getEntities()) {
+	for (const auto& i : entitymanager->getEntities()) {
 		if ((i->compMask & 32) == 32 && i->id > -1) {					//check there is an animation assigned to entity, if so retrieve sprite and animation data
-			SpriteRender sprite = *entityManager->getSpriteComponent(i->id);
-			Animation& animation = *entityManager->getAnimationComponent(i->id);
+			SpriteRender sprite = *entitymanager->getSpriteComponent(i->id);
+			Animation& animation = *entitymanager->getAnimationComponent(i->id);
 			int& frame = animation.currentFrame;
 			auto& frameList = animationList[animation.state];
 			if (frame >= frameList.size()) {
@@ -22,11 +22,11 @@ void geProject::AnimationManager::update(float deltaTime){
 			}		
 			//std::cout << deltaTime << std::endl;
 			Frame& currentFrame = frameList[frame];
-			auto playerSprites = resources->requestSpriteSheet(sprite.textureId);
-			auto& newSprite = playerSprites->getSprite(frame);				
-			entityManager->assignSpriteRender(i->id, newSprite);
+			//auto playerSprites = resourcemanager.requestSpriteSheet(sprite.textureId);
+			//auto& newSprite = playerSprites->getSprite(frame);				
+			//entitymanager.assignSpriteRender(i->id, newSprite);
 			currentFrame.time += deltaTime;
-			entityManager->assignSpriteRender(i->id, newSprite);
+			//entitymanager.assignSpriteRender(i->id, newSprite);
 			if (currentFrame.time >= animation.speed) {
 				frame++;
 				currentFrame.time = 0.0f;
@@ -100,9 +100,9 @@ void geProject::AnimationManager::from_json(json& data, Frame& comp){
 }
 
 void geProject::AnimationManager::assignEntityAnimation(int entityId, std::string state){
-	auto entity = entityManager->getEntity(entityId);
+	auto entity = entitymanager->getEntity(entityId);
 	if ((entity->compMask & 32) != 32) {
-		entityManager->assignAnimation(entity->id, Animation{.state = {state}});
+		entitymanager->assignAnimation(entity->id, Animation{.state = {state}});
 	}
 }
 

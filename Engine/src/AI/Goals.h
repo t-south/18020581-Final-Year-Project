@@ -35,7 +35,7 @@ namespace geProject {
 
 	class FleeGoal : public Goal {
 		FleeGoal() { condition = ~ENEMY_VISIBLE; };
-	}
+	};
 
 
 	class StayAliveGoal : public Goal {

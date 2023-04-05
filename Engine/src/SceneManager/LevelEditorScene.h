@@ -3,6 +3,7 @@
 #include "../Render/EditorRender.h"
 #include "../Cameras/EditorCamera.h"
 #include "../Windows/HierarchyWindow.h"
+#include "../AI/Enemy.h"
 
 namespace geProject {
 	class LevelEditorScene : public Scene {

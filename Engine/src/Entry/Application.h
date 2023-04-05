@@ -29,11 +29,11 @@ namespace geProject {
 		FrameBuffer* selectionTextures;
 		void startGamePlay(GameStartEvent* start);
 		void stopGamePlay(GameStopEvent* stop);
-		void loadGame(GameLoadEvent* load);	
+		void loadGame(GameLoadEvent* load);
 
 	};
-	
+
 	Application* CreateApplication();
 
-	
+
 }

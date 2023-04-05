@@ -25,14 +25,16 @@ namespace geProject {
 		std::shared_ptr<geProject::Texture> requestTexture(unsigned int guid);
 
 		unsigned int loadSpriteSheet(std::string guId, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex);
+		unsigned int loadMap(std::string guId, unsigned int spriteNum, float spriteWidth, float spriteHeight, float borderspacing, int zIndex);
 		void unloadSpriteSheet(unsigned int guId);
 		std::shared_ptr<geProject::SpriteSheet> requestSpriteSheet(unsigned int guid);
+		std::shared_ptr<geProject::SpriteSheet> requestLevelMap(unsigned int guid);
 
 	private:
 		static StackAllocator gameResources;
 		std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
 		std::unordered_map<unsigned int, std::shared_ptr<Texture>> textures;
 		std::unordered_map<unsigned int, std::shared_ptr<SpriteSheet>> spritesheets;
-	
+		std::unordered_map<unsigned int, std::shared_ptr<SpriteSheet>> maps;
 	};
 }

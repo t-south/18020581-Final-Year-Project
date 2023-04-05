@@ -1,14 +1,14 @@
 #include "EditorRender.h"
 
 
-geProject::EditorRender::EditorRender(ResourceManager& resources) {
+
+geProject::EditorRender::EditorRender() {
 	renderSize = 50000;
 	index = 0;
 	vertSize = 6;
 	for (int i = 0; i < renderSize * vertSize; i++) {
 		vertices.push_back(0);
-	}	
-	resourceManager = &resources;	
+	}		
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	glGenBuffers(1, &vbo);
@@ -63,8 +63,8 @@ void geProject::EditorRender::addBox(glm::vec2 centre, glm::vec2 dim, glm::vec3 
 glm::vec2 geProject::EditorRender::rotate(glm::vec2 vert, glm::vec2 centre, float rotation) {
 	//return glm::vec2(centre.x + (vert.x - centre.x) * cos(rotation) - (vert.y - centre.y) * sin(rotation), centre.y + (vert.x - centre.x) * sin(rotation) + (vert.y - centre.y) * cos(rotation));
 	//convert from degrees to radians
-	double PI =  3.14159265;
-	rotation = rotation * PI / 180.0;
+	double pi =  3.14159265;
+	rotation = rotation * pi / 180.0;
 	return glm::vec2((cos(rotation) * (vert.x - centre.x) - sin(rotation) * (vert.y - centre.y) + centre.x), (sin(rotation) * (vert.x - centre.x) + cos(rotation) * (vert.y - centre.y) + centre.y));
 }
 
@@ -125,7 +125,7 @@ void geProject::EditorRender::render(Camera& camera){
 	createVertices();
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-	auto shader = resourceManager->requestShader("../../../../Game/assets/shaders/LineVertexShader.glsl");
+	auto shader = resourcemanager.requestShader("../../../../Game/assets/shaders/LineVertexShader.glsl");
 	shader->setMat4f("uProjMat", camera.getProjection());
 	shader->setMat4f("uViewMat", camera.getViewMatrix());
 	glBindVertexArray(vao);
