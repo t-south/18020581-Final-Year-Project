@@ -206,7 +206,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		}
 			
 	}
-	Enemy* newEnemy = new Enemy();
+	//Enemy* newEnemy = new Enemy();
 	//auto test = newEnemy->planPath(1.291f, 0.544f, 3.582f, 2.721f);
 	//worldstate.testWorldMap();
 	loopcount++;
