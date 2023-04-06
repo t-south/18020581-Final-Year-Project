@@ -8,8 +8,6 @@ namespace geProject {
 		LevelScene();
 		~LevelScene();
 		void update(float deltaTime);
-		size_t addEntityToScene(unsigned int entityId);
-		void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId);	
 		virtual void updateImgui() override;
 		virtual void updateSceneImgui() override;
 		virtual void render(std::string shaderPath) override;

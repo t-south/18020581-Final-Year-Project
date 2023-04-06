@@ -14,8 +14,8 @@ namespace geProject {
 		~Renderer();
 
 		//static void BeginScene(const OrthographicCamera& camera);
-		void addSpriteToBatch(SpriteRender* sprite, Transform* transform);
-		void updateSprite(SpriteRender* sprite, Transform* transform);
+		void addSpriteToBatch(int entityId);
+		void updateSprite(int entityId);
 		static void render(Camera& camera, std::string shaderPath);
 		unsigned int getZindexBatch(unsigned int zIndex);
 		void renderMap(int mapId);

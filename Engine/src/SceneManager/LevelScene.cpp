@@ -5,26 +5,20 @@ geProject::LevelScene::LevelScene(){
 	std::cout << "Level Scene!" << std::endl;
 	camera = new LevelCamera(glm::vec2(0.0f, 0.0f));
 	filePath = "../../../../Game/assets/levels/level1.json";
-	player = new PlayerController(*entitymanager, *physicsmanager, *camera, entitymanager->getPlayerId());
+	player = new PlayerController(*camera);
 }
 
 geProject::LevelScene::~LevelScene(){}
 
 void geProject::LevelScene::init() {
-	entitymanager->assignUpdate();
+	entitymanager.assignUpdate();
 	camera->setPosition(glm::vec2(0, 0));
 }
-
-size_t geProject::LevelScene::addEntityToScene(unsigned int entityId) { return 1; }
-void geProject::LevelScene::reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) {
-
-}
-
 
 void geProject::LevelScene::update(float deltaTime){
 
 	camera->update(deltaTime);
-	physicsmanager->update(deltaTime);
+	physicsmanager.update(deltaTime);
 	if (player != nullptr) {
 		Command* command = controlManager->action();
 		player->update(deltaTime);
@@ -35,33 +29,28 @@ void geProject::LevelScene::update(float deltaTime){
 	}
 	
 	//UPDATES TO RENDERING
-	if (entitymanager->hasUpdate()) {
-		entities.clear();
-		for (int i = 0; i < entitymanager->getEntityNum(); i++) {
-			auto ent = entitymanager->getEntity(i);
-			if (ent->compMask > 0 && ent->id > -1) {
-				entities[ent->id] = ent;
+	if (entitymanager.hasUpdate()) {
+		for (int i = 0; i < entitymanager.getEntityNum(); i++) {
+			Entity ent = entitymanager.getEntity(i);
+			if (ent.compMask > 0 && ent.id > -1) {			
 				// only sprites that have not been added to the renderer previously will be set to 0
-				auto trans = entitymanager->getTransformComponent(ent->id);
-				auto sprite = entitymanager->getSpriteComponent(ent->id);
 				//transform dirtyflag for render index is by default set to -1 when first created
-				if (trans->dirtyFlag[2] == -1) {
-					rendermanager->addSpriteToBatch(sprite, trans);
-					trans->dirtyFlag[0] = 0;
+				if (entitymanager.getBatchStatus(ent.id) == -1) {
+					rendermanager->addSpriteToBatch(ent.id);				
 				}
 				//if there has been any updates the dirty flag in transform component will be set to 1
-				else if (trans->dirtyFlag[0] == 1) {
-					rendermanager->updateSprite(sprite, trans);
+				else if (entitymanager.getUpdateStatus(ent.id) == 1) {
+					rendermanager->updateSprite(ent.id);
 				}
 			}
 		}
-		entitymanager->endFrame();
+		entitymanager.endFrame();
 	}
 
 
 	animationManager->update(deltaTime);
 	keyboard->endFrame();
-	entitymanager->endFrame();
+	entitymanager.endFrame();
 	mouse->endFrame();
 	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 }

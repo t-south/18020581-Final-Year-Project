@@ -4,8 +4,8 @@
 #include <box2d/box2d.h>
 #include <unordered_map>
 #include <ge_engine/Core.h>
-#include "../EntityManager/EntityManager.h"
-
+//#include "../EntityManager/EntityManager.h"
+#include <ge_engine/Managers.h>
 
 namespace geProject {
 	//credit to gamedev.stackexchange.com/questions/196951/how-do-i-correctly-use-userdata-in-box2d
@@ -16,11 +16,13 @@ namespace geProject {
 
 	class Physics {
 	public:
-		Physics(EntityManager& eManager);
+		Physics(/*EntityManager& eManager*/);
 		~Physics();
-		void addEntity(Entity& entity);
-		void addBoxCollider(BoxCollider& box);
-		void addCircleCollider(CircleCollider& circle);
+		void startUp();
+	
+		void addEntity(int entityId);		
+		void addBoxCollider(BoxCollider box, int entityId);
+		void addCircleCollider(CircleCollider circle, int entityId);
 		void removeEntity(int  entityId);
 		void clear();
 		void update(float deltaTime); 
@@ -30,8 +32,8 @@ namespace geProject {
 		//b2RayCastOutput getRayCast(int entityId, float coordAx, float coordAy, float coordBx, float coordBy);
 	private:
 		b2Vec2 gravity{0, 0};
-		b2World world;
-		float time;
+		b2World world{b2World(gravity)};
+		float time{ 0 };
 		float timeStep;
 		float velocity;
 		float position;
@@ -42,7 +44,7 @@ namespace geProject {
 		void updateBoxCollider(BoxColliderEvent* e);
 		void updateCircleCollider(CircleColliderEvent* e);	
 		void deleteEntityPhysics(DeleteEntityEvent* e);	
-		EntityManager* entitymanager{ nullptr };
+		//EntityManager* entitymanager;
 		RayCastListener* rayCast(int entityId, const b2Vec2& origin, const b2Vec2& target);
 	};
 }

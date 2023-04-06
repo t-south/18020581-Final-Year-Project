@@ -1,7 +1,8 @@
 #include "Physics.h"
 
 
-geProject::Physics::Physics(EntityManager& emanager): time(0), world(b2World(gravity)) {
+geProject::Physics::Physics(/*/EntityManager& emanager*/) {
+	/*
 	timeStep = 1.0f / 60.0f;
 	position = 3.0f;
 	velocity = 0.0f;
@@ -11,30 +12,45 @@ geProject::Physics::Physics(EntityManager& emanager): time(0), world(b2World(gra
 	eventSystem.subscribe(this, &Physics::updateCircleCollider);
 	eventSystem.subscribe(this, &Physics::updateBoxCollider);
 	eventSystem.subscribe(this, &Physics::deleteEntityPhysics);
-	entitymanager = &emanager;
+	//entitymanager = &emanager;
+	*/
 }
 
 geProject::Physics::~Physics(){}
 
 
-void geProject::Physics::addEntity(Entity& entity) {
+void geProject::Physics::startUp(){
+	timeStep = 1.0f / 60.0f;
+	position = 3.0f;
+	velocity = 0.0f;
+	time = 0.0f;
+	world.SetContactListener(&customCallback);
+	eventSystem.subscribe(this, &Physics::updateRigidBody);
+	eventSystem.subscribe(this, &Physics::updateCircleCollider);
+	eventSystem.subscribe(this, &Physics::updateBoxCollider);
+	eventSystem.subscribe(this, &Physics::deleteEntityPhysics);
+}
+
+
+void geProject::Physics::addEntity(int entityId) {
+	Entity entity = entitymanager.getEntity(entityId);
 	//if(entity.compMask ) // select components based on the mask in the entity
 	//std::cout << bodies.count(entity.id) << std::endl;
 	if (entity.id > -1 && bodies.count(entity.id) == 0 && (entity.compMask & 4) == 4) {		
-		//if there is a rigidbody make a new body		
-		auto rigid = entitymanager->getRigidBodyComponent(entity.id);
-		auto transform = entitymanager->getTransformComponent(entity.id);
+		//if there is a rigidbody make a new body	
+		Rigidbody rigid = entitymanager.getRigidBodyComponent(entity.id);
+		Transform transform = entitymanager.getTransformComponent(entity.id);
 		b2BodyDef body;
 		double pi = 3.14159265;
-		float angle = transform->rotation * pi / 180.0;
+		float angle = transform.rotation * pi / 180.0;
 		body.angle = angle;
-		body.position.Set(transform->position.x, transform->position.y);
-		body.angularDamping = rigid->angularDamping;
-		body.linearDamping = rigid->linearDamping;
-		body.fixedRotation = rigid->fixedRotate;		
-		body.bullet = rigid->bullet;		
+		body.position.Set(transform.position.x, transform.position.y);
+		body.angularDamping = rigid.angularDamping;
+		body.linearDamping = rigid.linearDamping;
+		body.fixedRotation = rigid.fixedRotate;		
+		body.bullet = rigid.bullet;		
 		body.userData.pointer = reinterpret_cast<uintptr_t>(&entity);
-		switch (rigid->bodyType) {
+		switch (rigid.bodyType) {
 		case 0:
 			body.type = b2_kinematicBody;
 			break;
@@ -51,40 +67,34 @@ void geProject::Physics::addEntity(Entity& entity) {
 		bodies[entity.id] = worldBody;
 		
 		if ((entity.compMask & 8) == 8) {					//Circle collider
-			for (auto& circle: entitymanager->getCircleColliderComponents(entity.id)) {
-				addCircleCollider(circle);
+			for (auto& circle: entitymanager.getCircleColliderComponents(entity.id)) {
+				addCircleCollider(circle, entity.id);
 			}
 		}
 		if ((entity.compMask & 16) == 16) {			//Box collider
-			for (auto& box : entitymanager->getBoxColliderComponents(entity.id)) {
-				addBoxCollider(box);				
+			for (auto& box : entitymanager.getBoxColliderComponents(entity.id)) {
+				addBoxCollider(box, entity.id);
 			}
 		}
 	}	
 }
 
 
-void geProject::Physics::addBoxCollider(BoxCollider& box) {	
-	Transform transform = *entitymanager->getTransformComponent(box.entityAssigned);
-	Rigidbody rigid = *entitymanager->getRigidBodyComponent(box.entityAssigned);
-	b2PolygonShape shape = b2PolygonShape();
-	Entity currentEntity = *entitymanager->getEntity(box.entityAssigned);
-	b2Body& body = *bodies[currentEntity.id];
+void geProject::Physics::addBoxCollider(BoxCollider box, int entityId) {
+	b2PolygonShape shape = b2PolygonShape();	
+	b2Body& body = *bodies[entityId];
 	b2FixtureDef shapeFixture;
-	shape.SetAsBox(box.boxSize[0] * 0.5f, box.boxSize[1] * 0.5f, b2Vec2(box.offset[0], box.offset[1]), 0);		
+	shape.SetAsBox(box.boxSize[0] * 0.5f, box.boxSize[1] * 0.5f, b2Vec2(box.offset[0], box.offset[1]), 0);
 	shapeFixture.shape = &shape;	
 	shapeFixture.density = 1;
 	shapeFixture.isSensor = box.sensor;
-
 	body.CreateFixture(&shapeFixture);
 	std::cout << "added physics objects: " << bodies.size() << std::endl;	
-	
 }
 
-void geProject::Physics::addCircleCollider(CircleCollider& circle) {
-	b2CircleShape shape = b2CircleShape();
-	Entity currentEntity = *entitymanager->getEntity(circle.entityAssigned);
-	b2Body& body = *bodies[currentEntity.id];
+void geProject::Physics::addCircleCollider(CircleCollider circle, int entityId) {
+	b2CircleShape shape = b2CircleShape();	
+	b2Body& body = *bodies[entityId];
 	b2FixtureDef shapeFixture;
 	shape.m_p.Set(circle.offset[0], circle.offset[1]);
 	shape.m_radius = circle.radius;
@@ -213,6 +223,7 @@ void geProject::Physics::updateCircleCollider(CircleColliderEvent* e){
 	if (bodies.count(e->entityId) == 1) {
 		auto circle = bodies[e->entityId];
 	}
+	
 }
 
 
@@ -220,6 +231,7 @@ void geProject::Physics::updateCircleCollider(CircleColliderEvent* e){
 
 void geProject::Physics::deleteEntityPhysics(DeleteEntityEvent* e){	
 	removeEntity(e->entityId);
+	
 }
 
 

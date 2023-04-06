@@ -65,26 +65,29 @@ void geProject::RenderBatch::init() {
 	glEnableVertexAttribArray(4);
 }
 
-void geProject::RenderBatch::addSprite(SpriteRender* sprite, Transform* transform) {	
-	if (spriteNum <= maxBatch && sprite->zIndex == zIndex) {
+void geProject::RenderBatch::addSprite(int entityId, int count) {
+	Transform transform = entitymanager.getTransformComponent(entityId);
+	SpriteRender sprite = entitymanager.getSpriteComponent(entityId);
+	
+	if (spriteNum <= maxBatch && sprite.zIndex == zIndex) {
 		int index = spriteNum * 4 * vertSize;
-		std::cout << index << std::endl;
+		//std::cout << index << std::endl;
 		if (vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] != 0.0f) { // get the index where the object id is stored
 			index = getUnusedRenderSection();
 		}	
 		//load in new texture into texture array if not present, leave 0th element for normal colors		
-		if (sprite->spriteSheetId == 0 && sprite->textureId > 0 && textures[sprite->textureId] == nullptr) {
-			textures[sprite->textureId] = resourcemanager.requestTexture(sprite->textureId);
+		if (sprite.spriteSheetId == 0 && sprite.textureId > 0 && textures[sprite.textureId] == nullptr) {
+			textures[sprite.textureId] = resourcemanager.requestTexture(sprite.textureId);
 		}
-		else if (sprite->spriteSheetId > 0) {
-			textures[sprite->textureId] = resourcemanager.requestSpriteSheet(sprite->textureId);
+		else if (sprite.spriteSheetId > 0) {
+			textures[sprite.textureId] = resourcemanager.requestSpriteSheet(sprite.textureId);
 		}		
-		transform->dirtyFlag[2] = index;	
-		transform->dirtyFlag[0] = 0;	
+		
+		entitymanager.updateDirtyFlags(entityId, 0, count, index);
 		if (index == -1) {
 			std::cout << "test error" << std::endl;
 		}
-		createVertices(sprite, transform->position[0], transform->position[1], transform->scale[0], transform->scale[1], transform->rotation, index);
+		createVertices(sprite, transform.position[0], transform.position[1], transform.scale[0], transform.scale[1], transform.rotation, index);
 		hasUpdate = true;
 		spriteNum++;
 	}
@@ -101,21 +104,23 @@ void geProject::RenderBatch::addMapTile(SpriteRender sprite, int ssId, float x, 
 		auto map = resourcemanager.requestLevelMap(ssId);
 		
 		textures[map->getTextureId()] = map;
-		createVertices(&sprite, x, y, 0.25f, 0.25f, 0, index);
+		createVertices(sprite, x, y, 0.25f, 0.25f, 0, index);
 		spriteNum++;
 	}
 }
 
-void geProject::RenderBatch::updateSprite(SpriteRender* sprite, Transform* transform) {
-	if (sprite->zIndex == zIndex) {
-		createVertices(sprite, transform->position[0], transform->position[1], transform->scale[0], transform->scale[1], transform->rotation, transform->dirtyFlag[2]);
-		transform->dirtyFlag[0] = 0;	
+void geProject::RenderBatch::updateSprite(int entityId) {
+	Transform transform = entitymanager.getTransformComponent(entityId);
+	SpriteRender sprite = entitymanager.getSpriteComponent(entityId);
+	if (sprite.zIndex == zIndex) {
+		createVertices(sprite, transform.position[0], transform.position[1], transform.scale[0], transform.scale[1], transform.rotation, transform.dirtyFlag[2]);			
+		entitymanager.updateDirtyFlags(entityId, 0, transform.dirtyFlag[1], transform.dirtyFlag[2]);
 		hasUpdate = true;
 	}
 }
 
 
-void geProject::RenderBatch::createVertices(SpriteRender* sprite, float x, float y, float scaleX, float scaleY, float rotation, unsigned int index) {
+void geProject::RenderBatch::createVertices(SpriteRender sprite, float x, float y, float scaleX, float scaleY, float rotation, unsigned int index) {
 	
 	for (int i = 0; i < 4; i++) {
 		switch (i) {
@@ -144,14 +149,14 @@ void geProject::RenderBatch::createVertices(SpriteRender* sprite, float x, float
 			vertices[index] = newVerts[0];
 			vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = newVerts[1];
 		}
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = sprite->color[0]; //r
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = sprite->color[1]; //g
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = sprite->color[2]; //b
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 5] = sprite->color[3]; //a
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 6] = sprite->texturePos[i][0]; //texture coord x
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 7] = sprite->texturePos[i][1]; //texture coord y
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 8] = (float)sprite->textureId; // texture id
-		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] = (float)sprite->entityId + 1;
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = sprite.color[0]; //r
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = sprite.color[1]; //g
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = sprite.color[2]; //b
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 5] = sprite.color[3]; //a
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 6] = sprite.texturePos[i][0]; //texture coord x
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 7] = sprite.texturePos[i][1]; //texture coord y
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 8] = (float)sprite.textureId; // texture id
+		vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] = (float)sprite.entityId + 1;
 		index += vertSize;
 	}
 }

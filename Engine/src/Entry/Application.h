@@ -11,6 +11,8 @@
 #include "../SceneManager/LevelScene.h"
 #include "../Clock/Clock.h"
 #include <ge_engine/Core.h>
+#include <ge_engine/Managers.h>
+#include <ge_engine/PhysicsManager.h>
 
 namespace geProject {
 	class Application

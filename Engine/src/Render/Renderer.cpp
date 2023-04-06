@@ -69,53 +69,26 @@ void geProject::Renderer::renderMap(int mapId){
 	
 }
 
-void geProject::Renderer::addSpriteToBatch(SpriteRender* sprite, Transform* transform) {
-	//auto rList = std::make_shared<RenderBatch>(RenderBatch(maxBatch));
-	//renderList.push_back(rList);		
-	//if there are no batches added a new batch with zindex
-	//if (renderList.size() == 0) {
-	//	count++;
-	//	renderList.push_back(RenderBatch(maxBatch, sprite->zIndex, *resourceManager));
-	//}
-	//if there are batches go through until batch is found
-	//else if (renderList.size() > 0){
-		
-		//if no batch with zindex found, then insert a new batch in sequential zindex order
-		/*
-		if (count > (renderList.size() - 1) || sprite->zIndex != renderList[count].getZindex()) {
-			renderList.insert(renderList.begin() + count, RenderBatch(maxBatch, sprite->zIndex, *resourceManager));
-		}
-		//if batch is found check if it is full, if it is full then create a new batch next to old batch
-		else if (sprite->zIndex == renderList[count].getZindex()) {
-			if (renderList[count].isBatchFull() || renderList[count].isTextureFull(sprite->textureId)) {
-				count++;
-				
-			}
-		}
-		*/		
-	//}	
-	int count = getZindexBatch(sprite->zIndex);	
-	transform->dirtyFlag[1] = count;	
-	renderList[count].addSprite(sprite, transform);	
+void geProject::Renderer::addSpriteToBatch(int entityId) {
+	int count = getZindexBatch(entitymanager.getZindex(entityId));
+	renderList[count].addSprite(entityId, count);	
 }
 
-void geProject::Renderer::updateSprite(SpriteRender* sprite, Transform* transform) {	
-	if (transform->dirtyFlag[2] > -1) {
-
+void geProject::Renderer::updateSprite(int entityId) {
+	int vertexStatus = entitymanager.getVertexStatus(entityId);
+	int zIndex = entitymanager.getZindex(entityId);
+	if (vertexStatus > -1) {
+		int batchStatus = entitymanager.getBatchStatus(entityId);
 		//if zIndex is different from the current entities renderbatch
-		if (sprite->zIndex != renderList[transform->dirtyFlag[1]].getZindex()) {
+		if (zIndex != renderList[batchStatus].getZindex()) {
 			//remove the entity from the renderbatch and switch the renderbatch to the new z index;
-			renderList[transform->dirtyFlag[1]].removeVertices(transform->dirtyFlag[2]);
-			transform->dirtyFlag[1] = getZindexBatch(sprite->zIndex);
-			//find an unused section of the renderbatch
-			int newIndex = renderList[transform->dirtyFlag[1]].getUnusedRenderSection();
-			if (newIndex > -1) {
-				transform->dirtyFlag[2] = newIndex;
-			}		
-			renderList[transform->dirtyFlag[1]].addSprite(sprite, transform);
+			renderList[batchStatus].removeVertices(vertexStatus);
+			int count = getZindexBatch(zIndex);
+			//find an unused section of the renderbatch	
+			renderList[batchStatus].addSprite(entityId, count);
 		}
-		else if (transform->dirtyFlag[0] == 1) {
-			renderList[transform->dirtyFlag[1]].updateSprite(sprite, transform);
+		else if (entitymanager.getUpdateStatus(entityId) == 1) {
+			renderList[batchStatus].updateSprite(entityId);
 		}
 	}
 }
@@ -151,4 +124,5 @@ void geProject::Renderer::clear() {
 
 void geProject::Renderer::deleteEntity(DeleteEntityEvent* e){
 	renderList[e->renderBatch].removeVertices(e->renderIndex);
+	delete(e);
 }

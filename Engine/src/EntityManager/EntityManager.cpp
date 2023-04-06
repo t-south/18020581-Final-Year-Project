@@ -1,8 +1,12 @@
 #include "EntityManager.h"
 
 
-geProject::EntityManager::EntityManager(uInt max): maxEntities(max), entityUpdated(false), entitiesDeleted(0)
-{	
+
+geProject::EntityManager::EntityManager() {}
+geProject::EntityManager::~EntityManager(){}
+
+void geProject::EntityManager::startUp()
+{
 	eventSystem.subscribe(this, &EntityManager::updateTransform);
 	eventSystem.subscribe(this, &EntityManager::updateSprite);
 	eventSystem.subscribe(this, &EntityManager::updateRigidBody);
@@ -13,10 +17,6 @@ geProject::EntityManager::EntityManager(uInt max): maxEntities(max), entityUpdat
 	eventSystem.subscribe(this, &EntityManager::EndContact);
 	eventSystem.subscribe(this, &EntityManager::PreSolve);
 	eventSystem.subscribe(this, &EntityManager::PostSolve);
-}
-
-geProject::EntityManager::~EntityManager()
-{
 }
 
 int geProject::EntityManager::addEntity(entityTypes type) {
@@ -94,16 +94,16 @@ void geProject::EntityManager::deleteEntity(int entityId){
 void geProject::EntityManager::copyEntity(int entityId){
 	unsigned int mask = entities[entityId]->compMask;
 	int newEntityId = addEntity(entities[entityId]->type);
-	Transform newtransform = *getTransformComponent(entityId);	
+	Transform newtransform = getTransformComponent(entityId);	
 	newtransform.id = 0;
 	newtransform.position += 0.1f;
 	assignTransform(newEntityId, newtransform);
-	assignSpriteRender(newEntityId, *getSpriteComponent(entityId));
+	assignSpriteRender(newEntityId, getSpriteComponent(entityId));
 	for (int i = 4; i <= 64; i = i << 1) {//powers of 2, optional components onwards
 		int compmask = i & mask;
 		switch (compmask) {
 		case 4:
-			assignRigidBody(newEntityId, *getRigidBodyComponent(entityId));
+			assignRigidBody(newEntityId, getRigidBodyComponent(entityId));
 			break;
 		case 8:
 			for (auto& circle : componentCircleCollider[entityId]) {
@@ -117,19 +117,19 @@ void geProject::EntityManager::copyEntity(int entityId){
 			
 			break;
 		case 32:
-			assignAnimation(newEntityId, *getAnimationComponent(entityId));
+			assignAnimation(newEntityId, getAnimationComponent(entityId));
 			break;
 		
 		case 64:
-			assignController(newEntityId, *getControllerComponent(entityId));
+			assignController(newEntityId, getControllerComponent(entityId));
 			break;
 
 		case 128:
-			assignHealth(newEntityId, *getHealthComponent(entityId));
+			assignHealth(newEntityId, getHealthComponent(entityId));
 			break;
 
 		case 256:
-			assignDamage(newEntityId, *getDamageComponent(entityId));
+			assignDamage(newEntityId, getDamageComponent(entityId));
 			break;
 
 		default:
@@ -222,7 +222,7 @@ void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) 
 		componentBoxCollider[entityId].push_back(box);
 		if ((entities[entityId]->compMask & BoxColliderType) != BoxColliderType) {
 			entities[entityId]->compMask = entities[entityId]->compMask | box.id;
-		}		
+		}				
 	}
 	else{
 		std::cout << "unable to assign box collider" << std::endl;
@@ -328,43 +328,62 @@ std::vector<geProject::Controls*> geProject::EntityManager::getControllerCompone
 	return componentController;
 }
 
-std::vector<geProject::Health*> geProject::EntityManager::getHealthComponents()
-{
+std::vector<geProject::Health*> geProject::EntityManager::getHealthComponents(){
 	return componentHealth;
 }
 
-std::vector<geProject::Damage*> geProject::EntityManager::getDamageComponents()
-{
+std::vector<geProject::Damage*> geProject::EntityManager::getDamageComponents(){
 	return componentDamage;
 }
 
 
-
-geProject::Transform* geProject::EntityManager::getTransformComponent(int entityId) {
-	return componentTransforms[entityId];
-}
-geProject::SpriteRender* geProject::EntityManager::getSpriteComponent(int entityId) {
-	return componentSpriteRender[entityId];
-}
-geProject::Rigidbody* geProject::EntityManager::getRigidBodyComponent(int entityId) {
-	return componentRigidBody[entityId];
-}
-geProject::Animation* geProject::EntityManager::getAnimationComponent(int entityId) {
-	return componentAnimation[entityId];
+int geProject::EntityManager::getUpdateStatus(int entityId) {
+	return componentTransforms[entityId]->dirtyFlag[0];
 }
 
-geProject::Controls* geProject::EntityManager::getControllerComponent(int entityId){
-	return componentController[entityId];
+int geProject::EntityManager::getBatchStatus(int entityId) {
+	return componentTransforms[entityId]->dirtyFlag[1];
 }
 
-geProject::Health* geProject::EntityManager::getHealthComponent(int entityId)
-{
-	return componentHealth[entityId];
+int geProject::EntityManager::getVertexStatus(int entityId) {
+	return componentTransforms[entityId]->dirtyFlag[2];
 }
 
-geProject::Damage* geProject::EntityManager::getDamageComponent(int entityId)
-{
-	return componentDamage[entityId];
+int geProject::EntityManager::getZindex(int entityId){
+	return componentSpriteRender[entityId]->zIndex;
+}
+
+geProject::Entity geProject::EntityManager::getEntity(int entityId) {	
+	if (entities.size() > 0) {			
+		return *entities[entityId];
+	}
+}
+
+
+
+geProject::Transform geProject::EntityManager::getTransformComponent(int entityId) {
+	return *componentTransforms[entityId];
+}
+geProject::SpriteRender geProject::EntityManager::getSpriteComponent(int entityId) {
+	return *componentSpriteRender[entityId];
+}
+geProject::Rigidbody geProject::EntityManager::getRigidBodyComponent(int entityId) {
+	return *componentRigidBody[entityId];
+}
+geProject::Animation geProject::EntityManager::getAnimationComponent(int entityId) {
+	return *componentAnimation[entityId];
+}
+
+geProject::Controls geProject::EntityManager::getControllerComponent(int entityId){
+	return *componentController[entityId];
+}
+
+geProject::Health geProject::EntityManager::getHealthComponent(int entityId){
+	return *componentHealth[entityId];
+}
+
+geProject::Damage geProject::EntityManager::getDamageComponent(int entityId){
+	return *componentDamage[entityId];
 }
 
 std::vector<geProject::CircleCollider> geProject::EntityManager::getCircleColliderComponents(int entityId) {
@@ -396,65 +415,64 @@ void geProject::EntityManager::assignUpdate() {
 	entityUpdated = true;
 }
 
+void geProject::EntityManager::updateDirtyFlags(int entityId ,int update, int batch, int vertex) {
+	componentTransforms[entityId]->dirtyFlag = glm::vec3(update, batch, vertex);
+}
 
 //EVENT LISTENERS
 void geProject::EntityManager::updateTransform(TransformEvent* event) {
-	auto newTransform = componentTransforms[event->entityId];
+	Transform* newTransform = componentTransforms[event->entityId];
 	newTransform->position[0] = event->posX;
 	newTransform->position[1] = event->posY;
 	newTransform->rotation = event->rotation;
 	//newTransform->centre = getCentre(newTransform->position, glm::vec2(newTransform->position[0] + (1 * newTransform->scale.x), newTransform->position[1] + (1 * newTransform->scale.y)));
-	
-	componentTransforms[event->entityId]->dirtyFlag[0] = 1;
+	componentTransforms[event->entityId]->dirtyFlag[0] = 1;	
 }
 
-
-
-
-//EVENT LISTENERS
 void geProject::EntityManager::updateSprite(SpriteEvent* event) {
 	assignSpriteRender(event->entityId, *event->sprite);
 }
 
 void geProject::EntityManager::updateRigidBody(RigidEvent* event) {
-	assignRigidBody(event->entityId, *event->rigidbody);
+	assignRigidBody(event->entityId, *event->rigidbody);	
 }
 
 void geProject::EntityManager::updateBoxCollider(BoxColliderEvent* event) {
-	assignBoxCollider(event->entityId, BoxCollider{ .boxSize = {event->boxSizeX, event->boxSizeY} });
+	assignBoxCollider(event->entityId, BoxCollider{ .boxSize = {event->boxSizeX, event->boxSizeY} });	
 }
 
 void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event) {
-	assignCircleCollider(event->entityId, CircleCollider{});
+	assignCircleCollider(event->entityId, CircleCollider{});	
 }
 
 
 
 
 //PHYSICS EVENT LISTENERS
-void geProject::EntityManager::BeginContact(BeginContactEvent* event){
+void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
 	//std::cout << "begin contact" << std::endl;
-	switch (event->entityA->type) {	
-		case entityTypes::player:
-			break;
+	switch (event->entityA->type) {
+	case entityTypes::player:
+		break;
 
-		case entityTypes::enemy:
-			break;
-		
-		case entityTypes::environment:
-			if (event->entityB->type == player) {
-				componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 0, 0, 1);
-				componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
-			}
-			if (event->entityB->type == enemy) {
-				componentSpriteRender[event->entityA->id]->color = glm::vec4(0, 1, 0, 1);
-				componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
-			}
-			break;
+	case entityTypes::enemy:
+		break;
 
-		default:
-			break;
+	case entityTypes::environment:
+		if (event->entityB->type == player) {
+			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 0, 0, 1);
+			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
 		}
+		if (event->entityB->type == enemy) {
+			componentSpriteRender[event->entityA->id]->color = glm::vec4(0, 1, 0, 1);
+			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
+		}
+		break;
+
+	default:
+		break;
+	}
+
 
 }
 
@@ -481,7 +499,7 @@ void geProject::EntityManager::EndContact(EndContactEvent* event){
 	default:
 		break;
 	}
-
+	
 }
 
 void geProject::EntityManager::PreSolve(PresolveEvent* event){
@@ -490,7 +508,7 @@ void geProject::EntityManager::PreSolve(PresolveEvent* event){
 }
 
 void geProject::EntityManager::PostSolve(PostsolveEvent* event){
-
+	
 
 }
 
@@ -508,12 +526,7 @@ int geProject::EntityManager::getEntityNum() {
 	return entities.size();
 }
 
-geProject::Entity* geProject::EntityManager::getEntity(int entityId) {
-	if (entities.size() > 0) {
-		return entities[entityId];
-	}
-	return new Entity();
-}
+
 
 std::vector<geProject::Entity*> geProject::EntityManager::getEntities() {
 	return entities;
@@ -536,9 +549,9 @@ void geProject::EntityManager::endFrame() {
 //IMGUI
 void geProject::EntityManager::updateImgui(int entityId) {	
 	if (entityId > -1) {
-		auto entity = getEntity(entityId);
-		auto sprite = getSpriteComponent(entityId);
-		auto trans = getTransformComponent(entityId);
+		Entity entity = getEntity(entityId);
+		SpriteRender* sprite = componentSpriteRender[entityId];
+		Transform* trans = componentTransforms[entityId];
 		static char newName[256];
 		//TRANSFORM IMGUI updates
 		float positionX = trans->position[0];
@@ -553,7 +566,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 		if (ImGui::BeginTabBar("Editor Tabs"))
 			if (ImGui::BeginTabItem("Shortcuts")) {
 				if (ImGui::Button("Copy", ImVec2(100, 50))) {
-					copyEntity(entity->id);
+					copyEntity(entity.id);
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Delete", ImVec2(100, 50))) {
@@ -651,7 +664,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 	
 		//ANIMATION IMGUI UPDATES
 
-		if ((entity->compMask & 32) == 32) {
+		if ((entity.compMask & 32) == 32) {
 			if (ImGui::BeginTabItem("Animation")) {
 				bool loop = componentAnimation[entityId]->loopAnimation;
 				float speed = componentAnimation[entityId]->speed;
@@ -671,21 +684,21 @@ void geProject::EntityManager::updateImgui(int entityId) {
 		
 		
 		//RIGIDBODY IMGUI updates
-		if ((entity->compMask & 4) == 4) {
+		if ((entity.compMask & 4) == 4) {
 			if (ImGui::BeginTabBar("Editor Tabs")) {
 				if (ImGui::BeginTabItem("RigidBody")) {
 					auto rigid = getRigidBodyComponent(entityId);
-					int collider = rigid->collider;
-					float friction = rigid->friction;
-					float velocityX = rigid->velocity[0];
-					float velocityY = rigid->velocity[1];
-					float velocityZ = rigid->velocity[2];
-					float aDamp = rigid->angularDamping;
-					float lDamp = rigid->linearDamping;
-					float density = rigid->density;
-					bool fRotate = rigid->fixedRotate;
-					bool bullet = rigid->bullet;
-					int bType = rigid->bodyType;
+					int collider = rigid.collider;
+					float friction = rigid.friction;
+					float velocityX = rigid.velocity[0];
+					float velocityY = rigid.velocity[1];
+					float velocityZ = rigid.velocity[2];
+					float aDamp = rigid.angularDamping;
+					float lDamp = rigid.linearDamping;
+					float density = rigid.density;
+					bool fRotate = rigid.fixedRotate;
+					bool bullet = rigid.bullet;
+					int bType = rigid.bodyType;
 
 					if (ImGui::InputInt("body type", &bType)) {
 						if (bType > 2) {
@@ -694,55 +707,55 @@ void geProject::EntityManager::updateImgui(int entityId) {
 						else if (bType < 0) {
 							bType++;
 						}
-						rigid->bodyType = bType;
+						rigid.bodyType = bType;
 						rigidUpdate = true;
 					}
 					if (ImGui::DragInt("rigidBody", &collider)) {
-						rigid->collider = collider;
+						rigid.collider = collider;
 						rigidUpdate = true;
 					}
 					if (ImGui::DragFloat("friction", &friction)) {
-						rigid->friction = friction;
+						rigid.friction = friction;
 						rigidUpdate = true;
 					}
 					if (ImGui::DragFloat("angular damping", &aDamp)) {
-						rigid->angularDamping = aDamp;
+						rigid.angularDamping = aDamp;
 						rigidUpdate = true;
 					}
 					if (ImGui::DragFloat("linear damping", &lDamp)) {
-						rigid->linearDamping = lDamp;
+						rigid.linearDamping = lDamp;
 						rigidUpdate = true;
 					}
 					if (ImGui::InputFloat("density", &density)) {
-						rigid->density = density;
+						rigid.density = density;
 						rigidUpdate = true;
 					}
 					if (ImGui::Checkbox("fixed rotate", &fRotate)) {
-						rigid->fixedRotate = fRotate;
+						rigid.fixedRotate = fRotate;
 						rigidUpdate = true;
 					}
 					if (ImGui::Checkbox("bullet", &bullet)) {
-						rigid->bullet = bullet;
+						rigid.bullet = bullet;
 						rigidUpdate = true;
 					}
 
 					if (ImGui::DragFloat("velocityX", &velocityX)) {
-						rigid->velocity[0] = velocityX;
+						rigid.velocity[0] = velocityX;
 						rigidUpdate = true;
 					}
 					if (ImGui::DragFloat("velocityY", &velocityY)) {
-						rigid->velocity[1] = velocityY;
+						rigid.velocity[1] = velocityY;
 						rigidUpdate = true;
 					}
 					if (ImGui::DragFloat("velocityZ", &velocityZ)) {
-						rigid->velocity[2] = velocityZ;
+						rigid.velocity[2] = velocityZ;
 						rigidUpdate = true;
 					}
 					if (ImGui::Button("Delete Rigidbody")) {
 						deleteComponent(entityId, 4);
 					}
 					if (rigidUpdate) {
-						eventSystem.publishImmediately(new RigidEvent(EditorContext | ImGuiContext, entityId, *rigid));
+						eventSystem.publishImmediately(new RigidEvent(EditorContext | ImGuiContext, entityId, rigid));
 					}
 					ImGui::EndTabItem();
 				}
@@ -753,7 +766,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 		
 
 		//CIRCLE COLLIDER IMGUI updates
-		if ((entity->compMask & 8) == 8) {
+		if ((entity.compMask & 8) == 8) {
 			if (ImGui::BeginTabBar("Editor Tabs")) {
 				if (ImGui::BeginTabItem("Circle Colliders")) {
 					int count = 0;
@@ -802,7 +815,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 		}
 
 		//BOX COLLIDER IMGUI updates
-		if ((entity->compMask & 16) == 16) {
+		if ((entity.compMask & 16) == 16) {
 			if (ImGui::BeginTabBar("Editor Tabs")) {
 
 				if (ImGui::BeginTabItem("Box Colliders")) {
@@ -872,7 +885,7 @@ void geProject::EntityManager::updateImgui(int entityId) {
 
 
 		if (ImGui::BeginPopupContextWindow("UniqueId")) {
-			if ((entity->compMask & 4) != 4) {
+			if ((entity.compMask & 4) != 4) {
 				if (ImGui::MenuItem("Add Rigidbody")) {
 					assignRigidBody(entityId, Rigidbody());
 				}

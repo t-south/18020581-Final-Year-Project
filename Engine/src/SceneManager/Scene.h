@@ -14,6 +14,8 @@
 #include "../Controller/PlayerController.h"
 #include "../Controller/Receiver.h"
 #include "../EntityManager/EntityManager.h"
+#include <ge_engine/PhysicsManager.h>
+//#include <ge_engine/Managers.h>
 
 
 
@@ -22,9 +24,7 @@ namespace geProject {
 	class Scene {
 	public:
 		virtual void update(float deltaTime) = 0;
-		virtual void init() = 0;
-		virtual size_t addEntityToScene(unsigned int entityId) = 0;
-		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) = 0;		
+		virtual void init() = 0;	
 		virtual void updateImgui() = 0;
 		virtual void updateSceneImgui() = 0;
 		virtual void render(std::string shaderPath) = 0;	
@@ -45,14 +45,13 @@ namespace geProject {
 		void deserialize(std::string filepath);
 		void setPhysics(bool check);
 		//friend class SceneSerialize;
-	protected:
-		std::unordered_map<int, Entity*> entities;		
+	protected:	
 		static Window* gameWindow;
 		static MouseListener* mouse;
 		static KeyboardListener* keyboard;
 		//MANAGERS
-		static Physics* physicsmanager;
-		static EntityManager* entitymanager;
+		//static Physics* physicsmanager;
+		//static EntityManager* entitymanager;
 		static AnimationManager* animationManager;
 		static Receiver* controlManager;		
 		static Renderer* rendermanager;

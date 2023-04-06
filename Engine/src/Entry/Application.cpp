@@ -3,6 +3,8 @@
 geProject::EventHandler eventSystem;
 geProject::ResourceManager resourcemanager;
 geProject::WorldState worldstate;
+geProject::EntityManager entitymanager;
+geProject::Physics physicsmanager;
 
 namespace geProject {
 	Application::Application() {

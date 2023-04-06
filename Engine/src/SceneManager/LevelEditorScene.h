@@ -11,8 +11,6 @@ namespace geProject {
 		LevelEditorScene();
 		~LevelEditorScene();		
 		virtual void update(float deltaTime) override;	
-		virtual size_t addEntityToScene(unsigned int entityId) override;
-		virtual void reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) override;	
 		virtual void updateImgui() override;
 		virtual void updateSceneImgui() override;
 		virtual void render(std::string shaderPath) override;

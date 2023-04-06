@@ -20,18 +20,20 @@ namespace geProject {
 		AnimationType = (1 << 5),		/* 0b0000000000100000 */
 	};
 
+	
 
 	class EntityManager {
+		
 		typedef unsigned int uInt;
 	public:
-		EntityManager(uInt max);
+		EntityManager(/*uInt max*/);
 		~EntityManager();
 		//Entities
+		void startUp();
 		int addEntity(entityTypes type);
 		void deleteEntity(int entityId);
 		void copyEntity(int entityId);
 		int getEntityNum();
-		Entity* getEntity(int entityId);
 
 		std::vector<Entity*> getEntities();
 		//Components
@@ -53,27 +55,33 @@ namespace geProject {
 		std::vector <Controls*> getControllerComponents();
 		std::vector<Health*> getHealthComponents();
 		std::vector <Damage*> getDamageComponents();
+		int getUpdateStatus(int entityId);
+		int getBatchStatus(int entityId);
+		int getVertexStatus(int entityId);
+		int getZindex(int entityId);
 
-		Transform* getTransformComponent(int entityId);
-		SpriteRender* getSpriteComponent(int entityId);
-		Rigidbody* getRigidBodyComponent(int entityId);
-		std::vector<BoxCollider> getBoxColliderComponents(int entityId);
+		Entity getEntity(int entityId);
+		Transform getTransformComponent(int entityId);
+		SpriteRender getSpriteComponent(int entityId);
+		Rigidbody getRigidBodyComponent(int entityId);
+		Animation getAnimationComponent(int entityId);
+		Controls getControllerComponent(int entityId);
+		Health getHealthComponent(int entityId);
+		Damage getDamageComponent(int entityId);
 		std::vector<CircleCollider> getCircleColliderComponents(int entityId);
-		Animation* getAnimationComponent(int entityId);
-		Controls* getControllerComponent(int entityId);
-		Health* getHealthComponent(int entityId);
-		Damage* getDamageComponent(int entityId);
+		std::vector<BoxCollider> getBoxColliderComponents(int entityId);
 
 		void updateImgui(int entityId);
 		bool hasUpdate();
 		void endFrame();
 		void reloadManager();
 		void assignUpdate();
+		void updateDirtyFlags(int entityId, int update, int batch, int vertex);
 		int getPlayerId();
 		std::vector<int> getEnemyIds();
 	private:		
-		bool entityUpdated;
-		uInt maxEntities;
+		bool entityUpdated{ false };
+		uInt maxEntities{ 10000 };
 
 		int playerId{ -1 };
 		std::vector<int> enemyIds;

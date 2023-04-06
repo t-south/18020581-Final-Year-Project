@@ -1,8 +1,8 @@
 #pragma once
 #include "Controller.h"
 #include "../Cameras/Camera.h"
-#include "../Physics/Physics.h"
-#include "../EntityManager/EntityManager.h"
+#include <ge_engine/Managers.h>
+#include <ge_engine/PhysicsManager.h>
 #include <cmath>
 
 
@@ -10,7 +10,7 @@
 namespace geProject {
 	class PlayerController : public Controller {
 	public:
-		PlayerController(EntityManager& entitymanager, Physics& physicsmanager, Camera& camera, int entity);
+		PlayerController(/*EntityManager& entitymanager, Physics& physicsmanager,*/ Camera& camera);
 		virtual void dash() override;
 		virtual void attack() override;
 		virtual void specialAttack() override;
@@ -24,7 +24,7 @@ namespace geProject {
 		float dt;
 		int entityId;		
 		Camera& playerCamera;
-		EntityManager& entitymanager;
-		Physics& physicsmanager;
+		//EntityManager& entitymanager;
+		//Physics& physicsmanager;
 	};
 }

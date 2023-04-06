@@ -1,7 +1,9 @@
 #include "PlayerController.h"
 
 
-geProject::PlayerController::PlayerController(EntityManager& emanager, Physics& pmanager, Camera& camera, int entity): entitymanager(emanager), physicsmanager(pmanager),playerCamera(camera), entityId(entity){
+geProject::PlayerController::PlayerController(/*EntityManager& emanager, Physics& pmanager,*/ Camera& camera) : /*entitymanager(emanager), physicsmanager(pmanager),*/ playerCamera(camera){
+	dt = 0;
+	entityId = entitymanager.getPlayerId();
 	eventSystem.subscribe(this, &PlayerController::rotateToCursor);
 }
 
@@ -34,8 +36,8 @@ void geProject::PlayerController::moveTo(float x, float y){
 void geProject::PlayerController::rotateToCursor(MouseMoveEvent* mouseMove){
 	if (mouseMove->contextCheck(GameplayContext)) {
 		//PI / 2 = 1.571 Rad
-		Transform* trans = entitymanager.getTransformComponent(entityId);
-		float rotate = atan2((mouseMove->posY - trans->position[1]), (mouseMove->posX - trans->position[0]));		
+		Transform trans = entitymanager.getTransformComponent(entityId);
+		float rotate = atan2((mouseMove->posY - trans.position[1]), (mouseMove->posX - trans.position[0]));		
 		physicsmanager.applyRotation(entityId, rotate - 1.571);
 
 	}
@@ -52,8 +54,8 @@ void geProject::PlayerController::update(float deltaTime){
 		entityId = entitymanager.getPlayerId();
 	}
 	if (eventSystem.getContext() == GameplayContext) {
-		Transform* trans = entitymanager.getTransformComponent(entityId);
-		playerCamera.setCentredPosition(trans->position[0], trans->position[1]);
+		Transform trans = entitymanager.getTransformComponent(entityId);
+		playerCamera.setCentredPosition(trans.position[0], trans.position[1]);
 	}
 }
 

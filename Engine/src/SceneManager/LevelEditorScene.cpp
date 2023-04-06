@@ -9,8 +9,9 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	eventSystem.subscribe(this, &LevelEditorScene::updateCopy);
 	eventSystem.subscribe(this, &LevelEditorScene::keyCopyEntity);
 	std::cout << "Editor Scene!" << std::endl;	
-	entitymanager = new EntityManager(10000);
-	animationManager = new AnimationManager(*entitymanager);	
+	//entitymanager = new EntityManager(10000);
+	entitymanager.startUp();
+	animationManager = new AnimationManager(/**entitymanager*/);	
 	rendermanager = new Renderer();
 	camera = new EditorCamera(glm::vec2(0.0f, 0.0f));	
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
@@ -28,7 +29,8 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	int worldHeight = mapDims->getSpriteSheetHeight();
 	worldstate.generateWorldMap(worldWidth, worldHeight);
 	selectionTextures = new FrameBuffer(1920, 1080, true);	
-	physicsmanager = new Physics(*entitymanager);
+	//physicsmanager = new Physics(/**entitymanager*/);
+	physicsmanager.startUp();
 	controlManager = new Receiver();
 	sceneHierarchy = new HierarchyWindow();	
 	init();
@@ -40,45 +42,29 @@ geProject::LevelEditorScene::~LevelEditorScene(){}
 
 void geProject::LevelEditorScene::init() {
 	geProject::Scene::deserialize(filePath);
-	if (entities.size() == 0) {
-		for (int i = 0; i < entitymanager->getEntityNum(); i++) {
-			auto ent = entitymanager->getEntity(i);
-			entities[ent->id] = ent;
-			auto trans = entitymanager->getTransformComponent(i);
-			auto sprite = entitymanager->getSpriteComponent(i);
-			if ((ent->compMask & 4) == 4) {//check for rigidbody
-				if ((ent->compMask & 8) == 8 || (ent->compMask & 16) == 16) {//check for boxcollider or circlecollider
-					physicsmanager->addEntity(*ent);
-				}
+	for (int i = 0; i < entitymanager.getEntityNum(); i++) {
+		Entity ent = entitymanager.getEntity(i);		
+		if ((ent.compMask & 4) == 4) {//check for rigidbody
+			if ((ent.compMask & 8) == 8 || (ent.compMask & 16) == 16) {//check for boxcollider or circlecollider
+				physicsmanager.addEntity(ent.id);
 			}
-			if (trans->dirtyFlag[2] == -1) {
-				rendermanager->addSpriteToBatch(sprite, trans);
-				trans->dirtyFlag[0] = 0;
-			}
-		}	
+		}
+		if (entitymanager.getVertexStatus(ent.id) == -1) {
+			rendermanager->addSpriteToBatch(ent.id);			
+		}
+	}	
 		
-	}
+	
 	rendermanager->renderMap(1);
 	
-	int playerId = entitymanager->getPlayerId();
+	int playerId = entitymanager.getPlayerId();
 	if (playerId > -1) {
 		
-		player = new PlayerController(*entitymanager, *physicsmanager, *camera, playerId);
+		player = new PlayerController(*camera);
 	}
-	std::vector<int> enemies = entitymanager->getEnemyIds();
+	std::vector<int> enemies = entitymanager.getEnemyIds();
 }
 
-size_t geProject::LevelEditorScene::addEntityToScene(unsigned int entityId){
-	auto entity = entitymanager->getEntity(entityId);
-	entities[entity->id] = entity;
-	physicsmanager->addEntity(*entity);		
-	//rendermanager->addSpriteToBatch(entitymanager->getSpriteComponent(entityId), entitymanager->getTransformComponent(entityId));
-	return entities.size();
-}
-
-void geProject::LevelEditorScene::reAssignEntityToScene(unsigned int entitySceneId, unsigned int entityId) {
-	//entities[entitySceneId] = manager->getEntity(entityId);
-}
 
 void geProject::LevelEditorScene::update(float deltaTime) {		
 
@@ -107,21 +93,21 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	
 	//DRAG AND DROP
 	if (entityDrag == true && activatedEntity > -1) {
-		auto transform = entitymanager->getTransformComponent(activatedEntity);
+		Transform transform = entitymanager.getTransformComponent(activatedEntity);
 		float scroll = camera->getScroll();
 		float viewWidth = mouse->getViewXsize();
 		float viewHeight = mouse->getViewYsize();
 		if (gridSelected) {			
-			transform->position[0] = (int)(mouse->getCameraMouseX() / gridWidth) * gridWidth;
-			transform->position[1] = (int)(mouse->getCameraMouseY() / gridHeight) * gridHeight;
+			transform.position[0] = (int)(mouse->getCameraMouseX() / gridWidth) * gridWidth;
+			transform.position[1] = (int)(mouse->getCameraMouseY() / gridHeight) * gridHeight;
 		}
 		else {
-			transform->position[0] = mouse->getCameraMouseX() ;
-			transform->position[1] = mouse->getCameraMouseY() ;
+			transform.position[0] = mouse->getCameraMouseX() ;
+			transform.position[1] = mouse->getCameraMouseY() ;
 		}
 		
 		//std::cout << "Pos x: " << mouse->getCameraMouseX() << " Pos Y: " << mouse->getCameraMouseY() << " scroll: " << scroll << " gridwidth: " << gridWidth << " gridheight: " << gridHeight << std::endl;
-		entitymanager->assignTransform(activatedEntity, *transform);
+		entitymanager.assignTransform(activatedEntity, transform);
 		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && entityDrag == true) {
 			entityDrag = false;	
 			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
@@ -129,7 +115,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	}
 	//std::cout << activatedEntity << std::endl;
 	if (physicsEnabled == true) {
-		physicsmanager->update(deltaTime);
+		physicsmanager.update(deltaTime);
 	}
 
 
@@ -141,32 +127,26 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 			command->execute(*player);
 		}
 	}
+	
 
 	//UPDATES TO RENDERING
-	if (entitymanager->hasUpdate()) {
-		for (int i = 0; i < entitymanager->getEntityNum(); i++) {
-			if (entities.count(i) == 0) {
-				entities[i] = entitymanager->getEntity(i);
-			}
-			
-			auto ent = entitymanager->getEntity(i);
-			if (ent->compMask > 0 && ent->id > -1) {
-				if ((ent->compMask & 4) == 4) {//check for rigidbody
-					if ((ent->compMask & 8) == 8 || (ent->compMask & 16) == 16) {//check for boxcollider or circlecollider			
-						physicsmanager->addEntity(*ent);
+	if (entitymanager.hasUpdate()) {
+		for (int i = 0; i < entitymanager.getEntityNum(); i++) {			
+			Entity ent = entitymanager.getEntity(i);			
+			if (ent.compMask > 0 && ent.id > -1) {	
+				if ((ent.compMask & 4) == 4) {//check for rigidbody
+					if ((ent.compMask & 8) == 8 || (ent.compMask & 16) == 16) {//check for boxcollider or circlecollider			
+						physicsmanager.addEntity(ent.id);
 					}
 				}
-				// only sprites that have not been added to the renderer previously will be set to 0
-				auto trans = entitymanager->getTransformComponent(i);
-				auto sprite = entitymanager->getSpriteComponent(i);
+				// only sprites that have not been added to the renderer previously will be set to 0		
 				//transform dirtyflag for render index is by default set to -1 when first created
-				if (trans->dirtyFlag[2] == -1) {
-					rendermanager->addSpriteToBatch(sprite, trans);
-					trans->dirtyFlag[0] = 0;
+				if (entitymanager.getVertexStatus(ent.id) == -1) {
+					rendermanager->addSpriteToBatch(ent.id);			
 				}
 				//if there has been any updates the dirty flag in transform component will be set to 1
-				else if (trans->dirtyFlag[0] == 1) {
-					rendermanager->updateSprite(sprite, trans);
+				else if (entitymanager.getUpdateStatus(ent.id) == 1) {
+					rendermanager->updateSprite(ent.id);
 				}
 			}
 		}
@@ -174,33 +154,27 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	}
 	animationManager->update(deltaTime);
 	mouse->endFrame();
-
-
-
 	keyboard->endFrame();
-
-	entitymanager->endFrame();
-	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");	
-	
+	entitymanager.endFrame();
+	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");		
 	editor->render(*(camera));
-
 	//DEBUG DRAWING FOR PHYSICS
 	if (displayColliders && activatedEntity > -1) {		
-		auto colliderEntity = entitymanager->getEntity(activatedEntity);
-		auto trans = entitymanager->getTransformComponent(colliderEntity->id);
-		if ((colliderEntity->compMask & 8) == 8) {
-			for (auto& circle : entitymanager->getCircleColliderComponents(colliderEntity->id)) {
+		Entity colliderEntity = entitymanager.getEntity(activatedEntity);
+		Transform trans = entitymanager.getTransformComponent(colliderEntity.id);
+		if ((colliderEntity.compMask & 8) == 8) {
+			for (auto& circle : entitymanager.getCircleColliderComponents(colliderEntity.id)) {
 				if (circle.id > 0) {
 					//multiply by 2 since box size is set to half width / height
-					editor->addCircle(trans->position + circle.offset, glm::vec3(0.0f, 1.0f, 0.0f), circle.radius, 16, 1);
+					editor->addCircle(trans.position + circle.offset, glm::vec3(0.0f, 1.0f, 0.0f), circle.radius, 16, 1);
 				}
 			}
 		}
-		if ((colliderEntity->compMask & 16) == 16) {
-			for (auto& box : entitymanager->getBoxColliderComponents(colliderEntity->id)) {
+		if ((colliderEntity.compMask & 16) == 16) {
+			for (auto& box : entitymanager.getBoxColliderComponents(colliderEntity.id)) {
 				if (box.id > 0) {
 					//multiply by 2 since box size is set to half width / height
-					editor->addBox(trans->position + box.offset, box.boxSize, glm::vec3(0.0f, 1.0f, 0.0f), (float)trans->rotation, 1);
+					editor->addBox(trans.position + box.offset, box.boxSize, glm::vec3(0.0f, 1.0f, 0.0f), (float)trans.rotation, 1);
 				}
 			}
 		}
@@ -227,7 +201,7 @@ void geProject::LevelEditorScene::setActiveEntity(int entityId) {
 
 void geProject::LevelEditorScene::updateSceneImgui() {
 	ImGui::Begin("Inspector");
-	entitymanager->updateImgui(activatedEntity);
+	entitymanager.updateImgui(activatedEntity);
 	ImGui::End();
 	ImGui::Begin("Config");
 	ImGui::Checkbox("grid", &gridSelected);
@@ -271,7 +245,7 @@ void geProject::LevelEditorScene::updateImgui() {
 		if (ImGui::BeginTabItem("Player")) {
 			ImVec2 spriteDimensions(32, 32);
 			float spriteDim = 0.25f;
-			if (entitymanager->getPlayerId() == -1) {
+			if (entitymanager.getPlayerId() == -1) {
 				std::shared_ptr<SpriteSheet> playerSprites = resourcemanager.requestSpriteSheet(2);
 				SpriteRender newSprite = playerSprites->getSprite(0);
 				// https: //github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
@@ -323,11 +297,11 @@ void geProject::LevelEditorScene::updateImgui() {
 
 
 unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type) {
-	unsigned int entity = entitymanager->addEntity(type);
+	unsigned int entity = entitymanager.addEntity(type);
 	//float y = camera->getCameraY();		
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
-	entitymanager->assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY}});
-	entitymanager->assignSpriteRender(entity, *sprite);
+	entitymanager.assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY}});
+	entitymanager.assignSpriteRender(entity, *sprite);
 	//entities.push_back(manager->getEntity(entity));
 	entityDrag = true;	
 	setActiveEntity(entity);
@@ -335,15 +309,15 @@ unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* s
 }
 
 unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type){
-	unsigned int entity = entitymanager->addEntity(type);
+	unsigned int entity = entitymanager.addEntity(type);
 	
 	if (type == entityTypes::player) {
-		player = new PlayerController(*entitymanager, *physicsmanager, *camera, entity);
-		entitymanager->assignController(entity, Controls());
+		player = new PlayerController(*camera);
+		entitymanager.assignController(entity, Controls());
 	}	
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
-	entitymanager->assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY} });
-	entitymanager->assignSpriteRender(entity, *sprite);
+	entitymanager.assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY} });
+	entitymanager.assignSpriteRender(entity, *sprite);
 	//animationManager->assignEntityAnimation(entity, "Idle");
 	entityDrag = true;
 	setActiveEntity(entity);
@@ -400,7 +374,7 @@ void geProject::LevelEditorScene::setPicking() {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();
 		int entityId = selectionTextures->getPixel(x, y);		
-		std::cout << "entity: " << entityId << std::endl;	
+		//std::cout << "entity: " << entityId << std::endl;	
 		if (entityId == -1 && mouse->checkMouseBoundaries()) {
 			entityDrag = false;
 			entityClicked = false;
@@ -415,14 +389,14 @@ void geProject::LevelEditorScene::setPicking() {
 			}
 			else if (entityId > -1 && entityClicked == false && entityDrag == false) {
 				setActiveEntity(entityId);
-				editor->addBox(entitymanager->getTransformComponent(entityId)->position, glm::vec2(0.26f, 0.26f), glm::vec3(1.0f, 0.0f, 0.0f), 0, 5);
+				editor->addBox(entitymanager.getTransformComponent(entityId).position, glm::vec2(0.26f, 0.26f), glm::vec3(1.0f, 0.0f, 0.0f), 0, 5);
 				entityClicked = true;
 				mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
 			}
 			else if (entityId > -1 && entityId != activatedEntity) {
 				setActiveEntity(entityId);
 				entityClicked = true;
-				editor->addBox(entitymanager->getTransformComponent(entityId)->position, glm::vec2(0.26f, 0.26f), glm::vec3(1.0f, 0.0f, 0.0f), 0, 5);
+				editor->addBox(entitymanager.getTransformComponent(entityId).position, glm::vec2(0.26f, 0.26f), glm::vec3(1.0f, 0.0f, 0.0f), 0, 5);
 				mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
 			}
 		}
@@ -443,6 +417,7 @@ void geProject::LevelEditorScene::saveGame(GameSaveEvent* save) {
 		Scene::serialize(filePath);
 		animationManager->serializeAnimations();
 	}
+	
 }
 
 
@@ -452,21 +427,23 @@ void geProject::LevelEditorScene::deleteEntity(DeleteEntityEvent* e){
 		previousEntity = -1;
 	}
 	setActiveEntity(-1);
-	entities.erase(e->entityId);
+	
 }
 
 void geProject::LevelEditorScene::updateCopy(CopyEntityEvent* e){
 	setActiveEntity(e->newId);	
 	entityClicked = false;
 	entityDrag = true;
+	
 }
 
 void geProject::LevelEditorScene::keyCopyEntity(KeyPressedEvent* e){
 	if (eventSystem.getContext() == (EditorContext) && e->keycode == GLFW_KEY_C) {
 		if (previousEntity > -1) {
-			entitymanager->copyEntity(previousEntity);
+			entitymanager.copyEntity(previousEntity);
 		}
 	}
+	
 }
 
 

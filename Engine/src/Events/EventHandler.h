@@ -40,7 +40,7 @@ namespace geProject {
 				for (auto& observer : *observers) {
 					if (event->contextCheck(currentContext)) {
 						observer->setFunctionParam(event);
-						observer->callEvent();
+						observer->callEvent();						
 					}
 				}
 			}

@@ -3,9 +3,6 @@
   <PropertyGroup>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
-  <PropertyGroup>
-    <ResolveNugetPackages>false</ResolveNugetPackages>
-  </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -25,11 +22,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5C9AB53A-7CAE-3707-B38E-265BA728F415}</ProjectGuid>
+    <ProjectGuid>{9E682BF2-EA9C-355F-B75D-AFFF4EBBD441}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
-    <ProjectName>ALL_BUILD</ProjectName>
+    <ProjectName>graphviz</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -108,6 +105,82 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CustomBuild Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\CMakeFiles\f71e12e1b799f56054566e34f5e93aec\graphviz.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" --graphviz=foo .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\CMakeFiles\graphviz</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" --graphviz=foo .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\CMakeFiles\graphviz</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" --graphviz=foo .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\CMakeFiles\graphviz</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" --graphviz=foo .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\CMakeFiles\graphviz</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="C:\Users\south\source\repos\18020581-Final-Year-Project\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/south/source/repos/18020581-Final-Year-Project/CMakeLists.txt</Message>
@@ -165,6 +238,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\CMakeFiles\graphviz">
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\ZERO_CHECK.vcxproj">
@@ -172,56 +247,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\ImGui.vcxproj">
-      <Project>{DC4CD4CF-9956-3BDB-91FD-1C8DD543BAD5}</Project>
-      <Name>ImGui</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\box2d\src\box2d.vcxproj">
-      <Project>{F0656CC2-BB19-3A37-A4EB-9D95801DC95C}</Project>
-      <Name>box2d</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Game\ge_cpp_application.vcxproj">
-      <Project>{39A60D31-9552-3508-9D02-B471DAF59946}</Project>
-      <Name>ge_cpp_application</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\ge_cpp_engine.vcxproj">
-      <Project>{60BDB62A-ACC4-3135-A5EB-D510B06A0388}</Project>
-      <Name>ge_cpp_engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\GLAD\glad.vcxproj">
-      <Project>{F214A3FF-7348-3C80-B83A-E11BBED4C9DA}</Project>
-      <Name>glad</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\GLFW\src\glfw.vcxproj">
-      <Project>{54B1CB29-2DB4-3E9F-9658-4E5E1E87DB5B}</Project>
-      <Name>glfw</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\graphviz.vcxproj">
-      <Project>{9E682BF2-EA9C-355F-B75D-AFFF4EBBD441}</Project>
-      <Name>graphviz</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\box2d\extern\imgui\imgui.vcxproj">
-      <Project>{3E152ECD-1F28-342C-AADE-4B730E73CD2D}</Project>
-      <Name>imgui</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\box2d\extern\sajson\sajson.vcxproj">
-      <Project>{239A12CE-EE5F-3342-8B23-CCCA67E61752}</Project>
-      <Name>sajson</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\spdlog\spdlog.vcxproj">
-      <Project>{119A132C-CE95-3A99-A54E-B81FE9393B11}</Project>
-      <Name>spdlog</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\box2d\testbed\testbed.vcxproj">
-      <Project>{C0CBAFD1-8243-3E17-9E28-4B2AA926DABE}</Project>
-      <Name>testbed</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\south\source\repos\18020581-Final-Year-Project\build-dependency-graph\Engine\External\box2d\unit-test\unit_test.vcxproj">
-      <Project>{5BEBBD77-453E-335F-8096-5ED098A54B46}</Project>
-      <Name>unit_test</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

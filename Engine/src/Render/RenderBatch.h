@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include <glm/glm.hpp>
 #include "../Cameras/Camera.h"
+#include <ge_engine/Managers.h>
 
 
 
@@ -14,9 +15,10 @@ namespace geProject {
 		~RenderBatch();
 		bool isBatchFull();
 		bool isTextureFull(unsigned int id);
-		void addSprite(SpriteRender* sprite, Transform* transform);
+		void addSprite(int entityId, int count);
 		void addMapTile(SpriteRender sprite, int ssId, float x, float y, int layer);
-		void updateSprite(SpriteRender* sprite, Transform* transform);
+		void updateSprite(int entityId);
+		
 		void render(Camera& camera, std::string shaderPath);
 		unsigned int getSpriteNum();
 		unsigned int getZindex();
@@ -29,7 +31,7 @@ namespace geProject {
 		std::vector<float> vertices;
 		std::shared_ptr<geProject::Texture> textures[8]{nullptr};
 		std::vector<unsigned int> createIndexes();
-		void createVertices(SpriteRender* sprite, float x, float y, float scaleX, float scaleY, float rotation, unsigned int index);
+		void createVertices(SpriteRender sprite, float x, float y, float scaleX, float scaleY, float rotation, unsigned int index);
 		void init();
 		glm::vec2 rotate(glm::vec2 vert, glm::vec2 centre, float rotation);			
 	};

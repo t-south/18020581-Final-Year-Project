@@ -98,7 +98,7 @@ void geProject::Receiver::updateMouseButtonPress(MouseButtonEvent* mouseevent) {
 	}
 }
 
-void geProject::Receiver::updateKeyButtonPress(KeyPressedEvent * keyevent) {
+void geProject::Receiver::updateKeyButtonPress(KeyPressedEvent* keyevent) {
 	if (keyevent->contextCheck(GameplayContext) || (keyevent->contextCheck(ImGuiContext))) {
 		switch (keyevent->keycode) {
 			case 340: //LEFT SHIFT

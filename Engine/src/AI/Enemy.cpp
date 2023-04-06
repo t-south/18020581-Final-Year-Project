@@ -11,6 +11,9 @@ void geProject::Enemy::update(float deltaTime) {
 	if (path.size() == 0) {
 		//planPath();
 	}
+	else {
+
+	}
 	if (commandQueue.size() > 0) {
 		Command* command = commandQueue.front();
 		aiController->update(deltaTime);
@@ -20,6 +23,7 @@ void geProject::Enemy::update(float deltaTime) {
 		}
 		commandQueue.pop();
 	}
+
 	RotateCommand* rotate = new RotateCommand();
 	rotate->rotate = 10;
 	commandQueue.push(rotate);
