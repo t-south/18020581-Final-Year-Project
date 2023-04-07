@@ -15,6 +15,7 @@
 #include "../Controller/Receiver.h"
 #include "../EntityManager/EntityManager.h"
 #include <ge_engine/PhysicsManager.h>
+#include "../AI/Enemy.h"
 //#include <ge_engine/Managers.h>
 
 
@@ -55,7 +56,7 @@ namespace geProject {
 		static AnimationManager* animationManager;
 		static Receiver* controlManager;		
 		static Renderer* rendermanager;
-
+		std::vector<Enemy> enemies;
 		FrameBuffer* selectionTextures{ nullptr };
 		//(de)serialisation
 		std::string filePath;

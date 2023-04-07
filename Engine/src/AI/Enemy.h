@@ -8,6 +8,9 @@
 #include "../Controller/Command.h"
 #include "../Controller/ConcreteCommands.h"
 #include "../Controller/EnemyController.h"
+#include <ge_engine/Managers.h>
+#include <cmath>
+
 namespace geProject {
 	enum State {
 		IDLE, MOVE, ACTION
@@ -27,13 +30,14 @@ namespace geProject {
 	
 	class Enemy {
 	public:
-		Enemy();
+		Enemy(int entityId);
 		void update(float deltaTime);
 		std::vector<pathNode> planPath(float originX, float originY, float destinationX, float destinationY);
 	private:
 		static Planner actionPlanner;
 		glm::vec2 position;
-
+		float currentdirection;
+		float desiredirection;
 		//STATE TRANSITIONS  ||  IDLE -- ACTION -- MOVE
 		State currentState{State::IDLE};		
 
@@ -42,9 +46,9 @@ namespace geProject {
 		std::vector<Goal> availableGoals;
 
 		//ACTIONS
-		std::vector<Action> actionsAvailable;
-		std::vector<Action> actionPlan;
-
+		std::vector<Action*> actionsAvailable;
+		std::vector<Action*> actionPlan;
+		int entityId;
 		int fireEnergy;
 		int waterEnergy;
 		int earthEnergy;

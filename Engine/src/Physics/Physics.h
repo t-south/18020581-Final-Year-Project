@@ -29,6 +29,7 @@ namespace geProject {
 		b2Body& getPhysicsBody(int entityId);
 		void applyLinearImpulse(int entityId, float x, float y);
 		void applyRotation(int entityId, float angle);
+		void applyAngularVelocity(int entityId, float angle);
 		//b2RayCastOutput getRayCast(int entityId, float coordAx, float coordAy, float coordBx, float coordBy);
 	private:
 		b2Vec2 gravity{0, 0};

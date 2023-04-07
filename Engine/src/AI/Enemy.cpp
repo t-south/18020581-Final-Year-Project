@@ -2,19 +2,63 @@
 
 geProject::Planner geProject::Enemy::actionPlanner;
 
-geProject::Enemy::Enemy(){
-	aiController = new EnemyController();
+geProject::Enemy::Enemy(int entity): entityId(entity){
+	aiController = new EnemyController(entityId);
+	Transform transform = entitymanager.getTransformComponent(entityId);
+	position = transform.position;	
 	idleState();
 }
 
 void geProject::Enemy::update(float deltaTime) {
+	double pi = 3.14159265;
+	currentdirection = entitymanager.getTransformComponent(entityId).rotation;
+	if (currentdirection < 0) {
+		currentdirection = 359.0f;
+	}
 	if (path.size() == 0) {
-		//planPath();
+		planPath(position[0], position[1], 3.5f, 1.25f);
+		desiredirection = atan2((path[0].y - position[1]), (path[0].x - position[0]));
+		if (desiredirection < 0) // we don't want negative angles
+		{
+			desiredirection += (pi * 2 );
+			// make negative angles positive by adding 360 degrees
+		}
+		desiredirection -= 1.571;
+	}
+	float testangle = atan2(position[1], position[0]) - atan2(path[0].y, path[0].x);
+	/*
+	else {
+		if (path[0].x != position[0] && path[0].y != position[1]) {
+			//MoveCommand* move = new MoveCommand();
+			//move->x = position[0] - path[0].x;
+			//move->y = position[1] - path[0].y;
+			//commandQueue.push(move);
+		}
+		else {
+			path.erase(path.begin());
+		}
+
+		
+	}
+	*/
+	float currentDirRad = currentdirection * (pi / 180);
+	//check if range of direction is above or below 1 degree, then adjust the current direction to the new direction
+	if (currentdirection - desiredirection * (180 / pi) > 1 || currentdirection - desiredirection * (180 / pi) < -1) {
+		RotateCommand* rotate = new RotateCommand();
+		float rotation = desiredirection - currentDirRad;
+		while (rotation < -180 * (pi / 180)) rotation += 360 * (pi / 180);
+		while (rotation > 180 * (pi / 180)) rotation -= 360 * (pi / 180);
+		float anglechange = 1 * (pi / 180);
+		float testagain = std::min(anglechange, std::max(-anglechange, rotation));
+		float newangle = currentDirRad + testagain;
+		rotate->rotate = newangle;
+		commandQueue.push(rotate);		
 	}
 	else {
-
+		std::cout << "completed" << std::endl;
 	}
-	if (commandQueue.size() > 0) {
+
+	for (int i = 0; i < commandQueue.size(); i++) {
 		Command* command = commandQueue.front();
 		aiController->update(deltaTime);
 		if (command)
@@ -24,10 +68,8 @@ void geProject::Enemy::update(float deltaTime) {
 		commandQueue.pop();
 	}
 
-	RotateCommand* rotate = new RotateCommand();
-	rotate->rotate = 10;
-	commandQueue.push(rotate);
 	
+
 	
 }
 
@@ -79,15 +121,14 @@ float geProject::Enemy::calculateEuclidean(float originx, float originy, float d
 std::vector<geProject::pathNode> geProject::Enemy::planPath(float originX, float originY, float destinationX, float destinationY){	
 	std::vector<pathNode> openList;
 	std::vector<pathNode> closedList;
-	float currX = (int)(originX * 4);
-	float currY = (int)(originY * 4);
-	float destX = (int)(destinationX * 4);
-	float destY = (int)(destinationY * 4);
+	float currX = std::round(originX * 4);
+	float currY = std::round(originY * 4);
+	float destX = std::round(destinationX * 4);
+	float destY = std::round(destinationY * 4);
 	pathNode startNode = pathNode();
 	startNode.x = currX;
 	startNode.y = currY;
-	openList.push_back(startNode);
-	
+	openList.push_back(startNode);	
 	//A STAR
 	while (openList.size() > 0) {
 		int index = 0;
@@ -102,9 +143,12 @@ std::vector<geProject::pathNode> geProject::Enemy::planPath(float originX, float
 		}
 
 		if (expandedNode.x == destX && expandedNode.y == destY) {
+		
 			while (expandedNode.parent != nullptr) {
-				path.push_back(expandedNode);
-				expandedNode = *expandedNode.parent;
+				expandedNode.x = expandedNode.x / 4;
+				expandedNode.y = expandedNode.y / 4;
+				path.insert(path.begin(), expandedNode);				
+				expandedNode = *expandedNode.parent;				
 			}
 			return path;
 		}

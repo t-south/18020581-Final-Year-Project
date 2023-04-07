@@ -89,7 +89,7 @@ void geProject::Physics::addBoxCollider(BoxCollider box, int entityId) {
 	shapeFixture.density = 1;
 	shapeFixture.isSensor = box.sensor;
 	body.CreateFixture(&shapeFixture);
-	std::cout << "added physics objects: " << bodies.size() << std::endl;	
+	//std::cout << "added physics objects: " << bodies.size() << std::endl;	
 }
 
 void geProject::Physics::addCircleCollider(CircleCollider circle, int entityId) {
@@ -120,7 +120,7 @@ void geProject::Physics::removeEntity(int entityId){
 			fixtures = tmp;
 		}
 		bodies.erase(entityId);
-		std::cout << "removed physics objects: " << bodies.size() << std::endl;
+		//std::cout << "removed physics objects: " << bodies.size() << std::endl;
 	}
 }
 
@@ -146,16 +146,23 @@ void geProject::Physics::update(float deltaTime){
 				float test = body.second->GetAngle();
 				b2Vec2 position = body.second->GetPosition();
 				double pi = 3.14159265;
-				
+
 				float angle = (float)(body.second->GetAngle() * (180.0/ pi));
-				
+				if (body.first == 1425) {		
+
+					float angle = (float)(bodies[1425]->GetAngle() * (180.0 / pi));					
+					std::cout << angle << std::endl;
+					
+					
+				}
 				//printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
 				
 				/*for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
 					std::cout << count << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
 				}*/
 				count++;
-				entitymanager.updateTransform(body.first, position.x, position.y, (int)angle);
+
+				entitymanager.updateTransform(body.first, position.x, position.y, angle);
 				//eventSystem.publishImmediately(new TransformEvent(ImGuiContext | GameplayContext, (int)body.first, position.x, position.y, angle));
 			}
 		}		
@@ -176,6 +183,11 @@ void geProject::Physics::applyLinearImpulse(int entityId, float x, float y){
 
 void geProject::Physics::applyRotation(int entityId, float angle){
 	bodies[entityId]->SetTransform(bodies[entityId]->GetPosition(), angle);
+}
+
+void geProject::Physics::applyAngularVelocity(int entityId, float angle)
+{
+	bodies[entityId]->SetAngularVelocity(angle);
 }
 
 

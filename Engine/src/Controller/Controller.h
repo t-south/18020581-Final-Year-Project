@@ -1,6 +1,6 @@
 #pragma once
 #include <ge_engine/Core.h>
-
+#include <ge_engine/PhysicsManager.h>
 
 namespace geProject {
 	class Controller {	

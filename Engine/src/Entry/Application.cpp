@@ -120,6 +120,9 @@ namespace geProject {
 				sceneManager->getCurrentScene()->setActiveEntity(-1);
 			}
 			sceneManager->switchScene(load->sceneId);
+			if (load->sceneId > 1) {
+				sceneManager->getCurrentScene()->init();
+			}
 		}
 	}
 

@@ -12,7 +12,7 @@ namespace geProject {
 		std::string name{"object"};
 		glm::vec2 position{ 0 };
 		glm::vec2 scale{ 0 };
-		int rotation{ 0};	
+		float rotation{ 0};	
 		glm::vec3 dirtyFlag{0,0,-1 };
 	};
 

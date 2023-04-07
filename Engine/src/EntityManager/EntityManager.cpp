@@ -428,7 +428,7 @@ void geProject::EntityManager::updateTransform(TransformEvent* event) {
 	componentTransforms[event->entityId]->dirtyFlag[0] = 1;	
 }*/
 
-void geProject::EntityManager::updateTransform(int entityId, float x, float y, int rotate){
+void geProject::EntityManager::updateTransform(int entityId, float x, float y, float rotate){
 	componentTransforms[entityId]->position[0] = x;
 	componentTransforms[entityId]->position[1] = y;
 	componentTransforms[entityId]->rotation = rotate;
@@ -628,13 +628,13 @@ void geProject::EntityManager::updateImgui(int entityId) {
 				}
 			}
 
-			int rotation = trans->rotation;
-			if (ImGui::DragInt("rotation", &rotation)) {
-				if (rotation >= 0) {
-					rotation = rotation % 360;
+			float rotation = trans->rotation;
+			if (ImGui::DragFloat("rotation", &rotation)) {
+				if (rotation > 360) {
+					rotation = 0;
 				}
 				else if (rotation < 0) {
-					rotation = rotation % -360;
+					rotation = 359;
 				}
 				if (rotation != trans->rotation) {
 					trans->rotation = rotation;

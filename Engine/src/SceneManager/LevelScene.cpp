@@ -6,6 +6,7 @@ geProject::LevelScene::LevelScene(){
 	camera = new LevelCamera(glm::vec2(0.0f, 0.0f));
 	filePath = "../../../../Game/assets/levels/level1.json";
 	player = new PlayerController(*camera);
+
 }
 
 geProject::LevelScene::~LevelScene(){}
@@ -13,6 +14,9 @@ geProject::LevelScene::~LevelScene(){}
 void geProject::LevelScene::init() {
 	entitymanager.assignUpdate();
 	camera->setPosition(glm::vec2(0, 0));
+	for (auto& i : entitymanager.getEnemyIds()) {
+		enemies.push_back(Enemy(i));
+	}
 }
 
 void geProject::LevelScene::update(float deltaTime){
@@ -27,7 +31,10 @@ void geProject::LevelScene::update(float deltaTime){
 			command->execute(*player);
 		}
 	}
-	
+	for (auto& enemy : enemies) {
+		enemy.update(deltaTime);
+	}
+
 	//UPDATES TO RENDERING
 	if (entitymanager.hasUpdate()) {
 		for (int i = 0; i < entitymanager.getEntityNum(); i++) {

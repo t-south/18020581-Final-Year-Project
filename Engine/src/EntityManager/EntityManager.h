@@ -60,7 +60,7 @@ namespace geProject {
 		int getVertexStatus(int entityId);
 		int getZindex(int entityId);
 
-		void updateTransform(int entityId, float x, float y, int rotate);
+		void updateTransform(int entityId, float x, float y, float rotate);
 		Entity getEntity(int entityId);
 		Transform getTransformComponent(int entityId);
 		SpriteRender getSpriteComponent(int entityId);

@@ -42,10 +42,9 @@ void geProject::WorldState::generateWorldMap(int width, int height){
 	for (int i = 0; i < worldWidth; i++) {
 		worldMap.push_back(std::vector<int>());
 		for (int j = 0; j < worldHeight; j++) {
-			worldMap[i].push_back(1);
-			std::cout << " 1 ";
+			worldMap[i].push_back(1);			
 		}
-		std::cout << std::endl;
+	
 	}
 }
 

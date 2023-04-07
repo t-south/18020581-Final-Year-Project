@@ -6,6 +6,8 @@
 namespace geProject {
 	class EnemyController : public Controller {
 	public:
+		int entityId;
+		EnemyController(int entity);
 		virtual void dash() override;
 		virtual void attack() override;
 		virtual void specialAttack() override;
