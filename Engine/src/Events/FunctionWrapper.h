@@ -34,6 +34,7 @@ namespace geProject {
 
 		virtual void setEvent(Event* event) override { 
 			eventClass = event;		
+			
 			functionAssigned = true;
 		};
 	};

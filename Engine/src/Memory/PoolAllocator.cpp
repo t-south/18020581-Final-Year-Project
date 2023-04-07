@@ -14,7 +14,6 @@ PoolAllocator::PoolAllocator(size_t elNumber, size_t elSize) : element_number(el
 }
 
 PoolAllocator::~PoolAllocator() {
-	free(poolAddress);
 }
 void* PoolAllocator::allocate(size_t size) {
 	if (head->next != nullptr) {

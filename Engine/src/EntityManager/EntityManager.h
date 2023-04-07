@@ -60,6 +60,7 @@ namespace geProject {
 		int getVertexStatus(int entityId);
 		int getZindex(int entityId);
 
+		void updateTransform(int entityId, float x, float y, int rotate);
 		Entity getEntity(int entityId);
 		Transform getTransformComponent(int entityId);
 		SpriteRender getSpriteComponent(int entityId);
@@ -88,7 +89,7 @@ namespace geProject {
 		int entitiesDeleted{ 0 };
 
 
-		void updateTransform(TransformEvent* event);
+		
 		void updateSprite(SpriteEvent* event);
 		void updateRigidBody(RigidEvent* event);
 		void updateBoxCollider(BoxColliderEvent* event);

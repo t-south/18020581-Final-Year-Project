@@ -42,7 +42,13 @@ namespace geProject {
 						observer->setFunctionParam(event);
 						observer->callEvent();						
 					}
+					else {
+						delete(event);
+					}
 				}
+			}
+			else {
+				delete(event);
 			}
 		}
 		

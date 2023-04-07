@@ -74,9 +74,7 @@ void geProject::Camera::cameraMouseScrolled(MouseScrollEvent* scroll) {
 void geProject::Camera::setCentredPosition(float x, float y){
 	x = x - (projSize.x / 2.0f);
 	y = y - (projSize.y / 2.0f);
-
 	position = glm::vec3(x, y , 0);
-	projectionUpdate();
 
 }
 

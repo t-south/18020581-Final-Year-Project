@@ -7,7 +7,7 @@ geProject::EntityManager::~EntityManager(){}
 
 void geProject::EntityManager::startUp()
 {
-	eventSystem.subscribe(this, &EntityManager::updateTransform);
+	//eventSystem.subscribe(this, &EntityManager::updateTransform);
 	eventSystem.subscribe(this, &EntityManager::updateSprite);
 	eventSystem.subscribe(this, &EntityManager::updateRigidBody);
 	eventSystem.subscribe(this, &EntityManager::updateBoxCollider);
@@ -150,7 +150,6 @@ bool geProject::EntityManager::hasUpdate() {
 }
 
 void geProject::EntityManager::assignTransform(int entityId, Transform transform) {
-
 	if (entityId < maxEntities && entityId >= 0) {
 		if (componentTransforms[entityId]->id > 0) {
 			transform.dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
@@ -420,13 +419,21 @@ void geProject::EntityManager::updateDirtyFlags(int entityId ,int update, int ba
 }
 
 //EVENT LISTENERS
-void geProject::EntityManager::updateTransform(TransformEvent* event) {
-	Transform* newTransform = componentTransforms[event->entityId];
-	newTransform->position[0] = event->posX;
-	newTransform->position[1] = event->posY;
-	newTransform->rotation = event->rotation;
+/*
+void geProject::EntityManager::updateTransform(TransformEvent* event) {	
+	componentTransforms[event->entityId]->position[0] = event->posX;
+	componentTransforms[event->entityId]->position[1] = event->posY;
+	componentTransforms[event->entityId]->rotation = event->rotation;
 	//newTransform->centre = getCentre(newTransform->position, glm::vec2(newTransform->position[0] + (1 * newTransform->scale.x), newTransform->position[1] + (1 * newTransform->scale.y)));
 	componentTransforms[event->entityId]->dirtyFlag[0] = 1;	
+}*/
+
+void geProject::EntityManager::updateTransform(int entityId, float x, float y, int rotate){
+	componentTransforms[entityId]->position[0] = x;
+	componentTransforms[entityId]->position[1] = y;
+	componentTransforms[entityId]->rotation = rotate;
+	//newTransform->centre = getCentre(newTransform->position, glm::vec2(newTransform->position[0] + (1 * newTransform->scale.x), newTransform->position[1] + (1 * newTransform->scale.y)));
+	componentTransforms[entityId]->dirtyFlag[0] = 1;
 }
 
 void geProject::EntityManager::updateSprite(SpriteEvent* event) {
@@ -533,15 +540,17 @@ std::vector<geProject::Entity*> geProject::EntityManager::getEntities() {
 }
 
 void geProject::EntityManager::endFrame() {
-	int count = 0;
-	for (auto const& i : entities) {
-		if (i->id == -1) {
-			eventSystem.publishImmediately(new HierarchyEvent(EditorContext | ImGuiContext, count, i->compMask, componentTransforms[count]->name, false));
+	if(eventSystem.getContext() == EditorContext){
+		int count = 0;
+		for (auto const& i : entities) {
+			if (i->id == -1) {
+				eventSystem.publishImmediately(new HierarchyEvent(EditorContext | ImGuiContext, count, i->compMask, componentTransforms[count]->name, false));
+			}
+			else {
+				eventSystem.publishImmediately(new HierarchyEvent(EditorContext | ImGuiContext, i->id, i->compMask, componentTransforms[i->id]->name, true));
+			}
+			count++;
 		}
-		else {
-			eventSystem.publishImmediately(new HierarchyEvent(EditorContext | ImGuiContext, i->id, i->compMask, componentTransforms[i->id]->name, true));
-		}
-		count++;
 	}	
 }
 

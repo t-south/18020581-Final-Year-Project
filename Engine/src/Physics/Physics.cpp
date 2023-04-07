@@ -49,7 +49,7 @@ void geProject::Physics::addEntity(int entityId) {
 		body.linearDamping = rigid.linearDamping;
 		body.fixedRotation = rigid.fixedRotate;		
 		body.bullet = rigid.bullet;		
-		body.userData.pointer = reinterpret_cast<uintptr_t>(&entity);
+		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		switch (rigid.bodyType) {
 		case 0:
 			body.type = b2_kinematicBody;
@@ -155,8 +155,8 @@ void geProject::Physics::update(float deltaTime){
 					std::cout << count << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
 				}*/
 				count++;
-				
-				eventSystem.publishImmediately(new TransformEvent(ImGuiContext | GameplayContext, (int)body.first, position.x, position.y, angle));
+				entitymanager.updateTransform(body.first, position.x, position.y, (int)angle);
+				//eventSystem.publishImmediately(new TransformEvent(ImGuiContext | GameplayContext, (int)body.first, position.x, position.y, angle));
 			}
 		}		
 	}
