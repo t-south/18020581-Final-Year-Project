@@ -75,6 +75,7 @@ namespace geProject {
 		void to_json(json& data, Controls& comp);
 		void to_json(json& data, Health& comp);
 		void to_json(json& data, Damage& comp);
+		void to_json(json& data, ViewCollider& comp);
 
 		void from_json(json& data, Animation& comp);
 		void from_json(json& data, SpriteRender& comp);
@@ -85,7 +86,7 @@ namespace geProject {
 		void from_json(json& data, Controls& comp);
 		void from_json(json& data, Health& comp);
 		void from_json(json& data, Damage& comp);
-
+		void from_json(json& data, ViewCollider& comp);
 		//event listeners
 		virtual void saveGame(GameSaveEvent* save) = 0;
 

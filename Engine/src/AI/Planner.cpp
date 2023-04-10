@@ -2,53 +2,53 @@
 
 
 
-std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsigned int currentState, std::vector<Action> actionsAvailable) {
-	return std::vector<geProject::Action>();
-    /*std::vector<Action> actionPlan;
+std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, unsigned int currentState, std::vector<Action*> actionsAvailable) {		
+	std::vector<Action*> actionPlan;
     std::vector<asNode*> openList;
     std::vector<asNode*> closedList;
-
 	//find differences in current agent/world state and the goals required world state
 	unsigned int goalCondition = goal.getCondition();
 	asNode* startNode = new asNode();
-
 	if ((currentState & goalCondition) != goalCondition) {
 		startNode->currentState = currentState;
 		startNode->goalState = currentState | goalCondition;
 	}
 	openList.push_back(startNode);
 	asNode* expandedNode = nullptr;
-
 	//A STAR
     while (openList.size() > 0) {
+		int index = 0;
+		int count = 0;
 		//set the newly expanded node
 		expandedNode = openList[0];
 		for (auto& node : openList) {
 			if (node->fValue < expandedNode->fValue) {
 				expandedNode = node;
+				index = count;
 			}
+			count++;
 		}		
-		openList.erase(std::remove(openList.begin(), openList.end(), *expandedNode), openList.end());
-		closedList.push_back(expandedNode);		
 		//check both bools for current state and goal state are the same		
 		//if both are the same then we have found the optimal path
 		if (expandedNode->currentState == expandedNode->goalState) {
 			//create the action plan by following the nodes parents back to the origin node
 			while (expandedNode->parent != nullptr) {
-				actionPlan.push_back(*expandedNode->actionTaken);
+				actionPlan.push_back(expandedNode->actionTaken);
 				expandedNode = expandedNode->parent;
 			}
 			return actionPlan;
 		}
+		openList.erase(openList.begin() + index);
+		closedList.push_back(expandedNode);
 
 		//find adjacent nodes that fulfill the differences in effects 
 		for (auto& newAction : actionsAvailable) {				
 			//if action effect state matches the goal state
-			if ((newAction.getEffects() & expandedNode->goalState) == newAction.getEffects()) {
+			if ((newAction->getEffects() & expandedNode->goalState) == newAction->getEffects()) {
 				asNode* neighbour = new asNode();				
 				neighbour->currentState = expandedNode->goalState;
-				neighbour->actionTaken = &newAction;
-				unsigned int precon = newAction.getPreconditions();				
+				neighbour->actionTaken = newAction;
+				unsigned int precon = newAction->getPreconditions();				
 				//fill in precondition values for action 
 				neighbour->currentState = neighbour->goalState;
 				neighbour->goalState |= precon;
@@ -71,7 +71,7 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 			float fValue = gValue + heuristic;
 			bool neighbourclosed = std::find(closedList.begin(), closedList.end(), neighbour) != closedList.end();
 			bool neighbouropen = std::find(openList.begin(), openList.end(), neighbour) != openList.end();
-			if (gValue < expandedNode->gValue && neighbourclosed) {
+			if (fValue < expandedNode->fValue && neighbourclosed) {
 				neighbour->fValue = fValue;
 				neighbour->gValue = gValue;
 				expandedNode = neighbour->parent;
@@ -82,9 +82,12 @@ std::vector<geProject::Action> geProject::Planner::createPlan(Goal& goal, unsign
 				neighbour->parent = expandedNode;
 			}
 			else if (!neighbouropen && !neighbourclosed) {
+				neighbour->fValue = fValue;
+				neighbour->gValue = gValue;
 				openList.push_back(neighbour);
 			}
 		}
     }
-	return actionPlan;*/
+	return actionPlan;
+	
 }

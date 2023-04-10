@@ -73,7 +73,7 @@ void geProject::EditorRender::addCircle(glm::vec2 centre, glm::vec3 color, float
 	if (radius > 0) {
 		std::vector<glm::vec2> verts;
 		int increment = 360 / segments;
-		float angle = 0;
+		float angle = 0;		
 		for (int i = 0; i < segments; i++) {
 			glm::vec2 point = glm::vec2(radius, 0);
 			point = rotate(point, glm::vec2(0, 0), angle);
@@ -85,6 +85,27 @@ void geProject::EditorRender::addCircle(glm::vec2 centre, glm::vec3 color, float
 		}
 		addLine(verts[verts.size() - 1], verts[0], color, life);
 	}
+}
+
+void geProject::EditorRender::addSensor(glm::vec2 centre, glm::vec3 color, float radius, float angle, unsigned int life){
+	double pi = 3.14159265;
+	std::vector<glm::vec2> verts;
+	int increment = 90 / 16;	
+	for (int i = 0; i < 16; i++) {
+		glm::vec2 point = glm::vec2(radius, 0);
+		point = rotate(point, glm::vec2(0, 0), angle);
+		verts.push_back(point + centre);
+		if (i == 0) {
+			addLine(centre, verts[i], color, life);
+		}
+		else {
+			addLine(verts[static_cast<std::vector<glm::vec2, std::allocator<glm::vec2>>::size_type>(i) - 1], verts[i], color, life);
+		}
+		angle += increment;
+	}
+	addLine(verts[verts.size() - 1], centre, color, life);
+
+
 }
 
 void geProject::EditorRender::createVertices() {

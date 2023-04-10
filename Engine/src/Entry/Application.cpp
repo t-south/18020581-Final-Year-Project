@@ -107,7 +107,7 @@ namespace geProject {
 			scene->reloadLevel(scene->getFilePath());
 			scene->setPhysics(false);
 			scene = sceneManager->getCurrentScene();
-			scene->deserialize(scene->getFilePath());
+			scene->deserialize(scene->getFilePath());			
 			eventSystem.setContext(EditorContext);
 			scene->setActiveEntity(-1);
 		}

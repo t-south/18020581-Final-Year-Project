@@ -14,6 +14,8 @@ namespace geProject {
 		b2Fixture* mOwningFixture{};
 	};
 
+
+
 	class Physics {
 	public:
 		Physics(/*EntityManager& eManager*/);
@@ -21,15 +23,18 @@ namespace geProject {
 		void startUp();
 	
 		void addEntity(int entityId);		
+		
 		void addBoxCollider(BoxCollider box, int entityId);
 		void addCircleCollider(CircleCollider circle, int entityId);
-		void removeEntity(int  entityId);
+		void addViewSensorCollider(ViewCollider view, int entityId);
+		void removeEntity(int entityId);
 		void clear();
 		void update(float deltaTime); 
 		b2Body& getPhysicsBody(int entityId);
 		void applyLinearImpulse(int entityId, float x, float y);
 		void applyRotation(int entityId, float angle);
 		void applyAngularVelocity(int entityId, float angle);
+		void createProjectile(int entityId);
 		//b2RayCastOutput getRayCast(int entityId, float coordAx, float coordAy, float coordBx, float coordBy);
 	private:
 		b2Vec2 gravity{0, 0};
@@ -38,6 +43,8 @@ namespace geProject {
 		float timeStep;
 		float velocity;
 		float position;
+		float dt{ 0 };
+		std::vector<int> deleteBodies;
 		std::unordered_map<int, b2Body*> bodies;		
 		std::vector<FixtureUserData> fixtureData;
 		CustomContactListener customCallback;		

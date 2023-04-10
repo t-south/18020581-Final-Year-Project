@@ -124,5 +124,4 @@ void geProject::Renderer::clear() {
 
 void geProject::Renderer::deleteEntity(DeleteEntityEvent* e){
 	renderList[e->renderBatch].removeVertices(e->renderIndex);
-	delete(e);
 }

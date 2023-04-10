@@ -10,6 +10,7 @@
 #include "../Controller/EnemyController.h"
 #include <ge_engine/Managers.h>
 #include <cmath>
+#include <math.h>
 
 namespace geProject {
 	enum State {
@@ -27,20 +28,27 @@ namespace geProject {
 		pathNode* parent{ nullptr };
 		friend bool operator==(const pathNode& lhs, const pathNode& rhs) { return lhs.x == rhs.x && lhs.y == rhs.y; }
 	};
+
+
+
 	
 	class Enemy {
 	public:
 		Enemy(int entityId);
 		void update(float deltaTime);
 		std::vector<pathNode> planPath(float originX, float originY, float destinationX, float destinationY);
+		std::vector<pathNode> getPath();
+		int getPathSize();
+		int getEnemyId();
 	private:
 		static Planner actionPlanner;
 		glm::vec2 position;
+		glm::vec2 oldposition;		
 		float currentdirection;
 		float desiredirection;
 		//STATE TRANSITIONS  ||  IDLE -- ACTION -- MOVE
 		State currentState{State::IDLE};		
-
+		int agentStateDetails{ AT_HOME | FIRE_ENERGY | WATER_ENERGY | EARTH_ENERGY | WIND_ENERGY | HAS_ENERGY };
 		//GOALS
 		Goal currentGoal;
 		std::vector<Goal> availableGoals;
@@ -52,17 +60,17 @@ namespace geProject {
 		int fireEnergy;
 		int waterEnergy;
 		int earthEnergy;
-		int windEnergy;
-				 
+		int windEnergy;	
+		
 		void executeAction();
-		Goal chooseGoal();
+		void setDesiredDirection();
+		void moveAgent(float x, float y, float dt);
+		void rotateAgent();
+		void chooseGoal();
 		void addGoal(Goal& goal);
 		void removeGoal(Goal& goal);
-		void moveState();
-		void idleState();
-		void actionState();
 		float calculateEuclidean(float originx, float originy, float destx, float desty);
-		
+		void orientAgent();
 		std::vector<pathNode> path;
 		std::queue<Command*> commandQueue;
 		EnemyController* aiController;

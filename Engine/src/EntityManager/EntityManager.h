@@ -30,6 +30,7 @@ namespace geProject {
 		~EntityManager();
 		//Entities
 		void startUp();
+		void addParentEntity(int parentId, int childId);
 		int addEntity(entityTypes type);
 		void deleteEntity(int entityId);
 		void copyEntity(int entityId);
@@ -46,6 +47,7 @@ namespace geProject {
 		void assignController(int entityId, Controls control);
 		void assignHealth(int entityId, Health health);
 		void assignDamage(int entityId, Damage dmg);
+		void assignView(int entityId, ViewCollider view);
 		void deleteComponent(int entityId, uInt componentId);
 
 		std::vector<Transform*> getTransformComponents();
@@ -55,6 +57,8 @@ namespace geProject {
 		std::vector <Controls*> getControllerComponents();
 		std::vector<Health*> getHealthComponents();
 		std::vector <Damage*> getDamageComponents();
+		std::vector <ViewCollider*> getViewComponents();
+
 		int getUpdateStatus(int entityId);
 		int getBatchStatus(int entityId);
 		int getVertexStatus(int entityId);
@@ -69,6 +73,7 @@ namespace geProject {
 		Controls getControllerComponent(int entityId);
 		Health getHealthComponent(int entityId);
 		Damage getDamageComponent(int entityId);
+		ViewCollider getViewComponent(int entityId);
 		std::vector<CircleCollider> getCircleColliderComponents(int entityId);
 		std::vector<BoxCollider> getBoxColliderComponents(int entityId);
 
@@ -113,6 +118,7 @@ namespace geProject {
 		std::vector <Controls*> componentController;
 		std::vector <Health*> componentHealth;
 		std::vector <Damage*> componentDamage;
+		std::vector <ViewCollider*> componentView;
 
 		PoolAllocator entitypool{ maxEntities, sizeof(Entity) };
 		PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
@@ -122,6 +128,7 @@ namespace geProject {
 		PoolAllocator controllerpool{ maxEntities, sizeof(Controls) };
 		PoolAllocator healthpool{ maxEntities, sizeof(Health) };
 		PoolAllocator damagepool{ maxEntities, sizeof(Damage) };
+		PoolAllocator viewpool{ maxEntities, sizeof(ViewCollider) };
 
 		//stored in unordered maps instead of pool allocators, due to varying memory amounts per component
 		std::unordered_map<int, std::vector <BoxCollider>> componentBoxCollider;

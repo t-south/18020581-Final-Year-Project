@@ -9,7 +9,7 @@ namespace geProject {
 	class Receiver {
 	public:
 		Receiver();
-		Command* action();
+		Command* action(float deltaTime);
 	private:
 		Command* leftClick;
 		Command* rightClick;

@@ -13,10 +13,15 @@ geProject::Receiver::Receiver(){
 	eventSystem.subscribe(this, &Receiver::updateMouseButtonPress);
 }
 
-geProject::Command* geProject::Receiver::action(){		
+geProject::Command* geProject::Receiver::action(float deltaTime){		
 	bool movement = false;
-	
-	if (buttonPressed(0)) { 		
+	moveTo->dt = deltaTime;
+	if (buttonPressed(8)) {
+		buttonevents[8] = false;
+		return buttonTab;
+	}
+
+	if (buttonPressed(0)) { 			
 		return leftClick; 
 	}
 	if (buttonPressed(1)) { 		
@@ -69,9 +74,7 @@ geProject::Command* geProject::Receiver::action(){
 	if (buttonPressed(7)) { 
 		return buttonF; 
 	}
-	if (buttonPressed(8)) { 
-		return buttonTab; 
-	}
+
 	return nullptr;
 }
 

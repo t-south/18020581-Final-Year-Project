@@ -53,6 +53,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		json controllerData = json::object();
 		json healthData = json::object();
 		json damageData = json::object();
+		json viewData = json::object();
 		Transform transform = entitymanager.getTransformComponent(entity.id);
 		to_json(transformData, transform);
 		json spriteData = json::object();
@@ -128,6 +129,16 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 			};
 		}
 
+		if ((entity.compMask & 1 << 9) == 1 << 9) {
+			ViewCollider view = entitymanager.getViewComponent(entity.id);
+			to_json(viewData, view);
+		}
+		else {
+			viewData = json{
+				"ViewCollider", 0
+
+			};
+		}
 
 		entityjson["entity"].push_back(entityType);
 		entityjson["entity"].push_back(transformData);
@@ -139,6 +150,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		entityjson["entity"].push_back(controllerData);
 		entityjson["entity"].push_back(healthData);
 		entityjson["entity"].push_back(damageData);
+		entityjson["entity"].push_back(viewData);
 		return entityjson;
 	}
 
@@ -171,6 +183,7 @@ void geProject::Scene::deserialize(std::string filepath) {
 				json controllerData = i.value().at("entity")[7];
 				json healthData = i.value().at("entity")[8];
 				json damageData = i.value().at("entity")[9];
+				json viewData = i.value().at("entity")[10];
 				Transform trans = Transform();
 				SpriteRender sprite = SpriteRender();				
 				from_json(transData, trans);
@@ -213,10 +226,16 @@ void geProject::Scene::deserialize(std::string filepath) {
 					from_json(healthData, health);
 					entitymanager.assignHealth(entityId, health);
 				}
+				
 				if (damageData[1] != 0) {
 					Damage dmg = Damage();
 					from_json(damageData, dmg);
 					entitymanager.assignDamage(entityId, dmg);
+				}	
+				if (viewData[1] != 0) {
+					ViewCollider view = ViewCollider();
+					from_json(viewData, view);
+					entitymanager.assignView(entityId, view);
 				}
 	
 			}
@@ -295,6 +314,8 @@ void geProject::Scene::to_json(json& data, CircleCollider& comp) {
 			{"entityAssigned", comp.entityAssigned},
 			{"circleRadius", comp.radius},
 			{"circleoffsetX", comp.offset[0]}, {"circleoffsetY", comp.offset[1]},
+			{"circleentityType", comp.entityType},
+			{"circlecolliders", comp.colliders},
 			{"circleSensor", comp.sensor}
 		}
 	};	
@@ -308,6 +329,8 @@ void geProject::Scene::to_json(json& data, BoxCollider& comp) {
 			{"boxoffsetX", comp.offset[0]}, {"boxoffsetY", comp.offset[1]},
 			{"boxSizeX", comp.boxSize[0]}, {"boxSizeY", comp.boxSize[1]},
 			{"boxOriginX", comp.origin[0]}, {"boxOriginY", comp.origin[1]},
+			{"boxentityType", comp.entityType},
+			{"boxcolliders", comp.colliders},
 			{"boxSensor", comp.sensor}
 	}
 	};	
@@ -347,7 +370,18 @@ void geProject::Scene::to_json(json& data, Damage& comp){
 }
 
 
-
+void geProject::Scene::to_json(json& data, ViewCollider& comp) {
+	data = json{
+		"ViewCollider", {
+			{"entityAssigned", comp.entityAssigned},
+			{"viewRadius", comp.radius},
+			{"viewoffsetX", comp.offset[0]}, {"viewoffsetY", comp.offset[1]},			
+			{"viewentityType", comp.entityType},
+			{"viewcolliders", comp.colliders},
+			{"viewSensor", comp.sensor}
+		}
+	};
+}
 
 void geProject::Scene::from_json(json& data, Animation& comp) {
 	data[1].at("speed").get_to(comp.speed);
@@ -399,6 +433,8 @@ void geProject::Scene::from_json(json& data, CircleCollider& comp) {
 		data[1].at("circleRadius").get_to(comp.radius);
 		data[1].at("circleoffsetX").get_to(comp.offset[0]);
 		data[1].at("circleoffsetY").get_to(comp.offset[1]);
+		data[1].at("circleentityType").get_to(comp.entityType);
+		data[1].at("circlecolliders").get_to(comp.colliders);
 		data[1].at("circleSensor").get_to(comp.sensor);
 	}
 }
@@ -415,6 +451,8 @@ void geProject::Scene::from_json(json& data, BoxCollider& comp) {
 		data[1].at("boxSizeY").get_to(comp.boxSize[1]);
 		data[1].at("boxOriginX").get_to(comp.origin[0]);
 		data[1].at("boxOriginY").get_to(comp.origin[1]);
+		data[1].at("boxentityType").get_to(comp.entityType);
+		data[1].at("boxcolliders").get_to(comp.colliders);
 		data[1].at("boxSensor").get_to(comp.sensor);
 	}
 }
@@ -475,6 +513,21 @@ void geProject::Scene::from_json(json& data, Damage& comp){
 }
 
 
+void geProject::Scene::from_json(json& data, ViewCollider& comp) {
+	if (data[1] == 0) {
+		comp.id = 0;
+	}
+	else {
+		data[1].at("entityAssigned").get_to(comp.entityAssigned);
+		data[1].at("viewRadius").get_to(comp.radius);
+		data[1].at("viewoffsetX").get_to(comp.offset[0]);
+		data[1].at("viewoffsetY").get_to(comp.offset[1]);	
+		data[1].at("viewentityType").get_to(comp.entityType);
+		data[1].at("viewcolliders").get_to(comp.colliders);
+		data[1].at("viewSensor").get_to(comp.sensor);
+	}
+}
+
 
 void geProject::Scene::setWindow(Window* window){
 	gameWindow = window;
@@ -507,6 +560,7 @@ geProject::MouseListener* geProject::Scene::getMouseListener() {
 void geProject::Scene::reloadLevel(std::string filepath) {
 	physicsmanager.clear();
 	rendermanager->clear();
+	rendermanager->renderMap(1);
 	entitymanager.reloadManager();
 }
 

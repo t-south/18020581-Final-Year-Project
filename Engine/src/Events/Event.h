@@ -11,8 +11,8 @@ namespace geProject {
 		keyPressed, keyReleased,
 		mousePressed, mouseReleased, mouseMove, mouseScroll,
 		gameStart, gameStop, gameSave, gameLoad,
-		transForm, spriteRender, rigidBody, boxCollider, circleCollider,
-		beginContact, endContact, preSolve, postSolve
+		transForm, spriteRender, rigidBody, boxCollider, circleCollider, viewCollider,
+		beginContact, endContact, preSolve, postSolve		
 	};
 	enum Context {
 		NoContext = 0,					/* 0b0000000000000000 */
@@ -215,6 +215,17 @@ namespace geProject {
 		unsigned int entityId;
 	};
 
+	class ViewColliderEvent : public Event {
+	public:
+		ViewColliderEvent(int context, int id, ViewCollider& view) : Event(context), entityId(id), viewcollider(&view) {};
+		static int getType() { return Type::circleCollider; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		int addContext(Context context) { eventContext = getContext() & context; };
+		ViewCollider* viewcollider;
+		unsigned int entityId;
+	};
+
+
 	class ProjectionEvent : public Event {
 	public:
 		ProjectionEvent(int context, glm::mat4 pinv, glm::mat4 vinv) : Event(context), projInv(pinv), viewInv(vinv) {};
@@ -275,4 +286,7 @@ namespace geProject {
 		Entity* entityA;
 		Entity* entityB;
 	};
+
+
+
 }

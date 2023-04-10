@@ -24,8 +24,8 @@ void geProject::LevelScene::update(float deltaTime){
 	camera->update(deltaTime);
 	physicsmanager.update(deltaTime);
 	if (player != nullptr) {
-		Command* command = controlManager->action();
-		player->update(deltaTime);
+		Command* command = controlManager->action(deltaTime);
+		player->update();
 		if (command)
 		{
 			command->execute(*player);

@@ -10,18 +10,18 @@
 namespace geProject {
 	class PlayerController : public Controller {
 	public:
-		PlayerController(/*EntityManager& entitymanager, Physics& physicsmanager,*/ Camera& camera);
+		PlayerController(Camera& camera);
 		virtual void dash() override;
 		virtual void attack() override;
 		virtual void specialAttack() override;
 		virtual void shield() override;
 		virtual void switchAbility() override;
-		virtual void moveTo(float x, float y) override;
+		virtual void moveTo(float x, float y, float dt) override;
 		void rotateToCursor(MouseMoveEvent* mouseMove);
-		void rotateTo(float rotate);
-		void update(float deltaTime);
-	private:
-		float dt;
+		void rotateTo(float desiredDirection, float currentDirection);
+		void update();
+		
+	private:		
 		int entityId;		
 		Camera& playerCamera;
 		//EntityManager& entitymanager;

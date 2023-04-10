@@ -59,10 +59,12 @@ void geProject::LevelEditorScene::init() {
 	
 	int playerId = entitymanager.getPlayerId();
 	if (playerId > -1) {
-		
 		player = new PlayerController(*camera);
 	}
-	std::vector<int> enemies = entitymanager.getEnemyIds();
+	
+	for (auto& i : entitymanager.getEnemyIds()) {
+		enemies.push_back(Enemy(i));
+	}
 }
 
 
@@ -115,18 +117,32 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	}
 	//std::cout << activatedEntity << std::endl;
 	if (physicsEnabled == true) {
+		if (player != nullptr) {
+			Command* command = controlManager->action(deltaTime);
+			player->update();
+			if (command)
+			{
+				command->execute(*player);
+			}
+		}
+
+		for (auto& enemy : enemies) {
+			enemy.update(deltaTime);
+			ViewCollider view = entitymanager.getViewComponent(enemy.getEnemyId());
+			Transform transform = entitymanager.getTransformComponent(enemy.getEnemyId());
+			editor->addSensor(transform.position, glm::vec3(0, 0, 1), view.radius, transform.rotation + 50, 1);
+			if (enemy.getPathSize() > 0) {
+				for (auto& path : enemy.getPath()) {
+					editor->addBox(glm::vec2(path.x, path.y), glm::vec2(0.2f, 0.2f), glm::vec3(1, 0, 0), 0, 1);
+				}
+			}
+		
+		}
 		physicsmanager.update(deltaTime);
 	}
 
 
-	if(player != nullptr){		
-		Command* command = controlManager->action();
-		player->update(deltaTime);
-		if (command)
-		{
-			command->execute(*player);
-		}
-	}
+
 	
 
 	//UPDATES TO RENDERING

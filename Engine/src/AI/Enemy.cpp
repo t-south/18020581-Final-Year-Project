@@ -6,58 +6,92 @@ geProject::Enemy::Enemy(int entity): entityId(entity){
 	aiController = new EnemyController(entityId);
 	Transform transform = entitymanager.getTransformComponent(entityId);
 	position = transform.position;	
-	idleState();
+	//availableGoals.push_back(AttackEnemyGoal());
+	//availableGoals.push_back(CalmDownGoal());
+	availableGoals.push_back(PatrolGoal());
+	actionsAvailable.push_back(new DodgeAction());
+	actionsAvailable.push_back(new ShieldAction());
+	actionsAvailable.push_back(new DashAction());
+	actionsAvailable.push_back(new RecoverEnergyAction());
+	actionsAvailable.push_back(new PickupObjectAction());
+	actionsAvailable.push_back(new InvestigateAction());
+	actionsAvailable.push_back(new PatrolAction());
+	actionsAvailable.push_back(new WaitAction());
+	actionsAvailable.push_back(new GoHomeAction());
+	actionsAvailable.push_back(new FireAttackAction());
+	actionsAvailable.push_back(new WaterAttackAction());
+	actionsAvailable.push_back(new WindAttackAction());
+	actionsAvailable.push_back(new EarthAttackAction());
+	//availableGoals.push_back(RestGoal());
+	//availableGoals.push_back(InvestigateGoal());
+	//availableGoals.push_back(FleeGoal());
+	//availableGoals.push_back(StayAliveGoal());
+	chooseGoal();
 }
 
 void geProject::Enemy::update(float deltaTime) {
 	double pi = 3.14159265;
-	currentdirection = entitymanager.getTransformComponent(entityId).rotation;
-	if (currentdirection < 0) {
-		currentdirection = 359.0f;
-	}
-	if (path.size() == 0) {
-		planPath(position[0], position[1], 3.5f, 1.25f);
-		desiredirection = atan2((path[0].y - position[1]), (path[0].x - position[0]));
-		if (desiredirection < 0) // we don't want negative angles
-		{
-			desiredirection += (pi * 2 );
-			// make negative angles positive by adding 360 degrees
+	orientAgent();
+
+	if (currentState == IDLE) {		
+		path.clear();
+		if (actionPlan.size() == 0) {
+			actionPlan = actionPlanner.createPlan(currentGoal, agentStateDetails, actionsAvailable);
 		}
-		desiredirection -= 1.571;
-	}
-	float testangle = atan2(position[1], position[0]) - atan2(path[0].y, path[0].x);
-	/*
-	else {
-		if (path[0].x != position[0] && path[0].y != position[1]) {
-			//MoveCommand* move = new MoveCommand();
-			//move->x = position[0] - path[0].x;
-			//move->y = position[1] - path[0].y;
-			//commandQueue.push(move);
+		else if (actionPlan.size() > 0) {
+			currentState = ACTION;
 		}
 		else {
-			path.erase(path.begin());
+			Transform playerpos = entitymanager.getTransformComponent(entitymanager.getPlayerId());
+			planPath(position[0], position[1], playerpos.position.x, playerpos.position.y);
+			if (path.size() > 0) {
+				desiredirection = atan2((path[0].y - position[1]), (path[0].x - position[0]));
+				desiredirection -= 1.571;
+				if (desiredirection < 0) {
+					desiredirection += (pi * 2);
+				}
+				currentState = MOVE;
+			}
 		}
+	}	
 
+	if (currentState == ACTION) {
+
+	}
+
+	if (currentState == MOVE && path.size() > 0) {
+		//check if difference in direction is above or below 1 degree, then adjust the current direction to the new direction		
+		if (currentdirection - desiredirection * (180 / pi) > 1 || currentdirection - desiredirection * (180 / pi) < -1) {
+			rotateAgent();
+		}
+		else {
+			//check if the agent has moved to within the desired tile range, then halt movement to agent
+			if (path[0].x - position[0] < 0.2f && path[0].y - position[1] < 0.2f && path[0].x - position[0] > -0.2f && path[0].y - position[1] > -0.2f) {
+				path.erase(path.begin());
+				if (path.size() == 0) {
+					currentState = IDLE;
+				}
+				else{
+					desiredirection = atan2((path[0].y - position[1]), (path[0].x - position[0]));
+					desiredirection -= 1.571;
+					if (desiredirection < 0){desiredirection += (pi * 2);}
+					moveAgent(0, 0, deltaTime);
+				}
+			}
+			else {
+				//check that the distance is not too far from next place on the path, if so set the agent back to the idle state, otherwise move it to the next position
+				if (calculateEuclidean(position[0], position[1], path[0].x, path[0].y) > 0.6f) { 
+					currentState = IDLE; 
+				}
+				else {
+					moveAgent(position.x - path[0].x, position.y - path[0].y, deltaTime);
+				}
+			}
+		}
 		
 	}
-	*/
-	float currentDirRad = currentdirection * (pi / 180);
-	//check if range of direction is above or below 1 degree, then adjust the current direction to the new direction
-	if (currentdirection - desiredirection * (180 / pi) > 1 || currentdirection - desiredirection * (180 / pi) < -1) {
-		RotateCommand* rotate = new RotateCommand();
-		float rotation = desiredirection - currentDirRad;
-		while (rotation < -180 * (pi / 180)) rotation += 360 * (pi / 180);
-		while (rotation > 180 * (pi / 180)) rotation -= 360 * (pi / 180);
-		float anglechange = 1 * (pi / 180);
-		float testagain = std::min(anglechange, std::max(-anglechange, rotation));
-		float newangle = currentDirRad + testagain;
-		rotate->rotate = newangle;
-		commandQueue.push(rotate);		
-	}
-	else {
-		std::cout << "completed" << std::endl;
-	}
 
+	//go through all commands added to the queue and execute for this frame
 	for (int i = 0; i < commandQueue.size(); i++) {
 		Command* command = commandQueue.front();
 		aiController->update(deltaTime);
@@ -67,9 +101,6 @@ void geProject::Enemy::update(float deltaTime) {
 		}
 		commandQueue.pop();
 	}
-
-	
-
 	
 }
 
@@ -77,14 +108,14 @@ void geProject::Enemy::executeAction(){
 
 }
 
-geProject::Goal geProject::Enemy::chooseGoal(){	
-	Goal newGoal = Goal();
+void geProject::Enemy::chooseGoal(){	
+	currentGoal = availableGoals[0];
 	for (auto& goal : availableGoals) {
-		if (goal.priority > newGoal.priority) {
-			newGoal = goal;
+		if (goal.priority > currentGoal.priority) {
+			currentGoal = goal;
 		}
 	}	
-	return newGoal;
+	
 }
 
 void geProject::Enemy::addGoal(Goal& goal){
@@ -95,28 +126,40 @@ void geProject::Enemy::removeGoal(Goal& goal){
 	//availableGoals.erase(std::remove(availableGoals.begin(), availableGoals.end(), goal), availableGoals.end());
 }
 
-void geProject::Enemy::moveState(){
-	currentState = State::MOVE;
+
+
+
+void geProject::Enemy::setDesiredDirection(){
+
 }
 
-void geProject::Enemy::idleState(){
-	currentState = State::IDLE;
-	if (actionPlan.size() > 0) {
-		actionState();
+
+
+
+
+void geProject::Enemy::moveAgent(float x, float y, float dt){
+	if (currentState == MOVE) {
+		MoveCommand* move = new MoveCommand();
+		move->x = x;
+		move->y = y;
+		move->dt = dt;
+		commandQueue.push(move);
 	}
 }
 
-void geProject::Enemy::actionState(){
-	currentState = State::ACTION;
-
-}
-
-float geProject::Enemy::calculateEuclidean(float originx, float originy, float destx, float desty)
-{
+float geProject::Enemy::calculateEuclidean(float originx, float originy, float destx, float desty){
 	float x = originx - destx;
 	float y = originy - desty;
 	return sqrt(pow(x,2) + pow(y, 2));
 }
+
+void geProject::Enemy::rotateAgent(){	
+	RotateCommand* rotate = new RotateCommand();
+	rotate->desiredDirection = desiredirection;
+	rotate->currentDirection = currentdirection;
+	commandQueue.push(rotate);
+}
+
 
 std::vector<geProject::pathNode> geProject::Enemy::planPath(float originX, float originY, float destinationX, float destinationY){	
 	std::vector<pathNode> openList;
@@ -198,4 +241,30 @@ std::vector<geProject::pathNode> geProject::Enemy::planPath(float originX, float
 	
 	
 	return path;
+}
+
+std::vector<geProject::pathNode> geProject::Enemy::getPath()
+{
+	return path;
+}
+
+int geProject::Enemy::getPathSize()
+{
+	return path.size();
+}
+
+int geProject::Enemy::getEnemyId() {
+	return entityId;
+}
+
+void geProject::Enemy::orientAgent() {
+	Transform transform = entitymanager.getTransformComponent(entityId);
+	currentdirection = transform.rotation;
+	//currentdirection = (int)std::round(transform.rotation) % 360;
+	currentdirection = fmod(currentdirection, 360);
+	if (currentdirection < 0) {
+		currentdirection += 360;
+	}
+	oldposition = position;
+	position = transform.position;
 }
