@@ -84,9 +84,6 @@ void geProject::RenderBatch::addSprite(int entityId, int count) {
 		}		
 		
 		entitymanager.updateDirtyFlags(entityId, 0, count, index);
-		if (index == -1) {
-			std::cout << "test error" << std::endl;
-		}
 		createVertices(sprite, transform.position[0], transform.position[1], transform.scale[0], transform.scale[1], transform.rotation, index);
 		hasUpdate = true;
 		spriteNum++;

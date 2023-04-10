@@ -2,21 +2,23 @@
 
 
 
-std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, unsigned int currentState, std::vector<Action*> actionsAvailable) {		
+std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, int currentState, std::vector<Action*> actionsAvailable) {		
 	std::vector<Action*> actionPlan;
     std::vector<asNode*> openList;
     std::vector<asNode*> closedList;
 	//find differences in current agent/world state and the goals required world state
-	unsigned int goalCondition = goal.getCondition();
+	int goalCondition = goal.checkCondition(0);
 	asNode* startNode = new asNode();
-	if ((currentState & goalCondition) != goalCondition) {
-		startNode->currentState = currentState;
-		startNode->goalState = currentState | goalCondition;
-	}
+	
+	startNode->currentState = currentState;
+	startNode->goalState = goalCondition;
+	
 	openList.push_back(startNode);
 	asNode* expandedNode = nullptr;
 	//A STAR
+	int track = 0;
     while (openList.size() > 0) {
+		track++;
 		int index = 0;
 		int count = 0;
 		//set the newly expanded node
@@ -30,12 +32,13 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, unsig
 		}		
 		//check both bools for current state and goal state are the same		
 		//if both are the same then we have found the optimal path
-		if (expandedNode->currentState == expandedNode->goalState) {
+		if ((expandedNode->goalState & expandedNode->currentState) == expandedNode->goalState) {
 			//create the action plan by following the nodes parents back to the origin node
 			while (expandedNode->parent != nullptr) {
 				actionPlan.push_back(expandedNode->actionTaken);
 				expandedNode = expandedNode->parent;
 			}
+			std::cout << "action A*: " << track << std::endl;
 			return actionPlan;
 		}
 		openList.erase(openList.begin() + index);
@@ -44,27 +47,37 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, unsig
 		//find adjacent nodes that fulfill the differences in effects 
 		for (auto& newAction : actionsAvailable) {				
 			//if action effect state matches the goal state
-			if ((newAction->getEffects() & expandedNode->goalState) == newAction->getEffects()) {
+			//std::cout << "goal: " << expandedNode->goalState << std::endl;
+			//std::cout << "comparison: " << (expandedNode->goalState & newAction->getEffects()) << std::endl;
+			//std::cout << "comp: " << (expandedNode->goalState & newAction->getEffects() == expandedNode->goalState) << std::endl;
+			//std::cout << "effect: " <<  newAction->getEffects() << std::endl;
+			if ((newAction->setEffect(0)) == expandedNode->goalState) {
 				asNode* neighbour = new asNode();				
 				neighbour->currentState = expandedNode->goalState;
-				neighbour->actionTaken = newAction;
-				unsigned int precon = newAction->getPreconditions();				
+				neighbour->actionTaken = newAction;				
+				//std::cout << "goal: " << expandedNode->goalState << std::endl;
+				//std::cout << "precon: " << (precon) << std::endl;
+				//std::cout << "new goal: " << (expandedNode->goalState | precon) << std::endl;
+				//std::cout << "check: " << ((expandedNode->goalState | precon) & ~precon) << std::endl;
 				//fill in precondition values for action 
-				neighbour->currentState = neighbour->goalState;
-				neighbour->goalState |= precon;
+				neighbour->currentState = expandedNode->currentState | expandedNode->goalState;
+				neighbour->goalState =  newAction->applyPrecondition(expandedNode->goalState);
+				neighbour->parent = expandedNode;
 				expandedNode->neighbours.push_back(neighbour);				
 			}			
 		}
 
 		for (auto& neighbour : expandedNode->neighbours) {
 			//add cost to take action from current node to current accumulated action cost
-			float gValue = 0;// expandedNode->gValue + neighbour->actionTaken->getCost();
+			float gValue = expandedNode->gValue + neighbour->actionTaken->getCost();
 			//heuristic is the number of state differences left till starting state
 			int count = 0;
+			//check number of differences in bits to find heuristic
 			for (int i = 0; i < 32; i++) {
 				if (((expandedNode->goalState >> i) & 1) != ((expandedNode->currentState >> i) & 1)) {
 					count++;
 				}
+
 			}
 			int heuristic = count;
 			
