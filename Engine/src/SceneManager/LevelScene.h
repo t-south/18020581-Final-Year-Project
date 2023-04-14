@@ -20,7 +20,6 @@ namespace geProject {
 		void init();
 		virtual void saveGame(GameSaveEvent* save) override;
 		PlayerController* player;
-		Camera* camera;
-		
+		Camera* camera;		
 	};
 }

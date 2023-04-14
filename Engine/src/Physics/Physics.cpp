@@ -20,9 +20,6 @@ void geProject::Physics::startUp(){
 
 
 void geProject::Physics::addEntity(int entityId) {
-	if (entityId == 1428) {
-		std::cout << "test" << std::endl;
-	}
 	Entity entity = entitymanager.getEntity(entityId);
 	//if(entity.compMask ) // select components based on the mask in the entity
 	//std::cout << bodies.count(entity.id) << std::endl;
@@ -38,10 +35,7 @@ void geProject::Physics::addEntity(int entityId) {
 		body.angularDamping = rigid.angularDamping;
 		body.linearDamping = rigid.linearDamping;
 		body.fixedRotation = rigid.fixedRotate;		
-		body.bullet = rigid.bullet;		
-		if (entity.type == player) {
-			std::cout << "test" << std::endl;
-		}
+		body.bullet = rigid.bullet;	
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		switch (rigid.bodyType) {
 		case 0:
@@ -75,6 +69,25 @@ void geProject::Physics::addEntity(int entityId) {
 			
 		}
 	}	
+}
+
+bool geProject::Physics::checkTargetObstructed(float startx, float starty, float targetx, float targety){
+	bool obstructed = false;
+	RayCastCallback raycast;
+	world.RayCast(&raycast, b2Vec2(startx, starty), b2Vec2(targetx, targety));	
+	//check the raycast for the amount of objects it has hit between enemy and player/ projectile, if its more than 1 then there is an obstruction.
+ 	if (raycast.environmentHit && raycast.m_hit) {
+		obstructed = true;
+	}
+	/*
+	for (auto& hit : raycast.raycasthit) {
+		std::cout << hit.type << " -> ";
+	}
+	std::cout << std::endl;
+	std::cout << raycast.m_hit << std::endl;
+	*/
+	std::cout << obstructed << std::endl;
+	return obstructed;
 }
 
 
@@ -189,7 +202,7 @@ void geProject::Physics::update(float deltaTime){
 
 		
 				entitymanager.updateTransform(body.first, position.x, position.y, angle);
-				if (bodyData != nullptr && bodyData->type == projectile && bodyData->lifeTime > -1) {
+				if (bodyData != nullptr && (bodyData->type == enemyprojectile || bodyData->type == playerprojectile) && bodyData->lifeTime > -1) {
 					if (bodyData->lifeTime == 0) {										
 						deleteBodies.push_back(bodyData->id);
 					}
@@ -240,10 +253,27 @@ void geProject::Physics::applyAngularVelocity(int entityId, float angle){
 }
 
 void geProject::Physics::createProjectile(int entityId){
-	Damage dmg = entitymanager.getDamageComponent(entityId);	
-	int projectileId = entitymanager.addEntity(projectile);
+	Damage dmg = entitymanager.getDamageComponent(entityId);
+	Entity parent = entitymanager.getEntity(entityId);
+	int projectileId = 0;
+	if (parent.type == enemy) {
+		projectileId = entitymanager.addEntity(enemyprojectile);
+	}
+	else if (parent.type == player) {
+		projectileId = entitymanager.addEntity(enemyprojectile);
+	}
+	
 	entitymanager.addParentEntity(entityId, projectileId);
 	Entity entity = entitymanager.getEntity(projectileId);
+	int colliders =0;
+	if (entity.type == enemy) {
+		colliders |= BOUNDARY | PLAYER;
+		entity.type = enemyprojectile;
+	}
+	else if (entity.type == player) {
+		colliders |= BOUNDARY | ENEMY;
+		entity.type = playerprojectile;
+	}
 	Transform transform = entitymanager.getTransformComponent(entityId);
 	b2BodyDef body;
 	double pi = 3.14159265;
@@ -253,8 +283,7 @@ void geProject::Physics::createProjectile(int entityId){
 	body.angularDamping = 0;
 	body.linearDamping = 0;
 	body.fixedRotation = 0;
-	body.bullet = false;
-	entity.type = projectile;
+	body.bullet = false;	
 	b2Body* worldBody{};
 	b2Vec2 velocity;
 	switch (dmg.dmgType) {
@@ -262,7 +291,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 100;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(1, 0 ,0, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = BOUNDARY | ENEMY });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -272,7 +301,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 100;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(0.4226621091365814f, 0.127809539437294f ,0.9026548862457275f, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = BOUNDARY | ENEMY });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -282,7 +311,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 50;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(1, 1 ,1, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = BOUNDARY | ENEMY | PROJECTILE });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -293,7 +322,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 50;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(0, 0 ,1, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = BOUNDARY | ENEMY | PROJECTILE });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -377,12 +406,13 @@ void geProject::Physics::deleteEntityPhysics(DeleteEntityEvent* e){
 	
 }
 
-
+/*
 
 geProject::RayCastListener* geProject::Physics::rayCast(int entityId, const b2Vec2& origin, const b2Vec2& target){
 	RayCastListener* raycastCallback = new RayCastListener(entityId);
 	world.RayCast(raycastCallback, origin, target);
 	return raycastCallback;
 }
+*/
 
 

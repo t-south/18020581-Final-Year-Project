@@ -23,7 +23,7 @@ namespace geProject {
 		void startUp();
 	
 		void addEntity(int entityId);		
-		
+		bool checkTargetObstructed(float startx, float starty, float targetx, float targety);
 		void addBoxCollider(BoxCollider box, int entityId);
 		void addCircleCollider(CircleCollider circle, int entityId);
 		void addViewSensorCollider(ViewCollider view, int entityId);
@@ -53,6 +53,6 @@ namespace geProject {
 		void updateCircleCollider(CircleColliderEvent* e);	
 		void deleteEntityPhysics(DeleteEntityEvent* e);	
 		//EntityManager* entitymanager;
-		RayCastListener* rayCast(int entityId, const b2Vec2& origin, const b2Vec2& target);
+		//RayCastListener* rayCast(int entityId, const b2Vec2& origin, const b2Vec2& target);
 	};
 }

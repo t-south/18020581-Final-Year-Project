@@ -7,7 +7,7 @@ geProject::LevelEditorScene::LevelEditorScene() {
 	eventSystem.subscribe(this, &LevelEditorScene::saveGame);	
 	eventSystem.subscribe(this, &LevelEditorScene::deleteEntity);
 	eventSystem.subscribe(this, &LevelEditorScene::updateCopy);
-	eventSystem.subscribe(this, &LevelEditorScene::keyCopyEntity);
+	eventSystem.subscribe(this, &LevelEditorScene::editorKeyEvent);
 	std::cout << "Editor Scene!" << std::endl;	
 	//entitymanager = new EntityManager(10000);
 	entitymanager.startUp();
@@ -63,28 +63,28 @@ void geProject::LevelEditorScene::init() {
 	}
 	
 	for (auto& i : entitymanager.getEnemyIds()) {
-		enemies.push_back(Enemy(i));
+		enemies[i] = new Enemy(i);
 	}
 }
 
 
-void geProject::LevelEditorScene::update(float deltaTime) {		
+void geProject::LevelEditorScene::update(float deltaTime) {
 
-	camera->update(deltaTime);	
+	camera->update(deltaTime);
 	//if mouse is out of game view then set the event system to only take imgui callbacks
-	if (loopcount > 1) {	
+	if (loopcount > 1) {
 		if ((mouse->getScreenXpos() <= 1920.0f && mouse->getScreenXpos() >= 0.0f) && (mouse->getScreenYpos() <= 1080.0f && mouse->getScreenYpos() >= 0.0f)) {
 			if (physicsEnabled) {
-		
+
 				eventSystem.setContext(GameplayContext);
 			}
 			else {
-		
+
 				eventSystem.setContext(EditorContext);
 			}
 		}
 		else {
-		
+
 			eventSystem.setContext(ImGuiContext);
 		}
 	}
@@ -92,28 +92,28 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	if (gridSelected) {
 		setGridLines();
 	}
-	
+
 	//DRAG AND DROP
 	if (entityDrag == true && activatedEntity > -1) {
 		Transform transform = entitymanager.getTransformComponent(activatedEntity);
 		float scroll = camera->getScroll();
 		float viewWidth = mouse->getViewXsize();
 		float viewHeight = mouse->getViewYsize();
-		if (gridSelected) {			
+		if (gridSelected) {
 			transform.position[0] = (int)(mouse->getCameraMouseX() / gridWidth) * gridWidth;
 			transform.position[1] = (int)(mouse->getCameraMouseY() / gridHeight) * gridHeight;
 		}
 		else {
-			transform.position[0] = mouse->getCameraMouseX() ;
-			transform.position[1] = mouse->getCameraMouseY() ;
+			transform.position[0] = mouse->getCameraMouseX();
+			transform.position[1] = mouse->getCameraMouseY();
 		}
-		
+
 		//std::cout << "Pos x: " << mouse->getCameraMouseX() << " Pos Y: " << mouse->getCameraMouseY() << " scroll: " << scroll << " gridwidth: " << gridWidth << " gridheight: " << gridHeight << std::endl;
 		entitymanager.assignTransform(activatedEntity, transform);
 		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && entityDrag == true) {
-			entityDrag = false;	
+			entityDrag = false;
 			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
-		}		
+		}
 	}
 	//std::cout << activatedEntity << std::endl;
 	if (physicsEnabled == true) {
@@ -127,29 +127,29 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		}
 
 		for (auto& enemy : enemies) {
-			enemy.update(deltaTime);
-			ViewCollider view = entitymanager.getViewComponent(enemy.getEnemyId());
-			Transform transform = entitymanager.getTransformComponent(enemy.getEnemyId());
+			enemy.second->update(deltaTime);
+			ViewCollider view = entitymanager.getViewComponent(enemy.second->getEnemyId());
+			Transform transform = entitymanager.getTransformComponent(enemy.second->getEnemyId());
 			editor->addSensor(transform.position, glm::vec3(0, 0, 1), view.radius, transform.rotation + 50, 1);
-			if (enemy.getPathSize() > 0) {
-				for (auto& path : enemy.getPath()) {
+			if (enemy.second->getPathSize() > 0) {
+				for (auto& path : enemy.second->getPath()) {
 					editor->addBox(glm::vec2(path.x, path.y), glm::vec2(0.2f, 0.2f), glm::vec3(1, 0, 0), 0, 1);
 				}
 			}
-		
+
 		}
 		physicsmanager.update(deltaTime);
 	}
 
 
 
-	
+
 
 	//UPDATES TO RENDERING
 	if (entitymanager.hasUpdate()) {
-		for (int i = 0; i < entitymanager.getEntityNum(); i++) {			
-			Entity ent = entitymanager.getEntity(i);			
-			if (ent.compMask > 0 && ent.id > -1) {	
+		for (int i = 0; i < entitymanager.getEntityNum(); i++) {
+			Entity ent = entitymanager.getEntity(i);
+			if (ent.compMask > 0 && ent.id > -1) {
 				if ((ent.compMask & 4) == 4) {//check for rigidbody
 					if ((ent.compMask & 8) == 8 || (ent.compMask & 16) == 16) {//check for boxcollider or circlecollider			
 						physicsmanager.addEntity(ent.id);
@@ -158,7 +158,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 				// only sprites that have not been added to the renderer previously will be set to 0		
 				//transform dirtyflag for render index is by default set to -1 when first created
 				if (entitymanager.getVertexStatus(ent.id) == -1) {
-					rendermanager->addSpriteToBatch(ent.id);			
+					rendermanager->addSpriteToBatch(ent.id);
 				}
 				//if there has been any updates the dirty flag in transform component will be set to 1
 				else if (entitymanager.getUpdateStatus(ent.id) == 1) {
@@ -172,10 +172,10 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	mouse->endFrame();
 	keyboard->endFrame();
 	entitymanager.endFrame();
-	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");		
+	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 	editor->render(*(camera));
 	//DEBUG DRAWING FOR PHYSICS
-	if (displayColliders && activatedEntity > -1) {		
+	/*if (displayColliders && activatedEntity > -1) {
 		Entity colliderEntity = entitymanager.getEntity(activatedEntity);
 		Transform trans = entitymanager.getTransformComponent(colliderEntity.id);
 		if ((colliderEntity.compMask & 8) == 8) {
@@ -194,8 +194,31 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 				}
 			}
 		}
-			
+
 	}
+	*/
+	if (displayColliders) {
+		for (int i = 0; i < entitymanager.getEntityNum(); i++) {
+			Entity ent = entitymanager.getEntity(i);
+			if (ent.id > -1) {
+				Transform trans = entitymanager.getTransformComponent(ent.id);
+				for (auto& circle : entitymanager.getCircleColliderComponents(ent.id)) {
+					if (circle.id > 0) {
+						//multiply by 2 since box size is set to half width / height
+						editor->addCircle(trans.position + circle.offset, glm::vec3(0.0f, 1.0f, 0.0f), circle.radius, 16, 1);
+					}
+				}
+				for (auto& box : entitymanager.getBoxColliderComponents(ent.id)) {
+					if (box.id > 0) {
+						//multiply by 2 since box size is set to half width / height
+						editor->addBox(trans.position + box.offset, box.boxSize, glm::vec3(0.0f, 1.0f, 0.0f), (float)trans.rotation, 1);
+					}
+				}
+			}
+		}
+	}
+	
+
 	//Enemy* newEnemy = new Enemy();
 	//auto test = newEnemy->planPath(1.291f, 0.544f, 3.582f, 2.721f);
 	//worldstate.testWorldMap();
@@ -331,10 +354,13 @@ unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* spr
 		player = new PlayerController(*camera);
 		entitymanager.assignController(entity, Controls());
 	}	
+	if (type == entityTypes::enemy) {
+		animationManager->assignEntityAnimation(entity, "Idle");
+	}
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
 	entitymanager.assignTransform(entity, Transform{ .position = {mouse->getCameraMouseX(), mouse->getCameraMouseY()}, .scale = {sizeX, sizeY} });
 	entitymanager.assignSpriteRender(entity, *sprite);
-	//animationManager->assignEntityAnimation(entity, "Idle");
+	
 	entityDrag = true;
 	setActiveEntity(entity);
 	return entity;
@@ -453,14 +479,24 @@ void geProject::LevelEditorScene::updateCopy(CopyEntityEvent* e){
 	
 }
 
-void geProject::LevelEditorScene::keyCopyEntity(KeyPressedEvent* e){
+void geProject::LevelEditorScene::editorKeyEvent(KeyPressedEvent* e){
+	
 	if (eventSystem.getContext() == (EditorContext) && e->keycode == GLFW_KEY_C) {
+		std::cout << "copied " << std::endl;
 		if (previousEntity > -1) {
 			entitymanager.copyEntity(previousEntity);
 		}
 	}
+	if (eventSystem.getContext() == (EditorContext) && e->keycode == GLFW_KEY_DELETE) {
+		if (previousEntity > -1) {
+			entitymanager.deleteEntity(previousEntity);
+		}
+	}
 	
 }
+
+
+
 
 
 

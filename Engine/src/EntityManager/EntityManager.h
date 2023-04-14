@@ -48,16 +48,17 @@ namespace geProject {
 		void assignHealth(int entityId, Health health);
 		void assignDamage(int entityId, Damage dmg);
 		void assignView(int entityId, ViewCollider view);
+		void assignAgent(int entityId, Agent agent);
 		void deleteComponent(int entityId, uInt componentId);
 
-		std::vector<Transform*> getTransformComponents();
-		std::vector<SpriteRender*> getSpriteComponents();
-		std::vector <Rigidbody*> getRigidBodyComponents();	
-		std::vector<Animation*> getAnimationComponents();	
-		std::vector <Controls*> getControllerComponents();
-		std::vector<Health*> getHealthComponents();
-		std::vector <Damage*> getDamageComponents();
-		std::vector <ViewCollider*> getViewComponents();
+		//std::vector<Transform*> getTransformComponents();
+		//std::vector<SpriteRender*> getSpriteComponents();
+		//std::vector <Rigidbody*> getRigidBodyComponents();	
+		//std::vector<Animation*> getAnimationComponents();	
+		//std::vector <Controls*> getControllerComponents();
+		//std::vector<Health*> getHealthComponents();
+		//std::vector <Damage*> getDamageComponents();
+		//std::vector <ViewCollider*> getViewComponents();
 
 		int getUpdateStatus(int entityId);
 		int getBatchStatus(int entityId);
@@ -65,6 +66,7 @@ namespace geProject {
 		int getZindex(int entityId);
 
 		void updateTransform(int entityId, float x, float y, float rotate);
+		void updateAnimationState(int entityId, std::string state);
 		Entity getEntity(int entityId);
 		Transform getTransformComponent(int entityId);
 		SpriteRender getSpriteComponent(int entityId);
@@ -74,6 +76,7 @@ namespace geProject {
 		Health getHealthComponent(int entityId);
 		Damage getDamageComponent(int entityId);
 		ViewCollider getViewComponent(int entityId);
+		Agent getAgentComponent(int entityId);
 		std::vector<CircleCollider> getCircleColliderComponents(int entityId);
 		std::vector<BoxCollider> getBoxColliderComponents(int entityId);
 
@@ -84,6 +87,8 @@ namespace geProject {
 		void assignUpdate();
 		void updateDirtyFlags(int entityId, int update, int batch, int vertex);
 		int getPlayerId();
+		void updateAgentState(int entityId, int newState);
+		int getAgentState(int entityId);
 		std::vector<int> getEnemyIds();
 	private:		
 		bool entityUpdated{ false };
@@ -99,6 +104,7 @@ namespace geProject {
 		void updateRigidBody(RigidEvent* event);
 		void updateBoxCollider(BoxColliderEvent* event);
 		void updateCircleCollider(CircleColliderEvent* event);
+
 
 
 		//BOX2D CALLBACKS
@@ -119,6 +125,7 @@ namespace geProject {
 		std::vector <Health*> componentHealth;
 		std::vector <Damage*> componentDamage;
 		std::vector <ViewCollider*> componentView;
+		std::vector <Agent*> componentAgent;
 
 		PoolAllocator entitypool{ maxEntities, sizeof(Entity) };
 		PoolAllocator transformpool{ maxEntities, sizeof(Transform) };
@@ -129,6 +136,7 @@ namespace geProject {
 		PoolAllocator healthpool{ maxEntities, sizeof(Health) };
 		PoolAllocator damagepool{ maxEntities, sizeof(Damage) };
 		PoolAllocator viewpool{ maxEntities, sizeof(ViewCollider) };
+		PoolAllocator agentpool{ maxEntities, sizeof(Agent) };
 
 		//stored in unordered maps instead of pool allocators, due to varying memory amounts per component
 		std::unordered_map<int, std::vector <BoxCollider>> componentBoxCollider;

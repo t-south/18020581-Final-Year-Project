@@ -22,6 +22,20 @@ namespace geProject {
 		LIGHTNING = 0x0010
 	};
 
+	enum AgentStates {
+		AT_HOME = 0x00001,
+		PATROLLED = 0x00002,
+		HAS_ENERGY = 0x00004,
+		ALERT = 0x00008,
+		AGENT_ANGRY = 0x00010,
+		AGENT_TIRED = 0x00020,
+		AGENT_HURT = 0x00040,
+		ATTACK_SIGHTED = 0x00080,
+		POWERUP_IN_RANGE = 0x00100,
+		ENEMY_DEAD = 0x00200,
+		ENEMY_VISIBLE = 0x00400,
+	};
+
 
 	struct Transform {
 		unsigned int id = 0x0001;
@@ -116,6 +130,14 @@ namespace geProject {
 		int entityType{ 0 };
 		int colliders{ 0 };
 		bool sensor{ false };
+	};
+
+	struct Agent {
+		unsigned int id = 0x0400;
+		int agentStateDetails{AT_HOME | HAS_ENERGY}; //keeps track of the current agents state based on a bitmask
+		int goalPriority;  //context for goal priorities  COMBAT - 0 -> LIFESTYLE - 1 -> DUTY - 2
+		bool playerInRange{ false };
+		glm::vec2 anomalypos;
 	};
 
 }

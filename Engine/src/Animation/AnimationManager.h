@@ -10,7 +10,7 @@
 using json = nlohmann::json;
 namespace geProject {
 	enum AnimationState {
-		Default, Running, Dash, Idle
+		Idle, Sleeping, Angry
 	};
 
 	struct Frame {

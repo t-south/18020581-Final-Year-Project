@@ -25,7 +25,7 @@ geProject::EditorRender::~EditorRender(){}
 
 void geProject::EditorRender::lineCheck() {
 	for (int i = 0; i < lines.size(); i++) {
-		if (lines[i]->changeFrame() <= 0) {
+		if (lines[i].changeFrame() <= 0) {
 			lines.erase(lines.begin() + i);
 			i--;
 		}
@@ -33,7 +33,7 @@ void geProject::EditorRender::lineCheck() {
 }
 
 void geProject::EditorRender::addLine(glm::vec2 origin, glm::vec2 destination, glm::vec3 color, unsigned int life) {
-	lines.push_back(new Line(origin, destination, color, life));
+	lines.push_back(Line(origin, destination, color, life));
 	createVertices();
 }
 
@@ -111,24 +111,24 @@ void geProject::EditorRender::addSensor(glm::vec2 centre, glm::vec3 color, float
 void geProject::EditorRender::createVertices() {
 	if (lines.size() > 0) {		
 		int index = 0;
-		for (auto const& line : lines) {
+		for (auto & line : lines) {
 			glm::vec2 pos;
 			for (int i = 0; i < 2; i++) {				
 				switch (i) {
 				case 0:
-					pos = line->getOrigin();
+					pos = line.getOrigin();
 					vertices[index] = pos[0];
 					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];//x
 					break;
 				case 1:
-					pos = line->getDestination();
+					pos = line.getDestination();
 					vertices[index] = pos[0];
 					vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 1] = pos[1];//y
 					break;
 				default:
 					break;
 				}
-				glm::vec3 color = line->getColor();
+				glm::vec3 color = line.getColor();
 				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 2] = 0.0f;  //z
 				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 3] = color[0];
 				vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 4] = color[1];

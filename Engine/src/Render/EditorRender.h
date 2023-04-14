@@ -22,7 +22,7 @@ namespace geProject {
 	
 	private:
 		unsigned int vao, vbo, vertSize, index, renderSize;
-		std::vector<Line*> lines;
+		std::vector<Line> lines;
 		std::vector<float> vertices;	
 	};
 }

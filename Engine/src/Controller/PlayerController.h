@@ -21,7 +21,8 @@ namespace geProject {
 		void rotateTo(float desiredDirection, float currentDirection);
 		void update();
 		
-	private:		
+	private:	
+		int nextDmgType;
 		int entityId;		
 		Camera& playerCamera;
 		//EntityManager& entitymanager;

@@ -5,7 +5,7 @@
 namespace geProject {
 	class Controller {	
 	public:
-		int nextDmgType;
+		
 		virtual ~Controller() {};
 		virtual void dash() = 0;
 		virtual void attack() = 0;

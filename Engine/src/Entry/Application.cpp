@@ -57,7 +57,7 @@ namespace geProject {
 			//TEXTURE SELECTION UPDATES
 			scene->setPicking();
 			frameBuffer->bind();
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			//SCENE UPDATES
 			scene->update(deltaTime);
@@ -76,7 +76,7 @@ namespace geProject {
 			//std::cout << "Frame time: " << deltaTime << std::endl;
 			if (timePerSec > 1) {
 				//std::cout << "FPS1: " << loopCount << std::endl;
-				std::cout << "FPS2: " << 1 / deltaTime << std::endl;
+				//std::cout << "FPS2: " << 1 / deltaTime << std::endl;
 				timePerSec = 0;
 				loopCount = 0;
 			}

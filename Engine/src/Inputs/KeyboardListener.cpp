@@ -20,9 +20,13 @@ void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int 
     ImGuiIO& io = ImGui::GetIO();
     Context currentContext = eventSystem.getContext();
     
-    if (action == GLFW_PRESS) {        
-        if (key == GLFW_KEY_C) {
+    if (action == GLFW_PRESS) {            
+        if (key == GLFW_KEY_C ) {
+            std::cout << "C pressed " << std::endl;
             eventSystem.publishImmediately(new KeyPressedEvent(EditorContext | ImGuiContext, key, 0));           
+        }
+        else if (key == GLFW_KEY_DELETE) {
+            eventSystem.publishImmediately(new KeyPressedEvent(EditorContext | ImGuiContext, key, 0));
         }
         else {
             eventSystem.publishImmediately(new KeyPressedEvent(GameplayContext | ImGuiContext, key, 0));
@@ -30,6 +34,7 @@ void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int 
         }
     }
     if (action == GLFW_RELEASE) {
+
         eventSystem.publishImmediately(new KeyReleasedEvent(GameplayContext | ImGuiContext, key, 0));
         KeyboardListener::getInstance()->keyPressed[key] = false; 
     }

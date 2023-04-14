@@ -44,7 +44,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 	//go through each of the components 
 	if (oFile.is_open() && entity.id > -1) {
 		json entityjson = json::object();
-		json entityType = json{"entityType", entity.type};
+		json entityType = json{ "entityType", entity.type };
 		json transformData = json::object();
 		json rigidData = json::object();
 		json circleColliderData = json::object();
@@ -59,23 +59,23 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 		json spriteData = json::object();
 		SpriteRender sprite = entitymanager.getSpriteComponent(entity.id);
 		to_json(spriteData, sprite);
-		if ((entity.compMask & 1 << 2) == 1 << 2) {			
+		if ((entity.compMask & 1 << 2) == 1 << 2) {
 			Rigidbody rigid = entitymanager.getRigidBodyComponent(entity.id);
 			to_json(rigidData, rigid);
 		}
-		else {			
-			rigidData = json{
-				"Rigidbody", 0
-			};
+		else {	
+		rigidData = json{
+			"Rigidbody", 0
+		};
 		}
-		if ((entity.compMask & 1 << 3) == 1 << 3) {					
-			for (auto& circle : entitymanager.getCircleColliderComponents(entity.id)){
+		if ((entity.compMask & 1 << 3) == 1 << 3) {
+			for (auto& circle : entitymanager.getCircleColliderComponents(entity.id)) {
 				json circleData = json::object();
 				to_json(circleData, circle);
 				circleColliderData["EntityCircleCollider"].push_back(circleData);
 			}
 		}
-
+	
 
 		
 		if ((entity.compMask & 1 << 4) == 1 << 4) {				

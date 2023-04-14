@@ -11,6 +11,7 @@ namespace geProject {
 
 	class AttackCommand : public Command {
 	public:
+		
 		virtual void execute(Controller& entity) override { entity.attack(); };
 	};
 

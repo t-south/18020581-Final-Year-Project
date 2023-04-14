@@ -1,1 +1,1 @@
-{"Idle":[["Frame",{"sprite":0}]],"Running":[["Frame",{"sprite":1}],["Frame",{"sprite":2}],["Frame",{"sprite":3}]]}
+{"Idle":[["Frame",{"sprite":1}]],"Sleeping":[["Frame",{"sprite":2}],["Frame",{"sprite":3}],["Frame",{"sprite":4}]]}

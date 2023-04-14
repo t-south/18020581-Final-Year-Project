@@ -11,11 +11,14 @@
 #include <ge_engine/Managers.h>
 #include <cmath>
 #include <math.h>
+#include <thread>
 
 namespace geProject {
 	enum State {
 		IDLE, MOVE, ACTION
 	};
+
+
 	
 	class Enemy {
 	public:
@@ -24,16 +27,14 @@ namespace geProject {
 		std::vector<pathNode> getPath();
 		int getPathSize();
 		int getEnemyId();
+		void playerSpotted(bool playerSighted, bool obstructed, float posx, float posy);
+		void attackSpotted(bool attackSighted, bool obstructed, float posx, float posy);
 	private:
 		static Planner actionPlanner;
-		glm::vec2 position;
-		glm::vec2 oldposition;	
-		glm::vec2 homelocation;
-		float currentdirection;
-		float desiredirection;
+
 		//STATE TRANSITIONS  ||  IDLE -- ACTION -- MOVE
-		State currentState{State::IDLE};		
-		int agentStateDetails{  AT_HOME };// |RESTED | HAS_ENERGY | FIRE_ENERGY | WATER_ENERGY | EARTH_ENERGY | WIND_ENERGY };
+		State currentState{State::IDLE};	
+
 		//GOALS
 		Goal* currentGoal;
 		std::vector<Goal*> availableGoals;
@@ -41,25 +42,28 @@ namespace geProject {
 		//ACTIONS
 		std::vector<Action*> actionsAvailable;
 		std::vector<Action*> actionPlan;
-		Action* selectedAction{ nullptr };
 
-		int entityId;
-		int fireEnergy;
-		int waterEnergy;
-		int earthEnergy;
-		int windEnergy;	
-		
-		
+		//AGENT DETAILS
+		int entityId;	
+		int energy{ 10 };
+		int alertLevel = 10;
+		glm::vec2 position;
+		glm::vec2 oldposition;
+		glm::vec2 homelocation;
+		float currentdirection;
+		float desiredirection;
+
 		void executeAction();
 		void setDesiredDirection();
 		void moveAgent(float x, float y, float dt);
 		void rotateAgent();
-		void chooseGoal();
+		void chooseGoal(int agentState);
 		void addGoal(Goal* goal);
 		void removeGoal(Goal* goal);
 		void orientAgent();
 		std::vector<pathNode> path;
 		std::queue<Command*> commandQueue;
 		EnemyController* aiController;
+		void updateActionCost(int agentState);
 	};
 }

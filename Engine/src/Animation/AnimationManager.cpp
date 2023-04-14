@@ -14,23 +14,23 @@ void geProject::AnimationManager::update(float deltaTime){
 	for (const auto& i : entitymanager.getEntities()) {
 		if ((i->compMask & 32) == 32 && i->id > -1) {					//check there is an animation assigned to entity, if so retrieve sprite and animation data
 			SpriteRender sprite = entitymanager.getSpriteComponent(i->id);
-			Animation animation = entitymanager.getAnimationComponent(i->id);
-			int& frame = animation.currentFrame;
+			Animation animation = entitymanager.getAnimationComponent(i->id);			
 			auto& frameList = animationList[animation.state];
-			if (frame >= frameList.size()) {
-				frame = 0;
-			}		
+			if (animation.currentFrame >= frameList.size()) {
+				animation.currentFrame = 0;
+			}			
 			//std::cout << deltaTime << std::endl;
-			Frame& currentFrame = frameList[frame];
-			//auto playerSprites = resourcemanager.requestSpriteSheet(sprite.textureId);
-			//auto& newSprite = playerSprites->getSprite(frame);				
-			//entitymanager.assignSpriteRender(i->id, newSprite);
+			Frame& currentFrame = frameList[animation.currentFrame];
+			auto playerSprites = resourcemanager.requestSpriteSheet(sprite.textureId);
+			auto& newSprite = playerSprites->getSprite(frameList[animation.currentFrame].sprite);
+			entitymanager.assignSpriteRender(i->id, newSprite);
 			currentFrame.time += deltaTime;
 			//entitymanager.assignSpriteRender(i->id, newSprite);
 			if (currentFrame.time >= animation.speed) {
-				frame++;
+				animation.currentFrame++;
 				currentFrame.time = 0.0f;
 			}
+			entitymanager.assignAnimation(i->id, animation);
 		}
 	}
 }

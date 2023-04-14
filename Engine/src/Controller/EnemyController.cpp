@@ -4,6 +4,7 @@ geProject::EnemyController::EnemyController(int entity): entityId(entity){
 	desiredVelocity = glm::vec3();
 	currentVelocity = glm::vec3();
 	steeringVelocity = glm::vec3();
+	entitymanager.assignDamage(entityId, Damage());
 }
 
 void geProject::EnemyController::dash(){
@@ -11,7 +12,10 @@ void geProject::EnemyController::dash(){
 }
 
 void geProject::EnemyController::attack(){
-
+	Damage dmg = entitymanager.getDamageComponent(entityId);
+	dmg.dmgType = 2;
+	physicsmanager.createProjectile(entityId);
+	entitymanager.assignDamage(entityId, dmg);
 }
 
 void geProject::EnemyController::specialAttack(){

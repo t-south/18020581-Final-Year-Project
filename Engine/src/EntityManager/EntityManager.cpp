@@ -68,7 +68,8 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 		componentDamage[index]->id = 0;
 		componentView.push_back(reinterpret_cast<ViewCollider*>(viewpool.allocate(sizeof(ViewCollider))));
 		componentView[index]->id = 0;
-
+		componentAgent.push_back(reinterpret_cast<Agent*>(agentpool.allocate(sizeof(Agent))));
+		componentAgent[index]->id = 0;
 		std::memcpy(entities[index], &entity, sizeof(Entity));
 		if (type == 0) {
 			playerId = index;
@@ -95,6 +96,7 @@ void geProject::EntityManager::deleteEntity(int entityId){
 	componentHealth[entityId]->id = 0;
 	componentDamage[entityId]->id = 0;
 	componentView[entityId]->id = 0;
+	componentAgent[entityId]->id = 0;
 	entitiesDeleted++;	
 }
 
@@ -297,6 +299,16 @@ void geProject::EntityManager::assignView(int entityId, ViewCollider view){
 
 }
 
+void geProject::EntityManager::assignAgent(int entityId, Agent agent){
+	if (entityId < maxEntities && entityId >= 0) {
+		std::memcpy(componentAgent[entityId], &agent, sizeof(Agent));
+		entities[entityId]->compMask = entities[entityId]->compMask | agent.id;
+	}
+	else {
+		std::cout << "unable to assign agent" << std::endl;
+	}
+}
+
 
 void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 	if(entityId < maxEntities && entityId >= 0){
@@ -331,6 +343,9 @@ void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 		case 0x0200:
 			componentView[entityId]->id = 0;
 			break;
+		case 0x0400:
+			componentAgent[entityId]->id = 0;
+			break;
 		default:
 			break;
 		}
@@ -339,7 +354,7 @@ void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 	}
 }
 
-
+/*
 std::vector<geProject::Transform*> geProject::EntityManager::getTransformComponents() {
 	return componentTransforms;
 }
@@ -369,7 +384,7 @@ std::vector<geProject::ViewCollider*> geProject::EntityManager::getViewComponent
 {
 	return componentView;
 }
-
+*/
 
 int geProject::EntityManager::getUpdateStatus(int entityId) {
 	return componentTransforms[entityId]->dirtyFlag[0];
@@ -423,6 +438,10 @@ geProject::Damage geProject::EntityManager::getDamageComponent(int entityId){
 geProject::ViewCollider geProject::EntityManager::getViewComponent(int entityId)
 {
 	return *componentView[entityId];
+}
+
+geProject::Agent geProject::EntityManager::getAgentComponent(int entityId){
+	return *componentAgent[entityId];
 }
 
 std::vector<geProject::CircleCollider> geProject::EntityManager::getCircleColliderComponents(int entityId) {
@@ -482,6 +501,11 @@ void geProject::EntityManager::updateTransform(int entityId, float x, float y, f
 	componentTransforms[entityId]->dirtyFlag[0] = 1;
 }
 
+void geProject::EntityManager::updateAnimationState(int entityId, std::string state)
+{
+	componentAnimation[entityId]->state = state;
+}
+
 void geProject::EntityManager::updateSprite(SpriteEvent* event) {
 	assignSpriteRender(event->entityId, *event->sprite);
 }
@@ -508,14 +532,40 @@ void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
 	case entityTypes::player:
 		if (event->entityB->type == enemy) {
 			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 0, 0, 1);
-			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;
+			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;			
 		}
 		break;
 
 	case entityTypes::enemy:
 		if (event->entityB->type == player) {
+			if (event->obstructed) {				
+				componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_VISIBLE;
+				componentAgent[event->entityA->id]->playerInRange = true;
+				if ((componentAgent[event->entityA->id]->agentStateDetails & ENEMY_VISIBLE) == ENEMY_VISIBLE) {
+					componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
+				}
+				//componentAgent[event->entityA->id]->anomalypos = glm::vec2(posx, posy);
+			}
+			else {
+				componentAgent[event->entityA->id]->agentStateDetails |= ENEMY_VISIBLE;
+				componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_DEAD;
+			}
+
 			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 0, 0, 1);
 			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;
+		}
+		if (event->entityB->type == playerprojectile) {
+			if (event->obstructed) {
+				componentAgent[event->entityA->id]->agentStateDetails &= ~ATTACK_SIGHTED;				
+				//componentAgent[event->entityA->id]->anomalypos = glm::vec2(posx, posy);
+				if ((componentAgent[event->entityA->id]->agentStateDetails & ATTACK_SIGHTED) == ATTACK_SIGHTED) {
+					componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
+				}
+			}
+			else {
+				componentAgent[event->entityA->id]->agentStateDetails |= ATTACK_SIGHTED;
+			}
+
 		}
 		break;
 
@@ -544,13 +594,22 @@ void geProject::EntityManager::EndContact(EndContactEvent* event){
 		if (event->entityB->type == enemy) {
 			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 1, 1, 1);
 			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;
+	
 		}
 		break;
 
 	case entityTypes::enemy:
 		if (event->entityB->type == player) {
 			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 1, 1, 1);
-			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;
+			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;			
+			componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
+			componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_VISIBLE;	
+			componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_DEAD;	
+			componentAgent[event->entityA->id]->playerInRange = false;
+		}
+		if (event->entityB->type == playerprojectile) {			
+			componentAgent[event->entityA->id]->agentStateDetails &= ~ATTACK_SIGHTED;
+			componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
 		}
 		break;
 
@@ -583,6 +642,15 @@ void geProject::EntityManager::PostSolve(PostsolveEvent* event){
 
 int geProject::EntityManager::getPlayerId(){
 	return playerId;
+}
+
+void geProject::EntityManager::updateAgentState(int entityId, int newState){
+	componentAgent[entityId]->agentStateDetails = newState;
+}
+
+int geProject::EntityManager::getAgentState(int entityId)
+{
+	return componentAgent[entityId]->agentStateDetails;
 }
 
 std::vector<int> geProject::EntityManager::getEnemyIds(){

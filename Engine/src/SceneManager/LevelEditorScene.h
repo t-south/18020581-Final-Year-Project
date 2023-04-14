@@ -43,6 +43,7 @@ namespace geProject {
 		virtual void saveGame(GameSaveEvent* save) override;			
 		void deleteEntity(DeleteEntityEvent* e);
 		void updateCopy(CopyEntityEvent* e);
-		void keyCopyEntity(KeyPressedEvent* e);
+		void editorKeyEvent(KeyPressedEvent* e);
+		
 	};
 }

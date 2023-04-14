@@ -4,67 +4,89 @@
 namespace geProject {
 	class Goal {	
 	public:
-		int priority{ 10 };			
+		std::string name;
+		int goalType;
+		int priority{ 10 };
 		void increasePriority() { if (priority < 10) { priority++; } };
 		void decreasePriority() { if (priority > 0) {priority--;} };
 		virtual int checkCondition(int state) =0;
 		virtual bool checkValid(int state) = 0;
+		                                                                                           
 	};
 
 	class AttackEnemyGoal :public Goal {
 	public:
-		AttackEnemyGoal() {};	
+		AttackEnemyGoal() { name = "Attack Goal"; goalType = actionType::COMBAT; };
 		int checkCondition(int state) { return state | ENEMY_DEAD; };
-		bool checkValid(int state) { return (~ENEMY_DEAD & state) == state; }
+		bool checkValid(int state) { 
+			return ((~ENEMY_DEAD & state) | (ENEMY_VISIBLE | state)) == state; 
+		}
 	
-	};
-
-	class CalmDownGoal : public Goal {	
-	public:
-		CalmDownGoal() {};	
-		int checkCondition(int state) { return state & ~AGENT_ANGRY; };
-		bool checkValid(int state) { return (AGENT_ANGRY & state) == state; }
 	};
 
 	class PatrolGoal : public Goal {
 	public:
-		PatrolGoal() {};
+		PatrolGoal() { name = "Patrol Goal"; goalType = actionType::DUTY;};
 		int checkCondition(int state) {	state = state | PATROLLED;	return state & ~AT_HOME; };
-		bool checkValid(int state) { return (AT_HOME & ~PATROLLED & state) == state; };
+		bool checkValid(int state) {
+			return ((HAS_ENERGY | state) & (AT_HOME | state) & (~PATROLLED & state)) == state; 
+		};
 	};
 
 	class GoHomeGoal : public Goal {
 	public:
-		GoHomeGoal() {};
+		GoHomeGoal() { name = "GoHome Goal" ; goalType = actionType::DUTY;};
 		int checkCondition(int state) { state = state | AT_HOME;	return state & ~PATROLLED; };
-		bool checkValid(int state) { return (~AT_HOME & PATROLLED & state) == state; };
+		bool checkValid(int state) { 
+			int newState = state;
+			newState |= HAS_ENERGY | PATROLLED;
+			newState &= ~AT_HOME;
+			return newState == state;
+		};
 	};
+
+	class CalmDownGoal : public Goal {
+	public:
+		CalmDownGoal() { name = "CalmDown Goal" ; goalType = actionType::LIFESTYLE;};
+		int checkCondition(int state) { return state & ~AGENT_ANGRY; };
+		bool checkValid(int state) { 
+			return (AGENT_ANGRY & state) == state; 
+		}
+	};
+
 
 	class RestGoal : public Goal {
 	public:
-		RestGoal() {};
-		int checkCondition(int state) { return state | RESTED; };
-		bool checkValid(int state) { return (~RESTED & state) == state; };
+		RestGoal() { name = "Rest Goal"; goalType = actionType::LIFESTYLE | COMBAT;};
+		int checkCondition(int state) { return state | HAS_ENERGY; };
+		bool checkValid(int state) { 			
+			return (~HAS_ENERGY & state) == state; };
 	};
 
 	class InvestigateGoal : public Goal {
 	public:
-		InvestigateGoal() {};
+		InvestigateGoal() { name = "Investigate Goal"; goalType = actionType::COMBAT;};
 		int checkCondition(int state) { return  state & ~ALERT; };
-		bool checkValid(int state) { return (ALERT & state) == state; };
+		bool checkValid(int state) { 
+			return (ALERT & state) == state; 
+		};
 	};
 
 	class FleeGoal : public Goal {
 	public:
-		FleeGoal() {};
-		int checkCondition(int state) { return  state & ~ENEMY_VISIBLE; };
-		bool checkValid(int state) { return (ENEMY_VISIBLE & state) == state; };
+		FleeGoal() { name = "Flee Goal"; };		
+		int checkCondition(int state) { return  state & ~ENEMY_VISIBLE; goalType = actionType::COMBAT;};
+		bool checkValid(int state) { 
+			return (ENEMY_VISIBLE & state) == state; 
+		};
 	};
 
 	class StayAliveGoal : public Goal {
 	public:
-		StayAliveGoal() {};
+		StayAliveGoal() { name = "Stay Alive Goal"; goalType = actionType::COMBAT;};
 		int checkCondition(int state) { return state & ~AGENT_HURT; };
-		bool checkValid(int state) { return (AGENT_HURT & state) == state; };
+		bool checkValid(int state) { 
+			return (AGENT_HURT & state) == state; 
+		};
 	};
 }

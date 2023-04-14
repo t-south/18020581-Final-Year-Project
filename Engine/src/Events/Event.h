@@ -10,7 +10,7 @@ namespace geProject {
 		deleteEntity, copyEntity, sceneHier,
 		keyPressed, keyReleased,
 		mousePressed, mouseReleased, mouseMove, mouseScroll,
-		gameStart, gameStop, gameSave, gameLoad,
+		gameStart, gameStop, gameSave, gameLoad, playerFound, attackfound,
 		transForm, spriteRender, rigidBody, boxCollider, circleCollider, viewCollider,
 		beginContact, endContact, preSolve, postSolve		
 	};
@@ -101,7 +101,34 @@ namespace geProject {
 		unsigned int sceneId;
 	};
 
+	class PlayerFoundEvent : public Event {
+	public:
+		PlayerFoundEvent(int context, unsigned int id, int playerx, int playery, bool found, bool obstruct) : Event(context), enemyId(id), posx(playerx), 
+																											  posy(playery), sighted(found), obstructed(obstruct) {};
+		static int getType() { return Type::playerFound; };
+		int addContext(Context context) { eventContext = getContext() & context; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		float posx;
+		float posy;
+		bool sighted;
+		bool obstructed;
+		unsigned int enemyId;
 
+	};
+
+	class AttackSightedEvent : public Event {
+	public:
+		AttackSightedEvent(int context, unsigned int id, int attackx, int attacky, bool found, bool obstruct) : Event(context), enemyId(id), posx(attackx), 
+																												posy(attacky), sighted(found), obstructed(obstruct) {};
+		static int getType() { return Type::attackfound; };
+		int addContext(Context context) { eventContext = getContext() & context; };
+		bool contextCheck(Context cat) { return getContext() & cat; }
+		unsigned int enemyId;
+		float posx;
+		float posy;
+		bool sighted;
+		bool obstructed;
+	};
 
 	//KEYBOARD EVENTS
 
@@ -248,13 +275,14 @@ namespace geProject {
 
 	class BeginContactEvent : public Event {
 	public:
-		BeginContactEvent(int context, Entity* entitya, Entity* entityb, bool contact) : Event(context), entityA(entitya), entityB(entityb), deadly(contact) {};
+		BeginContactEvent(int context, Entity* entitya, Entity* entityb, bool contact, bool obstruction) : Event(context), entityA(entitya), entityB(entityb), deadly(contact), obstructed(obstruction) {};
 		static int getType() { return Type::beginContact; };
 		bool contextCheck(Context cat) { return getContext() & cat; }
 		int addContext(Context context) { eventContext = getContext() & context; };
 		Entity* entityA;
 		Entity* entityB;
 		bool deadly;
+		bool obstructed;
 	};
 
 	class EndContactEvent : public Event {

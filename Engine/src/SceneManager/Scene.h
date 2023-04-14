@@ -44,19 +44,16 @@ namespace geProject {
 		std::string getFilePath();
 		void serialize(std::string filepath);
 		void deserialize(std::string filepath);
-		void setPhysics(bool check);
-		//friend class SceneSerialize;
+		void setPhysics(bool check);	
 	protected:	
 		static Window* gameWindow;
 		static MouseListener* mouse;
 		static KeyboardListener* keyboard;
 		//MANAGERS
-		//static Physics* physicsmanager;
-		//static EntityManager* entitymanager;
 		static AnimationManager* animationManager;
 		static Receiver* controlManager;		
 		static Renderer* rendermanager;
-		std::vector<Enemy> enemies;
+		std::unordered_map<int, Enemy*> enemies;
 		FrameBuffer* selectionTextures{ nullptr };
 		//(de)serialisation
 		std::string filePath;
@@ -89,6 +86,5 @@ namespace geProject {
 		void from_json(json& data, ViewCollider& comp);
 		//event listeners
 		virtual void saveGame(GameSaveEvent* save) = 0;
-
 	};
 }
