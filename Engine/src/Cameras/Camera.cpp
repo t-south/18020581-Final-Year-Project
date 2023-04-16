@@ -17,7 +17,7 @@ void geProject::Camera::projectionUpdate() {
 	projection = glm::mat4(1.0f);	
 	projection = glm::ortho(0.0f, projSize[0] * scroll, 0.0f, projSize[1] * scroll);	
 	projInv = glm::inverse(projection);	
-	eventSystem.publishImmediately(new ProjectionEvent(GameplayContext | EditorContext, projInv, viewInv));
+	eventSystem.publishImmediately(new ProjectionEvent(GameplayContext | EditorContext | GameplayContext, projInv, viewInv));
 }
 
 

@@ -42,7 +42,8 @@ void geProject::LevelScene::init() {
 }
 
 void geProject::LevelScene::update(float deltaTime){
-
+	glClearColor(0, 0, 0, 1); 
+	glClear(GL_COLOR_BUFFER_BIT);
 	camera->update(deltaTime);
 	if (player != nullptr) {
 		Command* command = controlManager->action(deltaTime);

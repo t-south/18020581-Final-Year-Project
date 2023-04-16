@@ -65,6 +65,10 @@ namespace geProject {
 			}
 		
 		}
+		void clearEvents() {
+			events.clear();
+		}
+
 		void setContext(Context context) { 
 			currentContext = context; 
 		};	

@@ -37,10 +37,11 @@ geProject::Enemy::Enemy(int entity, bool goap): entityId(entity), aiActive(goap)
 void geProject::Enemy::update(float deltaTime) {
 	double pi = 3.14159265; 
 	orientAgent();
-	Agent agent = entitymanager.getAgentComponent(entityId);	
+		
 
 	if (aiActive) {	
 		updateAgentVisibility();
+		Agent agent = entitymanager.getAgentComponent(entityId);
 		if (agent.energy <= 10 && (agent.agentStateDetails & ALERT) != ALERT && (agent.agentStateDetails & ENEMY_VISIBLE) != ENEMY_VISIBLE) {
 			agent.agentStateDetails = agent.agentStateDetails & ~HAS_ENERGY;
 			entitymanager.updateAnimationState(entityId, "Sleeping");
@@ -71,7 +72,7 @@ void geProject::Enemy::update(float deltaTime) {
 		chooseGoal(agent.agentStateDetails);
 	}
 
-
+	Agent agent = entitymanager.getAgentComponent(entityId);
 	if (currentState == IDLE) {	
 		if (aiActive) {
 			path.clear();

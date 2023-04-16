@@ -39,7 +39,7 @@ namespace geProject {
 		std::vector<Action*> actionPlan;
 		//AGENT DETAILS
 		int entityId;	
-		int cooldown = 10;
+		int cooldown = 5;
 		glm::vec2 position;
 		glm::vec2 oldposition;
 		glm::vec2 homelocation;

@@ -52,10 +52,10 @@ void geProject::EnemyController::rotateTo(float desiredDirection, float currentD
 	while (rotation > 180 * (pi / 180)) rotation -= 360 * (pi / 180);
 	float anglechange = 0;
 	if (rotation < 0.1f || rotation > -0.1f) {
-		anglechange = 2 * (pi / 180);
+		anglechange = 3 * (pi / 180);
 	}
 	else {
-		anglechange = 1 * (pi / 180);
+		anglechange = 2 * (pi / 180);
 	}
 	float newangle = currentDirection + std::min(anglechange, std::max(-anglechange, rotation));
 	

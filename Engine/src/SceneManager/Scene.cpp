@@ -587,6 +587,7 @@ geProject::MouseListener* geProject::Scene::getMouseListener() {
 }
 
 void geProject::Scene::reloadLevel() {
+
 	physicsmanager.clear();
 	enemies.clear();
 	rendermanager->clear();	

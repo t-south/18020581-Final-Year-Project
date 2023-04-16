@@ -66,8 +66,9 @@ void geProject::ImguiWindow::dockWindow(){
 void geProject::ImguiWindow::gameViewWindow() {
 	ImVec2 vPos = viewPos;
 	ImVec2 vSize = viewSize;
+	
+	ImGui::BeginMainMenuBar();
 	if (eventSystem.getContext() == EditorContext) {
-		ImGui::BeginMainMenuBar();
 		if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
 			eventSystem.publish(new GameStartEvent(ImGuiContext));
 			windowRunning = true;
@@ -83,13 +84,13 @@ void geProject::ImguiWindow::gameViewWindow() {
 			eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1, true));
 			loadLevel = false;
 		}
-		if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
-			eventSystem.publish(new GameLoadEvent(ImGuiContext, 2, true));
-			loadLevel = false;
-
-		}
-		ImGui::EndMainMenuBar();
 	}
+	if (ImGui::MenuItem("Main Menu", "", loadLevel, !loadLevel)) {
+		eventSystem.publishImmediately(new GameLoadEvent(GameplayContext, 1, true));
+		loadLevel = false;
+	}
+	ImGui::EndMainMenuBar();
+	
 	ImGui::Begin("gameViewWindow");		
 	ImVec2 size = getMaxViewPort();
 	ImVec2 position = ImGui::GetContentRegionAvail();
@@ -105,7 +106,7 @@ void geProject::ImguiWindow::gameViewWindow() {
 
 
 	if (vPos.x != viewPos.x || vPos.y != viewPos.y || vSize.x != viewSize.x || vSize.y != viewSize.y) {
-		eventSystem.publishImmediately(new ViewPortEvent(EditorContext | GameplayContext, viewPos.x, viewPos.y, viewSize.x, viewSize.y));
+		eventSystem.publishImmediately(new ViewPortEvent(EditorContext | GameplayContext | MenuContext, viewPos.x, viewPos.y, viewSize.x, viewSize.y));
 	}
 
 

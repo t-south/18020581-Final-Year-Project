@@ -8,13 +8,8 @@ geProject::EntityManager entitymanager;
 geProject::Physics physicsmanager;
 
 namespace geProject {
-	Application::Application() {
-
-	}
-	Application::~Application() {
-
-
-	}
+	Application::Application() {}
+	Application::~Application() {}
 
 	void Application::Startup() {
 		eventSystem = EventHandler();
@@ -122,10 +117,9 @@ namespace geProject {
 			if (load->sceneId == -1) {
 				running = false;
 			}
-			else {				
+			else {
 				sceneManager->switchScene(load->sceneId);
 				sceneManager->getCurrentScene()->reloadLevel();
-
 				sceneManager->getCurrentScene()->setGoapStatus(load->aiActive);
 				sceneManager->getCurrentScene()->init();
 				sceneManager->getCurrentScene()->setActiveEntity(-1);
