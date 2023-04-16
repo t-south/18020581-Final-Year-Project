@@ -9,9 +9,6 @@
 
 using json = nlohmann::json;
 namespace geProject {
-	enum AnimationState {
-		Idle, Sleeping, Angry
-	};
 
 	struct Frame {
 		float time{ 0 };

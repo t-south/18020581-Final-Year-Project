@@ -18,7 +18,8 @@ namespace geProject {
 		NoContext = 0,					/* 0b0000000000000000 */
 		EditorContext = (1 << 0),       /* 0b0000000000000001 */
 		ImGuiContext = (1 << 1),		/* 0b0000000000000010 */
-		GameplayContext = (1 << 2)		/* 0b0000000000000100 */
+		GameplayContext = (1 << 2),		/* 0b0000000000000100 */
+		MenuContext = (1<< 3)
 	};
 
 	class Event {
@@ -26,7 +27,9 @@ namespace geProject {
 		Event(int context) : eventContext(context) {};
 		unsigned int eventContext{ NoContext };
 		bool eventHandled{ false };			
-		int getContext() { return eventContext; };
+		int getContext() { 
+			return eventContext; 
+		};
 		bool isEventHandled(){ return eventHandled; };
 		void setHandled(){ eventHandled = true; };
 	};
@@ -94,11 +97,14 @@ namespace geProject {
 
 	class GameLoadEvent : public Event {
 	public:
-		GameLoadEvent(int context, unsigned int id) : Event(context), sceneId(id){};
+		GameLoadEvent(int context, unsigned int id, bool goap) : Event(context), sceneId(id), aiActive(goap){};
 		static int getType() { return Type::gameLoad; };
 		int addContext(Context context) { eventContext = getContext() & context; };
-		bool contextCheck(Context cat) { return getContext() & cat; }
+		bool contextCheck(Context cat) { 
+			return getContext() & cat; 
+		}
 		unsigned int sceneId;
+		bool aiActive;
 	};
 
 	class PlayerFoundEvent : public Event {

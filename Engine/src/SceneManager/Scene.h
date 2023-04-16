@@ -26,26 +26,23 @@ namespace geProject {
 	public:
 		virtual void update(float deltaTime) = 0;
 		virtual void init() = 0;	
-		virtual void updateImgui() = 0;
-		virtual void updateSceneImgui() = 0;
-		virtual void render(std::string shaderPath) = 0;	
-		virtual void setActiveEntity(int entityId) = 0;
-		virtual unsigned int getActiveEntity() = 0;
-		virtual void setEntityDrag(bool drag) = 0;
-		virtual bool getEntityDrag() = 0;
 		virtual void setPicking() = 0;
+		virtual void updateSceneImgui() {};
+		virtual void setActiveEntity(int entityId) {};
 		void setWindow(Window* window);
 		void setMouseListener();
 		void setKeyboardListener();
 		float getMouseX();
 		float getMouseY();
 		MouseListener* getMouseListener();
-		void reloadLevel(std::string filePath);
+		void reloadLevel();
 		std::string getFilePath();
 		void serialize(std::string filepath);
 		void deserialize(std::string filepath);
 		void setPhysics(bool check);	
+		void setGoapStatus(bool goap);
 	protected:	
+		void render(Camera& camera, std::string shaderPath);
 		static Window* gameWindow;
 		static MouseListener* mouse;
 		static KeyboardListener* keyboard;
@@ -59,8 +56,8 @@ namespace geProject {
 		std::string filePath;
 		std::ofstream oFile;		
 		bool physicsEnabled{ false };
-
-
+		void renderScene();
+		bool goapEnabled{ false };
 		json serializeEntity(Entity& entity);
 		//overrides for serialising to/from json
 		void to_json(json& data, Animation& comp);		

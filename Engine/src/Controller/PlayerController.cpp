@@ -18,16 +18,20 @@ void geProject::PlayerController::attack(){
 		physicsmanager.createProjectile(entityId);
 		switch (dmg.dmgType) {
 		case dmgTypes::FIRE:
-			dmg.coolDown = 2;
+			dmg.coolDown = 5;
+			dmg.dmgModifier = 1.2f;
 			break;
 		case dmgTypes::WATER:
 			dmg.coolDown = 1;
+			dmg.dmgModifier = 0.5f;
 			break;
 		case dmgTypes::EARTH:
-			dmg.coolDown = 9;
+			dmg.coolDown = 5;
+			dmg.dmgModifier = 3;
 			break;
 		case dmgTypes::LIGHTNING:
-			dmg.coolDown = 2;		
+			dmg.coolDown = 2;	
+			dmg.dmgModifier = 1;
 			break;
 		default:
 			break;

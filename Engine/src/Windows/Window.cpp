@@ -38,18 +38,14 @@ geProject::Window::~Window() {
 }
 
 void geProject::Window::glfwError(int id, const char* description){	std::cout << description << std::endl;}
+void geProject::Window::stopWindow()
+{
+	glfwDestroyWindow(window);
+	glfwTerminate();
+}
 void geProject::Window::window_size_callback(GLFWwindow* window, int width, int height){glfwSetWindowSize(window, width, height);}
 GLFWwindow* geProject::Window::getWindow() {return window;}
 int geProject::Window::getWidth() { return width; }
 int geProject::Window::getHeight() { return height; }
 
-//void geProject::Window::onUpdate(Event* event) {
-	/*
-	if (event->getType() == Type::gameStart) {
-		std::cout << "Starting Play" << std::endl;
-	}
-	else if (event->getType() == Type::gameStop) {
-		std::cout << "Stopping Play" << std::endl;
-	}*/
-//}
 

@@ -34,14 +34,17 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 		while (entities[index]->id > -1) {
 			index++;
 		}
+		
+	
+		
 		if (entities[index]->id == -1) {
 			entity.id = index;
 			std::memcpy(entities[index], &entity, sizeof(Entity));
 			entitiesDeleted--;
-			if (type == 0) {
+			if ((type & player) == player) {
 				playerId = index;
 			}
-			else if (type == 1) {
+			else if ((type & enemy) == enemy) {
 				enemyIds.push_back(index);
 			}
 			return index;
@@ -71,10 +74,10 @@ int geProject::EntityManager::addEntity(entityTypes type) {
 		componentAgent.push_back(reinterpret_cast<Agent*>(agentpool.allocate(sizeof(Agent))));
 		componentAgent[index]->id = 0;
 		std::memcpy(entities[index], &entity, sizeof(Entity));
-		if (type == 0) {
+		if ((type & player) == player) {
 			playerId = index;
 		}
-		else if (type == 1) {
+		else if ((type & enemy) == enemy) {
 			enemyIds.push_back(index);
 		}
 		return index;
@@ -144,7 +147,7 @@ void geProject::EntityManager::copyEntity(int entityId){
 		case 0x0200:
 			assignView(newEntityId, getViewComponent(entityId));
 			break;
-
+	
 
 		default:
 			break;
@@ -176,7 +179,7 @@ void geProject::EntityManager::assignTransform(int entityId, Transform transform
 		}
 		transform.dirtyFlag[0] = 1;
 		std::memcpy(componentTransforms[entityId], &transform, sizeof(Transform));
-		if (entities[entityId]->type == entityTypes::environment) {
+		if ((entities[entityId]->type & environment) == entityTypes::environment) {
 			//make that position inaccessible on the map
 			worldstate.addToMap((int)(transform.position[0] * 4), (int)(transform.position[1] * 4), 0);
 		}
@@ -218,9 +221,9 @@ void geProject::EntityManager::assignRigidBody(int entityId, Rigidbody rbody) {
 void geProject::EntityManager::assignCircleCollider(int entityId, CircleCollider circle) {
 	if (entityId < maxEntities && entityId >= 0) {
 		circle.entityAssigned = entityId;
-		if (entities[entityId]->type == player) {
-			circle.entityType = physCats::PLAYER;
-			circle.colliders |= physCats::BOUNDARY | physCats::ENEMY | physCats::PROJECTILE;
+		if ((entities[entityId]->type & player) == player) {
+			circle.entityType = player;
+			circle.colliders |= environment | enemy | enemyprojectile;
 		}
 		componentCircleCollider[entityId].push_back(circle);		
 		if ((entities[entityId]->compMask & CircleColliderType) != CircleColliderType) {
@@ -248,6 +251,7 @@ void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) 
 
 
 void geProject::EntityManager::assignAnimation(int entityId, Animation animate) {
+
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentAnimation[entityId], &animate, sizeof(Animation));	
 		entities[entityId]->compMask = entities[entityId]->compMask | animate.id;
@@ -270,6 +274,7 @@ void geProject::EntityManager::assignController(int entityId, Controls control){
 
 void geProject::EntityManager::assignHealth(int entityId, Health health){
 	if (entityId < maxEntities && entityId >= 0) {
+		
 		std::memcpy(componentHealth[entityId], &health, sizeof(Health));
 		entities[entityId]->compMask = entities[entityId]->compMask | health.id;
 	}
@@ -354,37 +359,6 @@ void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
 	}
 }
 
-/*
-std::vector<geProject::Transform*> geProject::EntityManager::getTransformComponents() {
-	return componentTransforms;
-}
-std::vector<geProject::SpriteRender*> geProject::EntityManager::getSpriteComponents() {
-	return componentSpriteRender;
-}
-std::vector<geProject::Rigidbody*> geProject::EntityManager::getRigidBodyComponents() {
-	return componentRigidBody;
-}
-std::vector<geProject::Animation*> geProject::EntityManager::getAnimationComponents() {
-	return componentAnimation;
-}
-
-std::vector<geProject::Controls*> geProject::EntityManager::getControllerComponents(){
-	return componentController;
-}
-
-std::vector<geProject::Health*> geProject::EntityManager::getHealthComponents(){
-	return componentHealth;
-}
-
-std::vector<geProject::Damage*> geProject::EntityManager::getDamageComponents(){
-	return componentDamage;
-}
-
-std::vector<geProject::ViewCollider*> geProject::EntityManager::getViewComponents()
-{
-	return componentView;
-}
-*/
 
 int geProject::EntityManager::getUpdateStatus(int entityId) {
 	return componentTransforms[entityId]->dirtyFlag[0];
@@ -454,6 +428,8 @@ std::vector <geProject::BoxCollider> geProject::EntityManager::getBoxColliderCom
 
 void geProject::EntityManager::reloadManager() {
 	entitiesDeleted = 0;
+	entitypool.reset();
+	entities.clear();
 	transformpool.reset();
 	componentTransforms.clear();
 	spritepool.reset();
@@ -473,6 +449,8 @@ void geProject::EntityManager::reloadManager() {
 	componentDamage.clear();
 	viewpool.reset();
 	componentView.clear();
+	agentpool.reset();
+	componentAgent.clear();
 }
 
 void geProject::EntityManager::assignUpdate() {
@@ -483,15 +461,6 @@ void geProject::EntityManager::updateDirtyFlags(int entityId ,int update, int ba
 	componentTransforms[entityId]->dirtyFlag = glm::vec3(update, batch, vertex);
 }
 
-//EVENT LISTENERS
-/*
-void geProject::EntityManager::updateTransform(TransformEvent* event) {	
-	componentTransforms[event->entityId]->position[0] = event->posX;
-	componentTransforms[event->entityId]->position[1] = event->posY;
-	componentTransforms[event->entityId]->rotation = event->rotation;
-	//newTransform->centre = getCentre(newTransform->position, glm::vec2(newTransform->position[0] + (1 * newTransform->scale.x), newTransform->position[1] + (1 * newTransform->scale.y)));
-	componentTransforms[event->entityId]->dirtyFlag[0] = 1;	
-}*/
 
 void geProject::EntityManager::updateTransform(int entityId, float x, float y, float rotate){
 	componentTransforms[entityId]->position[0] = x;
@@ -527,40 +496,38 @@ void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event) 
 
 //PHYSICS EVENT LISTENERS
 void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
-	//std::cout << "begin contact" << std::endl;
 	switch (event->entityA->type) {
 	case entityTypes::player:
-		if (event->entityB->type == enemy) {
-			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 0, 0, 1);
-			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;			
+		if ((event->entityB->type & enemyprojectile) == enemyprojectile) {
+			if (event->deadly) {
+				updateAnimationState(event->entityA->id, "PlayerHurt");
+				Health health = *componentHealth[event->entityA->id];
+				Damage dmg = *componentDamage[event->entityB->parentId];
+				health.currentHealth -= dmg.dmgAtk * dmg.dmgModifier;
+				assignHealth(event->entityA->id, health);		
+			}
 		}
 		break;
 
 	case entityTypes::enemy:
-		if (event->entityB->type == player) {
-			if (event->obstructed) {				
-				componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_VISIBLE;
-				componentAgent[event->entityA->id]->playerInRange = true;
-				if ((componentAgent[event->entityA->id]->agentStateDetails & ENEMY_VISIBLE) == ENEMY_VISIBLE) {
-					componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
-				}
-				//componentAgent[event->entityA->id]->anomalypos = glm::vec2(posx, posy);
-			}
-			else {
-				componentAgent[event->entityA->id]->agentStateDetails |= ENEMY_VISIBLE;
-				componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_DEAD;
-			}
-
-			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 0, 0, 1);
-			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;
+		if ((event->entityB->type & player) == player) {			
+			componentAgent[event->entityA->id]->playerInRange = true;	
 		}
-		if (event->entityB->type == playerprojectile) {
-			if (event->obstructed) {
-				componentAgent[event->entityA->id]->agentStateDetails &= ~ATTACK_SIGHTED;				
-				//componentAgent[event->entityA->id]->anomalypos = glm::vec2(posx, posy);
-				if ((componentAgent[event->entityA->id]->agentStateDetails & ATTACK_SIGHTED) == ATTACK_SIGHTED) {
-					componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
+		if ((event->entityB->type & playerprojectile )== playerprojectile) {
+			if (event->deadly) {
+				updateAnimationState(event->entityA->id ,"Hurt");
+				Health health = *componentHealth[event->entityA->id];
+				Damage dmg = *componentDamage[event->entityB->parentId];
+				health.currentHealth -= dmg.dmgAtk * dmg.dmgModifier;
+				if (health.currentHealth == 1) {
+					updateAnimationState(event->entityA->id, "Death");
 				}
+				assignHealth(event->entityA->id, health);
+				
+
+			}
+			else if (event->obstructed) {
+				componentAgent[event->entityA->id]->agentStateDetails &= ~ATTACK_SIGHTED;		
 			}
 			else {
 				componentAgent[event->entityA->id]->agentStateDetails |= ATTACK_SIGHTED;
@@ -570,16 +537,14 @@ void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
 		break;
 
 	case entityTypes::environment:
-		if (event->entityB->type == player) {
-			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 0, 0, 1);
-			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
+		if ((event->entityB->type & enemyprojectile)== enemyprojectile) {
+			entities[event->entityB->id]->lifeTime = 0;
 		}
-		if (event->entityB->type == enemy) {
-			componentSpriteRender[event->entityA->id]->color = glm::vec4(0, 1, 0, 1);
-			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
+		if ((event->entityB->type & playerprojectile)  == playerprojectile) {
+			
 		}
 		break;
-
+	
 	default:
 		break;
 	}
@@ -588,42 +553,28 @@ void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
 }
 
 void geProject::EntityManager::EndContact(EndContactEvent* event){
-	//std::cout << "end contact" << std::endl;
 	switch (event->entityA->type) {
 	case entityTypes::player:
-		if (event->entityB->type == enemy) {
-			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 1, 1, 1);
-			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;
-	
-		}
 		break;
 
 	case entityTypes::enemy:
-		if (event->entityB->type == player) {
-			componentSpriteRender[event->entityB->id]->color = glm::vec4(1, 1, 1, 1);
-			componentTransforms[event->entityB->id]->dirtyFlag[0] = 1;			
-			componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
-			componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_VISIBLE;	
-			componentAgent[event->entityA->id]->agentStateDetails &= ~ENEMY_DEAD;	
-			componentAgent[event->entityA->id]->playerInRange = false;
+		if ((event->entityB->type & player) == player) {	
+			componentAgent[event->entityA->id]->playerInRange = false;			
 		}
-		if (event->entityB->type == playerprojectile) {			
+		if ((event->entityB->type & playerprojectile )== playerprojectile) {			
 			componentAgent[event->entityA->id]->agentStateDetails &= ~ATTACK_SIGHTED;
 			componentAgent[event->entityA->id]->agentStateDetails |= ALERT;
 		}
 		break;
 
 	case entityTypes::environment:
-		if (event->entityB->type == player) {
-			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 1, 1, 1);
-			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
-		}
-		if (event->entityB->type == enemy) {
-			componentSpriteRender[event->entityA->id]->color = glm::vec4(1, 1, 1, 1);
-			componentTransforms[event->entityA->id]->dirtyFlag[0] = 1;
-		}
+
+		break;
+	case entityTypes::enemyprojectile:
 		break;
 
+	case entityTypes::playerprojectile:
+		break;
 	default:
 		break;
 	}

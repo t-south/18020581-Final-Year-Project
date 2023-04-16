@@ -21,8 +21,6 @@ void geProject::Physics::startUp(){
 
 void geProject::Physics::addEntity(int entityId) {
 	Entity entity = entitymanager.getEntity(entityId);
-	//if(entity.compMask ) // select components based on the mask in the entity
-	//std::cout << bodies.count(entity.id) << std::endl;
 	if (entity.id > -1 && bodies.count(entity.id) == 0 && (entity.compMask & 4) == 4) {		
 		//if there is a rigidbody make a new body	
 		Rigidbody rigid = entitymanager.getRigidBodyComponent(entity.id);
@@ -79,33 +77,39 @@ bool geProject::Physics::checkTargetObstructed(float startx, float starty, float
  	if (raycast.environmentHit && raycast.m_hit) {
 		obstructed = true;
 	}
-	/*
-	for (auto& hit : raycast.raycasthit) {
-		std::cout << hit.type << " -> ";
-	}
-	std::cout << std::endl;
-	std::cout << raycast.m_hit << std::endl;
-	*/
-	std::cout << obstructed << std::endl;
 	return obstructed;
 }
 
 
+
+
 void geProject::Physics::addBoxCollider(BoxCollider box, int entityId) {
+	Entity entity = entitymanager.getEntity(entityId);
+	int colliders = 0;
+	if ((entity.type & environment) == environment) {
+		colliders |= playerprojectile | enemy | player | completion | enemyprojectile ;
+	}
 	b2PolygonShape shape = b2PolygonShape();	
 	b2Body& body = *bodies[entityId];
 	b2FixtureDef shapeFixture;
 	shape.SetAsBox(box.boxSize[0] * 0.5f, box.boxSize[1] * 0.5f, b2Vec2(box.offset[0], box.offset[1]), 0);
 	shapeFixture.shape = &shape;	
 	shapeFixture.density = 1;
-	shapeFixture.filter.categoryBits = box.entityType;
-	shapeFixture.filter.maskBits = box.colliders;
+	shapeFixture.filter.categoryBits = entity.type;//box.entityType;
+	shapeFixture.filter.maskBits = colliders;//box.colliders;
 	shapeFixture.isSensor = box.sensor;
 	body.CreateFixture(&shapeFixture);
-	//std::cout << "added physics objects: " << bodies.size() << std::endl;	
 }
 
 void geProject::Physics::addCircleCollider(CircleCollider circle, int entityId) {
+	Entity entity = entitymanager.getEntity(entityId);
+	int colliders = 0;
+	if ((entity.type & player) == player) {
+		colliders |=  environment | enemy | completion | enemyprojectile;
+	}
+	else if ((entity.type & enemy) == enemy) {
+		colliders |= environment | player | completion | playerprojectile;
+	}
 	b2CircleShape shape = b2CircleShape();	
 	b2Body& body = *bodies[entityId];
 	b2FixtureDef shapeFixture;
@@ -113,8 +117,8 @@ void geProject::Physics::addCircleCollider(CircleCollider circle, int entityId) 
 	shape.m_radius = circle.radius;
 	shapeFixture.shape = &shape;
 	shapeFixture.density = 1;
-	shapeFixture.filter.categoryBits = circle.entityType;
-	shapeFixture.filter.maskBits = circle.colliders;
+	shapeFixture.filter.categoryBits = entity.type;//circle.entityType;
+	shapeFixture.filter.maskBits = colliders;//circle.colliders;
 	shapeFixture.isSensor = circle.sensor;
 	body.CreateFixture(&shapeFixture);
 }
@@ -133,12 +137,9 @@ void geProject::Physics::addViewSensorCollider(ViewCollider view, int entityId){
 	}
 	shape.Set(vertices, 8);
 	shapeFixture.shape = &shape;
-	//shapeFixture.density = 1;
 	shapeFixture.isSensor = view.sensor;	
-
-	shapeFixture.filter.categoryBits = view.entityType;
+	shapeFixture.filter.categoryBits = view.entityType | viewSensor;
 	shapeFixture.filter.maskBits = view.colliders;
-	//shapeFixture.isSensor = view.sensor;
 	body.CreateFixture(&shapeFixture);
 }
 
@@ -157,16 +158,13 @@ void geProject::Physics::removeEntity(int entityId){
 			fixtures->GetBody()->DestroyFixture(fixtures);
 			fixtures = tmp;
 		}
-		bodies[entityId]->GetWorld()->DestroyBody(bodies[entityId]);
-		
-		bodies.erase(entityId);
-		//std::cout << "removed physics objects: " << bodies.size() << std::endl;
+		bodies[entityId]->GetWorld()->DestroyBody(bodies[entityId]);		
+		bodies.erase(entityId);	
 	}
 }
 
 void geProject::Physics::clear(){
-	for (auto& body : bodies) {
-		// Do stuff
+	for (auto& body : bodies) {	
 		world.DestroyBody(body.second);
 	}
 	bodies.clear();
@@ -179,30 +177,13 @@ void geProject::Physics::update(float deltaTime){
 		time -= timeStep;
 		world.Step(timeStep, velocity, position);
 		if (bodies.size() > 0) {			
-			for (auto &body : bodies) {
-				if (body.second->GetType() == b2_dynamicBody) {
-					
-				}
-				float test = body.second->GetAngle();
+			for (auto &body : bodies) {			
 				b2Vec2 position = body.second->GetPosition();
 				double pi = 3.14159265;
-
-				float angle = (float)(body.second->GetAngle() * (180.0/ pi));
-				
-				Entity* bodyData = (Entity*)body.second->GetUserData().pointer;
-				/*
-				if (body.first == 1428) {	
-					for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-						std::cout << body.first << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
-					}
-					//std::cout << "lVel: " << body.second->GetLinearVelocity().x << " " << body.second->GetLinearVelocity().y << " angle: " << angle << std::endl;
-					//std::cout << " posx: " << position.x << " posy: " << position.y << " inertia: " << body.second->GetInertia() << std::endl;
-					
-				}*/
-
-		
+				float angle = (float)(body.second->GetAngle() * (180.0/ pi));				
+				Entity* bodyData = (Entity*)body.second->GetUserData().pointer;		
 				entitymanager.updateTransform(body.first, position.x, position.y, angle);
-				if (bodyData != nullptr && (bodyData->type == enemyprojectile || bodyData->type == playerprojectile) && bodyData->lifeTime > -1) {
+				if (bodyData != nullptr && ((bodyData->type & enemyprojectile) == enemyprojectile || (bodyData->type & playerprojectile) == playerprojectile) && bodyData->lifeTime > -1) {
 					if (bodyData->lifeTime == 0) {										
 						deleteBodies.push_back(bodyData->id);
 					}
@@ -210,25 +191,13 @@ void geProject::Physics::update(float deltaTime){
 						bodyData->lifeTime -= 1;
 					}
 				}
-				//printf("%4.2f %4.2f %4.2f %u %4.2f\n", position.x, position.y, angle, (int)body.first, body.second->GetMass());	
-				
-				/*for (b2Fixture* fixture = body.second->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
-					std::cout << count << ": " << fixture->GetBody()->GetTransform().p.x << "  " << fixture->GetBody()->GetTransform().p.y << std::endl;
-				}*/
-				
-
-				
-				//eventSystem.publishImmediately(new TransformEvent(ImGuiContext | GameplayContext, (int)body.first, position.x, position.y, angle));
 			}
-
 			for (auto& body : deleteBodies) {
 				//calls delete entity -> delete render -> delete physics component
 				entitymanager.deleteEntity(body);
 			}
 			deleteBodies.clear();
-			//publish events from earlier callbacks
-			//eventSystem.handleEvents(beginContact);
-			//eventSystem.handleEvents(endContact);
+
 		}		
 	}
 
@@ -256,23 +225,29 @@ void geProject::Physics::createProjectile(int entityId){
 	Damage dmg = entitymanager.getDamageComponent(entityId);
 	Entity parent = entitymanager.getEntity(entityId);
 	int projectileId = 0;
-	if (parent.type == enemy) {
+	if ((parent.type & enemy) == enemy) {
 		projectileId = entitymanager.addEntity(enemyprojectile);
 	}
-	else if (parent.type == player) {
-		projectileId = entitymanager.addEntity(enemyprojectile);
+	else if ((parent.type & player) == player) {
+		projectileId = entitymanager.addEntity(playerprojectile);
 	}
-	
+
 	entitymanager.addParentEntity(entityId, projectileId);
 	Entity entity = entitymanager.getEntity(projectileId);
-	int colliders =0;
-	if (entity.type == enemy) {
-		colliders |= BOUNDARY | PLAYER;
-		entity.type = enemyprojectile;
+	int colliders = 0;
+	int projectiletype = 0;
+	int projectileCat = 0;
+	if ((entity.type & enemyprojectile)== enemyprojectile) {
+		projectiletype = enemyprojectile;
+		projectileCat = enemyprojectile;
+		colliders |= environment | player | playerprojectile;
+
 	}
-	else if (entity.type == player) {
-		colliders |= BOUNDARY | ENEMY;
-		entity.type = playerprojectile;
+	else if ((entity.type & playerprojectile)== playerprojectile) {
+		projectiletype = playerprojectile;
+		projectileCat = playerprojectile;
+		colliders |= environment | enemy | enemyprojectile | completion;
+	
 	}
 	Transform transform = entitymanager.getTransformComponent(entityId);
 	b2BodyDef body;
@@ -291,7 +266,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 100;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(1, 0 ,0, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.08f, .entityType = projectiletype,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -301,7 +276,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 100;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(0.4226621091365814f, 0.127809539437294f ,0.9026548862457275f, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.08f, .entityType = projectiletype,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -311,7 +286,7 @@ void geProject::Physics::createProjectile(int entityId){
 		entity.lifeTime = 50;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(1, 1 ,1, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.08f, .entityType = projectiletype,  .colliders = colliders });
 		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
@@ -319,11 +294,13 @@ void geProject::Physics::createProjectile(int entityId){
 		body.type = b2_staticBody;
 		break;
 	case dmgTypes::WATER:
+		colliders |= enemyprojectile | playerprojectile;
 		entity.lifeTime = 50;
 		body.type = b2_dynamicBody;
 		entitymanager.assignSpriteRender(projectileId, SpriteRender{ .color = glm::vec4(0, 0 ,1, 1) });
-		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.1f, .entityType = PROJECTILE,  .colliders = colliders });
-		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 2.0f);
+		entitymanager.assignCircleCollider(projectileId, CircleCollider{ .radius = 0.08f, .entityType = projectiletype,  .colliders = colliders });
+		velocity = b2Vec2(cos(angle + 1.5708) * 2.0f, sin(angle + 1.5708) * 1.0f);
+		
 		body.userData.pointer = reinterpret_cast<uintptr_t>(new Entity(entity));
 		worldBody = world.CreateBody(&body);
 		worldBody->SetLinearVelocity(velocity);
@@ -341,8 +318,8 @@ void geProject::Physics::createProjectile(int entityId){
 		shape.m_radius = circle.radius;
 		shapeFixture.shape = &shape;
 		shapeFixture.density = 1;
-		shapeFixture.filter.categoryBits = circle.entityType;
-		shapeFixture.filter.maskBits = circle.colliders;
+		shapeFixture.filter.categoryBits = projectileCat;
+		shapeFixture.filter.maskBits = colliders;
 		shapeFixture.isSensor = circle.sensor;
 		worldBody->CreateFixture(&shapeFixture);
 	}

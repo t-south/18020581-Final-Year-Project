@@ -22,7 +22,7 @@ namespace geProject {
 	};
 	class Planner {
 	public:
-		std::vector<Action*> createPlan(Goal& goal, int agentId, std::vector<Action*> actionsAvailable);
+		std::vector<Action*> createPlan(Goal& goal, int agentState, int agentId, std::vector<Action*> actionsAvailable);
 		std::vector<Action*> recreate;
 
 	};

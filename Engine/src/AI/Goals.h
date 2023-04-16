@@ -7,8 +7,8 @@ namespace geProject {
 		std::string name;
 		int goalType;
 		int priority{ 10 };
-		void increasePriority() { if (priority < 10) { priority++; } };
-		void decreasePriority() { if (priority > 0) {priority--;} };
+		void increasePriority(int increase) { priority += increase;  if (priority > 10) { priority = 10; } };
+		void decreasePriority(int decrease) { priority -= decrease; if (priority < 0) { priority = 0; } };
 		virtual int checkCondition(int state) =0;
 		virtual bool checkValid(int state) = 0;
 		                                                                                           
@@ -19,7 +19,10 @@ namespace geProject {
 		AttackEnemyGoal() { name = "Attack Goal"; goalType = actionType::COMBAT; };
 		int checkCondition(int state) { return state | ENEMY_DEAD; };
 		bool checkValid(int state) { 
-			return ((~ENEMY_DEAD & state) | (ENEMY_VISIBLE | state)) == state; 
+			int newState = state;
+			newState |= ENEMY_VISIBLE | COOLDOWN;
+			newState &= ~ENEMY_DEAD ;
+			return newState == state; 
 		}
 	
 	};
@@ -29,7 +32,10 @@ namespace geProject {
 		PatrolGoal() { name = "Patrol Goal"; goalType = actionType::DUTY;};
 		int checkCondition(int state) {	state = state | PATROLLED;	return state & ~AT_HOME; };
 		bool checkValid(int state) {
-			return ((HAS_ENERGY | state) & (AT_HOME | state) & (~PATROLLED & state)) == state; 
+			int newState = state;
+			newState |= HAS_ENERGY;
+			newState &= ~PATROLLED & ~ALERT & ~ENEMY_VISIBLE;
+			return newState == state; 
 		};
 	};
 
@@ -40,7 +46,7 @@ namespace geProject {
 		bool checkValid(int state) { 
 			int newState = state;
 			newState |= HAS_ENERGY | PATROLLED;
-			newState &= ~AT_HOME;
+			newState &= ~AT_HOME & ~ALERT & ~ENEMY_VISIBLE;
 			return newState == state;
 		};
 	};
@@ -50,7 +56,7 @@ namespace geProject {
 		CalmDownGoal() { name = "CalmDown Goal" ; goalType = actionType::LIFESTYLE;};
 		int checkCondition(int state) { return state & ~AGENT_ANGRY; };
 		bool checkValid(int state) { 
-			return (AGENT_ANGRY & state) == state; 
+			return (AGENT_ANGRY & state) == AGENT_ANGRY; 
 		}
 	};
 
@@ -65,10 +71,14 @@ namespace geProject {
 
 	class InvestigateGoal : public Goal {
 	public:
-		InvestigateGoal() { name = "Investigate Goal"; goalType = actionType::COMBAT;};
-		int checkCondition(int state) { return  state & ~ALERT; };
+		InvestigateGoal() { name = "Investigate Goal"; goalType = actionType::DUTY;};
+		int checkCondition(int state) { 
+			state = state | INVESTIGATED;
+			state = state & ~ALERT;
+			return  state; 
+		};
 		bool checkValid(int state) { 
-			return (ALERT & state) == state; 
+			return (ALERT & state) == ALERT; 
 		};
 	};
 

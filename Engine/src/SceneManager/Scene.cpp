@@ -20,7 +20,6 @@ std::string geProject::Scene::getFilePath()
 void geProject::Scene::serialize(std::string filepath) {
 	oFile.open(filepath);
 	if (oFile.is_open(), std::ofstream::out | std::ofstream::trunc) {
-		//std::cout << "File is open" << std::endl;
 		//serialize each entity into json
 		json sceneData;
 		auto ent = entitymanager.getEntities();
@@ -39,6 +38,34 @@ void geProject::Scene::serialize(std::string filepath) {
 	
 }
 
+
+void geProject::Scene::renderScene()
+{
+	//UPDATES TO RENDERING
+	if (entitymanager.hasUpdate()) {
+		for (int i = 0; i < entitymanager.getEntityNum(); i++) {
+			Entity ent = entitymanager.getEntity(i);
+			if (ent.compMask > 0 && ent.id > -1) {
+				if ((ent.compMask & 4) == 4) {//check for rigidbody
+					if ((ent.compMask & 8) == 8 || (ent.compMask & 16) == 16) {//check for boxcollider or circlecollider			
+						physicsmanager.addEntity(ent.id);
+					}
+				}
+				// only sprites that have not been added to the renderer previously will be set to 0		
+				//transform dirtyflag for render index is by default set to -1 when first created
+				if (entitymanager.getVertexStatus(ent.id) == -1) {
+					rendermanager->addSpriteToBatch(ent.id);
+				}
+				//if there has been any updates the dirty flag in transform component will be set to 1
+				else if (entitymanager.getUpdateStatus(ent.id) == 1) {
+					rendermanager->updateSprite(ent.id);
+				}
+			}
+		}
+		//manager->endFrame();			
+	}
+
+}
 
 json geProject::Scene::serializeEntity(Entity& entity) {
 	//go through each of the components 
@@ -529,6 +556,8 @@ void geProject::Scene::from_json(json& data, ViewCollider& comp) {
 }
 
 
+
+
 void geProject::Scene::setWindow(Window* window){
 	gameWindow = window;
 	setKeyboardListener();
@@ -557,10 +586,10 @@ geProject::MouseListener* geProject::Scene::getMouseListener() {
 	return mouse;
 }
 
-void geProject::Scene::reloadLevel(std::string filepath) {
+void geProject::Scene::reloadLevel() {
 	physicsmanager.clear();
-	rendermanager->clear();
-	rendermanager->renderMap(1);
+	enemies.clear();
+	rendermanager->clear();	
 	entitymanager.reloadManager();
 }
 
@@ -569,4 +598,16 @@ void geProject::Scene::reloadLevel(std::string filepath) {
 
 void geProject::Scene::setPhysics(bool check) {
 	physicsEnabled = check;
+}
+
+void geProject::Scene::setGoapStatus(bool goap)
+{
+	goapEnabled = goap;
+}
+
+
+
+void geProject::Scene::render(Camera& camera, std::string shaderPath)
+{
+	rendermanager->render(camera, shaderPath);
 }

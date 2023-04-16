@@ -12,8 +12,43 @@ geProject::CustomContactListener::~CustomContactListener(){
 
 void geProject::CustomContactListener::BeginContact(b2Contact* contact) {	
 	bool obstructed = false;
+	bool deadly = false;
 	Entity* firstData = (Entity*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
 	Entity* secondData = (Entity*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+	if (firstData->type == completion) {
+		if (secondData->type == player || secondData->type == playerprojectile) {
+			eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1, true));
+		}
+	}
+	switch (firstData->type) {
+	case environment:
+		if(secondData->type == playerprojectile || secondData->type == enemyprojectile){
+			secondData->lifeTime = 1;
+		}
+		break;
+	case enemy:
+		if (secondData->type == playerprojectile || secondData->type == enemyprojectile) {
+			if (contact->GetFixtureA()->IsSensor()) {
+
+			}
+			else {
+				secondData->lifeTime = 1;
+				deadly = true;
+
+			}
+		}
+		break;
+	case player:
+		if (secondData->type == playerprojectile || secondData->type == enemyprojectile) {
+			secondData->lifeTime = 1;
+			deadly = true;
+		}
+
+		break;
+	}
+
+
+
 	if ((firstData->type == enemy && secondData->type == player) || (firstData->type == enemy && secondData->type == playerprojectile)) {
 		RayCastCallback raycast;
 		Transform enemyPoint = entitymanager.getTransformComponent(firstData->id);
@@ -32,9 +67,8 @@ void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
 	contact->GetWorldManifold(&manifold);
 	glm::vec2 firstNormal = glm::vec2(manifold.normal.x, manifold.normal.y);
 	glm::vec2 secondNormal = -firstNormal;
-	eventSystem.publishImmediately(new BeginContactEvent(GameplayContext | ImGuiContext, firstData, secondData, true, obstructed));
+	eventSystem.publishImmediately(new BeginContactEvent(GameplayContext | ImGuiContext, firstData, secondData, deadly, obstructed));
 	
-	//put callbacks into handler queue instead of publishing immediately due to multiple collisions occuring per frame 		
 }
 
 

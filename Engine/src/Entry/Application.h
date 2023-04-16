@@ -9,10 +9,13 @@
 #include "../SceneManager/SceneStates.h"
 #include "../SceneManager/LevelEditorScene.h"
 #include "../SceneManager/LevelScene.h"
+#include "../SceneManager/MenuScene.h"
 #include "../Clock/Clock.h"
 #include <ge_engine/Core.h>
 #include <ge_engine/Managers.h>
 #include <ge_engine/PhysicsManager.h>
+
+
 
 namespace geProject {
 	class Application
@@ -32,7 +35,7 @@ namespace geProject {
 		void startGamePlay(GameStartEvent* start);
 		void stopGamePlay(GameStopEvent* stop);
 		void loadGame(GameLoadEvent* load);
-
+		bool running{ true };
 	};
 
 	Application* CreateApplication();

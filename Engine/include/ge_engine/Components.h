@@ -7,12 +7,6 @@
 #include <string>
 
 namespace geProject {
-	enum physCats {
-		BOUNDARY = 0x0001,
-		PLAYER = 0x0002,
-		ENEMY = 0x0004,
-		PROJECTILE = 0x0008
-	};
 
 	enum dmgTypes {
 		SPECIAL = 0x0001,
@@ -31,9 +25,10 @@ namespace geProject {
 		AGENT_TIRED = 0x00020,
 		AGENT_HURT = 0x00040,
 		ATTACK_SIGHTED = 0x00080,
-		POWERUP_IN_RANGE = 0x00100,
+		INVESTIGATED = 0x00100,
 		ENEMY_DEAD = 0x00200,
 		ENEMY_VISIBLE = 0x00400,
+		COOLDOWN = 0x08000
 	};
 
 
@@ -108,15 +103,15 @@ namespace geProject {
 	struct Health {
 		unsigned int id = 0x0080;
 		int maxHealth{ 100 };
-		int currentHealth;
+		int currentHealth{ 100 };
 		bool invincible{ false };
 	};
 	
 
 	struct Damage {
 		unsigned int id = 0x0100;
-		int dmgAtk;
-		int dmgModifier;
+		int dmgAtk{ 1 };
+		float dmgModifier{ 1 };
 		int coolDown;
 		int dmgType{dmgTypes::FIRE};
 	};
@@ -134,9 +129,11 @@ namespace geProject {
 
 	struct Agent {
 		unsigned int id = 0x0400;
-		int agentStateDetails{AT_HOME | HAS_ENERGY}; //keeps track of the current agents state based on a bitmask
+		int agentStateDetails{AT_HOME | HAS_ENERGY | COOLDOWN}; //keeps track of the current agents state based on a bitmask
 		int goalPriority;  //context for goal priorities  COMBAT - 0 -> LIFESTYLE - 1 -> DUTY - 2
 		bool playerInRange{ false };
+		float alertLevel{ 0 };
+		float energy{ 10 };
 		glm::vec2 anomalypos;
 	};
 

@@ -1,7 +1,0 @@
-target_sources(memory PRIVATE
-	AlignAlloc.cpp
-	DeStackAllocator.cpp
-	DoubleBufferedAllocator.cpp
-	PoolAllocator.cpp
-	StackAllocator.cpp
-)

@@ -1,4 +1,0 @@
-target_sources(resourceManager PRIVATE		
-	Resource.cpp
-	ResourceManager.cpp	
-)

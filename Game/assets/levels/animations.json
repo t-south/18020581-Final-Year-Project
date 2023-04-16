@@ -1,1 +1,8 @@
-{"Idle":[["Frame",{"sprite":1}]],"Sleeping":[["Frame",{"sprite":2}],["Frame",{"sprite":3}],["Frame",{"sprite":4}]]}
+{"Attacking":[["Frame",{"sprite":5}],["Frame",{"sprite":6}],["Frame",{"sprite":7}]],"CompleteLevel":[["Frame",{"sprite":12}]],"Death":[["Frame",{"sprite":13}]],"Hurt":[["Frame",{"sprite":11}]],"Idle":[["Frame",{"sprite":0}]],"Investigating":[["Frame",{"sprite":8}],["Frame",{"sprite":9}],["Frame",{"sprite":10}]],"Sleeping":[["Frame",{"sprite":2}],["Frame",{"sprite":3}],["Frame",{"sprite":4}]],
+
+
+
+
+"PlayerIdle":[["Frame",{"sprite":0}]], 
+"PlayerHurt":[["Frame",{"sprite":1}]], 
+"PlayerDamaged": [["Frame",{"sprite":2}]], "PlayerCritical":[["Frame",{"sprite":3}]]}

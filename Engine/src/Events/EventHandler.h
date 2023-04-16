@@ -13,10 +13,12 @@ namespace geProject {
 	public:	
 		template<class T>
 		void publish(T* event) {
-			std::list<FunctionWrapper*>* observers = events[event->getType()];			
-			for (auto& observer : *observers) {
-				if (event->contextCheck(currentContext)) {
-					observer->setFunctionParam(event);
+			std::list<FunctionWrapper*>* observers = events[event->getType()];
+			if (observers != nullptr) {
+				for (auto& observer : *observers) {
+					if (event->contextCheck(currentContext)) {
+						observer->setFunctionParam(event);
+					}
 				}
 			}
 		};
@@ -55,10 +57,12 @@ namespace geProject {
 		void handleEvents(Type eventType){	
 			std::list<FunctionWrapper*>* observers = events[eventType];
 			int count = 0;
-			for (auto& observer : *observers) {
-				count++;
-				observer->callEvent();
-			}	
+			if (observers != nullptr) {
+				for (auto& observer : *observers) {
+					count++;
+					observer->callEvent();
+				}
+			}
 		
 		}
 		void setContext(Context context) { 

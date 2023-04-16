@@ -1,5 +1,6 @@
 #include "Application.h"
 
+
 geProject::EventHandler eventSystem;
 geProject::ResourceManager resourcemanager;
 geProject::WorldState worldstate;
@@ -23,12 +24,12 @@ namespace geProject {
 		gameWindow = new geProject::Window("game", 1920, 1080);
 		gameClock = Clock::getInstance();
 		sceneManager = new SceneStates();
-		sceneManager = new SceneStates();
+		std::shared_ptr<Scene> menuScene = std::make_shared<MenuScene>();
 		std::shared_ptr<Scene> levelEditorScene = std::make_shared<LevelEditorScene>();
-		//levelEditorScene->setSerializer(&serial);
 		std::shared_ptr<Scene> levelScene = std::make_shared<LevelScene>();
-		int editorSceneId = sceneManager->addScene(levelEditorScene);
+		int menuSceneId = sceneManager->addScene(menuScene);
 		int levelSceneId = sceneManager->addScene(levelScene);
+		int editorSceneId = sceneManager->addScene(levelEditorScene);
 		//add window to scene, also add mouse listener and keyboard listener
 		sceneManager->getCurrentScene()->setWindow(gameWindow);
 		//mouse = MouseListener::getInstance();
@@ -49,7 +50,7 @@ namespace geProject {
 		float deltaTime = 0;
 		//SceneSerialize serial = SceneSerialize(sceneManager->getCurrentScene());
 		//serial.deserialize("jsonTest.json");
-		while (!glfwWindowShouldClose(gameWindow->getWindow())) {
+		while (running &&  !glfwWindowShouldClose(gameWindow->getWindow())) {
 			eventSystem.handleEvents(Type::keyPressed);
 			eventSystem.handleEvents(Type::keyReleased);
 			glfwPollEvents();
@@ -82,6 +83,7 @@ namespace geProject {
 			}
 			gameClock->endFrame();
 			gameClock->updateTime();
+
 		}
 		glfwDestroyWindow(gameWindow->getWindow());
 		glfwTerminate();
@@ -104,25 +106,31 @@ namespace geProject {
 		if (stop->getType() == Type::gameStop) {
 			std::cout << "stopping play" << std::endl;
 			auto scene = sceneManager->getCurrentScene();
-			scene->reloadLevel(scene->getFilePath());
+			scene->reloadLevel();
 			scene->setPhysics(false);
 			scene = sceneManager->getCurrentScene();
 			scene->deserialize(scene->getFilePath());			
 			eventSystem.setContext(EditorContext);
 			scene->setActiveEntity(-1);
+			scene->init();
 		}
 	}
 
 	void geProject::Application::loadGame(GameLoadEvent* load) {
 		if (load->getType() == Type::gameLoad) {
 			std::cout << "GAME LOADED" << std::endl;
-			if (load->sceneId == 1) {
+			if (load->sceneId == -1) {
+				running = false;
+			}
+			else {				
+				sceneManager->switchScene(load->sceneId);
+				sceneManager->getCurrentScene()->reloadLevel();
+
+				sceneManager->getCurrentScene()->setGoapStatus(load->aiActive);
+				sceneManager->getCurrentScene()->init();
 				sceneManager->getCurrentScene()->setActiveEntity(-1);
 			}
-			sceneManager->switchScene(load->sceneId);
-			if (load->sceneId > 1) {
-				sceneManager->getCurrentScene()->init();
-			}
+
 		}
 	}
 

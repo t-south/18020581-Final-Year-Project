@@ -2,8 +2,8 @@
 
 
 
-std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal,  int agentId, std::vector<Action*> actionsAvailable) {	
-	int currentState = entitymanager.getAgentState(agentId);
+std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, int agentState, int agentId, std::vector<Action*> actionsAvailable) {	
+	
 	std::vector<Action*> actionPlan;
     std::vector<asNode*> openList;
     std::vector<asNode*> closedList;
@@ -11,7 +11,7 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal,  int 
 	int goalCondition = goal.checkCondition(0);
 	asNode* startNode = new asNode();
 	
-	startNode->currentState = currentState;
+	startNode->currentState = agentState;
 	startNode->goalState = goalCondition;
 	
 	openList.push_back(startNode);
@@ -33,6 +33,7 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal,  int 
 		}		
 		//check both bools for current state and goal state are the same		
 		//if both are the same then we have found the optimal path
+		//std::cout << (expandedNode->goalState) << std::endl;
 		//std::cout << (expandedNode->goalState & expandedNode->currentState) << std::endl;
 		if ((expandedNode->goalState & expandedNode->currentState) == expandedNode->goalState) {
 			//create the action plan by following the nodes parents back to the origin node
@@ -50,7 +51,7 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal,  int 
 		for (auto& newAction : actionsAvailable) {				
 			//if action effect state matches the goal state
 			
-			if ((newAction->setEffect(0)) == expandedNode->goalState && newAction->proceduralPrecondition(agentId)) {
+			if (newAction->setEffect(0) == expandedNode->goalState && newAction->proceduralPrecondition(agentId)) {
 				asNode* neighbour = new asNode();				
 				neighbour->currentState = expandedNode->goalState;
 				neighbour->actionTaken = newAction;		
@@ -61,6 +62,7 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal,  int 
 				expandedNode->neighbours.push_back(neighbour);				
 			}			
 		}
+
 
 		for (auto& neighbour : expandedNode->neighbours) {
 			//add cost to take action from current node to current accumulated action cost

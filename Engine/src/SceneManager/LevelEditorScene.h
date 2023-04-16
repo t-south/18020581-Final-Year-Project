@@ -11,14 +11,13 @@ namespace geProject {
 		LevelEditorScene();
 		~LevelEditorScene();		
 		virtual void update(float deltaTime) override;	
-		virtual void updateImgui() override;
-		virtual void updateSceneImgui() override;
-		virtual void render(std::string shaderPath) override;
-		virtual void setActiveEntity(int entityId) override;
-		virtual unsigned int getActiveEntity() override;
-		virtual void setEntityDrag(bool drag) override;
-		virtual bool getEntityDrag() override;		
 		virtual void setPicking() override;		
+		void updateImgui();
+		void updateSceneImgui();
+		void setActiveEntity(int entityId);
+		unsigned int getActiveEntity();
+		void setEntityDrag(bool drag);
+		bool getEntityDrag() ;		
 	private:
 		int activatedEntity{ -1 };
 		int previousEntity{ -1 };

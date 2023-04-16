@@ -15,6 +15,7 @@ namespace geProject {
 		GLFWwindow* getWindow();
 		int getWidth();
 		int getHeight();
+		void stopWindow();
 		static void window_size_callback(GLFWwindow* window, int width, int height);
 	private:
 		int width, height;

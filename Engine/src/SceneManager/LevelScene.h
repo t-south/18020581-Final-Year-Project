@@ -8,17 +8,11 @@ namespace geProject {
 		LevelScene();
 		~LevelScene();
 		void update(float deltaTime);
-		virtual void updateImgui() override;
-		virtual void updateSceneImgui() override;
-		virtual void render(std::string shaderPath) override;
-		virtual void setActiveEntity(int entityId) override;
-		virtual unsigned int getActiveEntity() override;
-		virtual void setEntityDrag(bool drag) override;
-		virtual bool getEntityDrag() override;
-		virtual void setPicking() override;
+
+		virtual void setPicking() {};
 	private:
-		void init();
-		virtual void saveGame(GameSaveEvent* save) override;
+		virtual void init() override;
+		virtual void saveGame(GameSaveEvent* save) {};
 		PlayerController* player;
 		Camera* camera;		
 	};

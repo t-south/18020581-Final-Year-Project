@@ -4,7 +4,14 @@
 namespace geProject {
 
 	enum entityTypes {
-		player, enemy, environment, playerprojectile, enemyprojectile, noType
+		player			= 0x0001,
+		enemy			= 0x0002,
+		environment     = 0x0004,
+		playerprojectile= 0x0008,
+		enemyprojectile = 0x0010,
+		completion      = 0x0020,
+		viewSensor      = 0x0040,
+		noType          = 0x0080
 	};
 
 	struct Entity	{

@@ -66,28 +66,30 @@ void geProject::ImguiWindow::dockWindow(){
 void geProject::ImguiWindow::gameViewWindow() {
 	ImVec2 vPos = viewPos;
 	ImVec2 vSize = viewSize;
-	ImGui::BeginMainMenuBar();
-	if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {				
-		eventSystem.publish(new GameStartEvent(ImGuiContext));
-		windowRunning = true;
+	if (eventSystem.getContext() == EditorContext) {
+		ImGui::BeginMainMenuBar();
+		if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
+			eventSystem.publish(new GameStartEvent(ImGuiContext));
+			windowRunning = true;
+		}
+		if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {
+			eventSystem.publish(new GameStopEvent(ImGuiContext));
+			windowRunning = false;
+		}
+		if (ImGui::Button("Save")) {
+			eventSystem.publish(new GameSaveEvent(ImGuiContext));
+		}
+		if (ImGui::MenuItem("Editor", "", loadLevel, !loadLevel)) {
+			eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1, true));
+			loadLevel = false;
+		}
+		if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
+			eventSystem.publish(new GameLoadEvent(ImGuiContext, 2, true));
+			loadLevel = false;
+
+		}
+		ImGui::EndMainMenuBar();
 	}
-	if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {			
-		eventSystem.publish(new GameStopEvent(ImGuiContext));
-		windowRunning = false;
-	}
-	if (ImGui::Button("Save")) {		
-		eventSystem.publish(new GameSaveEvent(ImGuiContext));
-	}
-	if (ImGui::MenuItem("Editor", "", loadLevel, !loadLevel)) {
-		eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1));
-		loadLevel = false;
-	}
-	if (ImGui::MenuItem("Level 1", "", loadLevel, !loadLevel)) {
-		eventSystem.publish(new GameLoadEvent(ImGuiContext, 2));
-		loadLevel = false;
-	
-	}
-	ImGui::EndMainMenuBar();	
 	ImGui::Begin("gameViewWindow");		
 	ImVec2 size = getMaxViewPort();
 	ImVec2 position = ImGui::GetContentRegionAvail();

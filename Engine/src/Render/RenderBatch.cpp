@@ -68,9 +68,10 @@ void geProject::RenderBatch::init() {
 void geProject::RenderBatch::addSprite(int entityId, int count) {
 	Transform transform = entitymanager.getTransformComponent(entityId);
 	SpriteRender sprite = entitymanager.getSpriteComponent(entityId);
-	
+
 	if (spriteNum <= maxBatch && sprite.zIndex == zIndex) {
 		int index = spriteNum * 4 * vertSize;
+		int test = index;
 		//std::cout << index << std::endl;
 		if (vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] != 0.0f) { // get the index where the object id is stored
 			index = getUnusedRenderSection();
@@ -84,6 +85,7 @@ void geProject::RenderBatch::addSprite(int entityId, int count) {
 		}		
 		
 		entitymanager.updateDirtyFlags(entityId, 0, count, index);
+
 		createVertices(sprite, transform.position[0], transform.position[1], transform.scale[0], transform.scale[1], transform.rotation, index);
 		hasUpdate = true;
 		spriteNum++;
@@ -241,6 +243,7 @@ int geProject::RenderBatch::getUnusedRenderSection() {
 	while ((static_cast<unsigned long long>(count) * verticesSize) < vertices.size() && vertices[(static_cast<std::vector<float, std::allocator<float>>::size_type>(count) * verticesSize) + 9] != 0) {
 		count++;
 	}
+	
 	return count * verticesSize;
 }
 

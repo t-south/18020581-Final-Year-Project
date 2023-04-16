@@ -24,6 +24,7 @@ namespace geProject {
 	
 		void addEntity(int entityId);		
 		bool checkTargetObstructed(float startx, float starty, float targetx, float targety);
+
 		void addBoxCollider(BoxCollider box, int entityId);
 		void addCircleCollider(CircleCollider circle, int entityId);
 		void addViewSensorCollider(ViewCollider view, int entityId);

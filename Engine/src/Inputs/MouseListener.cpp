@@ -49,8 +49,8 @@ void geProject::MouseListener::mouse_button_callback(GLFWwindow* window, int but
 }
 
 void geProject::MouseListener::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    Context currentContext = eventSystem.getContext();
-    eventSystem.publishImmediately(new MouseScrollEvent(currentContext, xoffset, yoffset, MouseListener::getInstance()->getScreenXpos(), MouseListener::getInstance()->getScreenYpos()));
+    //only allow mouse scrolling in and out in the editor
+    eventSystem.publishImmediately(new MouseScrollEvent(EditorContext, xoffset, yoffset, MouseListener::getInstance()->getScreenXpos(), MouseListener::getInstance()->getScreenYpos()));
     MouseListener::getInstance()->xScroll = xoffset;
     MouseListener::getInstance()->yScroll = yoffset;
 }

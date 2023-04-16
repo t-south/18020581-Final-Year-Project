@@ -1,39 +1,8 @@
 #include "LevelEditorScene.h"
 
 geProject::LevelEditorScene::LevelEditorScene() {
-	player = nullptr;
-	gridWidth = 0.25f;
-	gridHeight = 0.25f;	
-	eventSystem.subscribe(this, &LevelEditorScene::saveGame);	
-	eventSystem.subscribe(this, &LevelEditorScene::deleteEntity);
-	eventSystem.subscribe(this, &LevelEditorScene::updateCopy);
-	eventSystem.subscribe(this, &LevelEditorScene::editorKeyEvent);
-	std::cout << "Editor Scene!" << std::endl;	
-	//entitymanager = new EntityManager(10000);
-	entitymanager.startUp();
-	animationManager = new AnimationManager(/**entitymanager*/);	
-	rendermanager = new Renderer();
-	camera = new EditorCamera(glm::vec2(0.0f, 0.0f));	
-	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
-	resourcemanager.loadShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl", "../../../../Game/assets/shaders/FragmentShaderDefault.glsl");
-	resourcemanager.loadShader("../../../../Game/assets/shaders/LineVertexShader.glsl", "../../../../Game/assets/shaders/LineFragmentShader.glsl");
-	resourcemanager.loadShader("../../../../Game/assets/shaders/SelectionVertexShader.glsl", "../../../../Game/assets/shaders/SelectionFragmentShader.glsl");
-	filePath = "../../../../Game/assets/levels/levelEditor.json";	
-	editor = new EditorRender();	
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/environment.png", 15, 16, 16, 0, 0);
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/player.png", 26, 16, 16, 0, 0);
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/enemies.png", 26, 16, 16, 0, 0);
-	resourcemanager.loadMap("../../../../Game/assets/images/spritesheets/level1.png", 9476, 16, 16, 0, 0);
-	std::shared_ptr<SpriteSheet> mapDims = resourcemanager.requestLevelMap(1);
-	int worldWidth = mapDims->getSpriteSheetWidth();
-	int worldHeight = mapDims->getSpriteSheetHeight();
-	worldstate.generateWorldMap(worldWidth, worldHeight);
-	selectionTextures = new FrameBuffer(1920, 1080, true);	
-	//physicsmanager = new Physics(/**entitymanager*/);
-	physicsmanager.startUp();
-	controlManager = new Receiver();
-	sceneHierarchy = new HierarchyWindow();	
-	init();
+
+	
 }
 
 
@@ -41,9 +10,36 @@ geProject::LevelEditorScene::~LevelEditorScene(){}
 
 
 void geProject::LevelEditorScene::init() {
+	player = nullptr;
+	gridWidth = 0.25f;
+	gridHeight = 0.25f;
+	eventSystem.subscribe(this, &LevelEditorScene::saveGame);
+	eventSystem.subscribe(this, &LevelEditorScene::deleteEntity);
+	eventSystem.subscribe(this, &LevelEditorScene::updateCopy);
+	eventSystem.subscribe(this, &LevelEditorScene::editorKeyEvent);
+	std::cout << "Editor Scene!" << std::endl;
+	//entitymanager = new EntityManager(10000);
+	entitymanager.startUp();
+	animationManager = new AnimationManager(/**entitymanager*/);
+	rendermanager = new Renderer();
+	camera = new EditorCamera(glm::vec2(0.0f, 0.0f));
+	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
+	filePath = "../../../../Game/assets/levels/levelEditor.json";
+	editor = new EditorRender();
+
+	std::shared_ptr<SpriteSheet> mapDims = resourcemanager.requestLevelMap(1);	
+	int worldWidth = mapDims->getSpriteSheetWidth();
+	int worldHeight = mapDims->getSpriteSheetHeight();
+	worldstate.generateWorldMap(worldWidth, worldHeight);
+	selectionTextures = new FrameBuffer(1920, 1080, true);
+	//physicsmanager = new Physics(/**entitymanager*/);
+	physicsmanager.startUp();
+	controlManager = new Receiver();
+	sceneHierarchy = new HierarchyWindow();
 	geProject::Scene::deserialize(filePath);
 	for (int i = 0; i < entitymanager.getEntityNum(); i++) {
-		Entity ent = entitymanager.getEntity(i);		
+		Entity ent = entitymanager.getEntity(i);
+	
 		if ((ent.compMask & 4) == 4) {//check for rigidbody
 			if ((ent.compMask & 8) == 8 || (ent.compMask & 16) == 16) {//check for boxcollider or circlecollider
 				physicsmanager.addEntity(ent.id);
@@ -63,8 +59,9 @@ void geProject::LevelEditorScene::init() {
 	}
 	
 	for (auto& i : entitymanager.getEnemyIds()) {
-		enemies[i] = new Enemy(i);
+		enemies[i] = new Enemy(i, goapEnabled);
 	}
+	eventSystem.setContext(EditorContext);
 }
 
 
@@ -125,55 +122,39 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 				command->execute(*player);
 			}
 		}
-
+		std::vector<int> deleteEnemies;
 		for (auto& enemy : enemies) {
 			enemy.second->update(deltaTime);
 			ViewCollider view = entitymanager.getViewComponent(enemy.second->getEnemyId());
 			Transform transform = entitymanager.getTransformComponent(enemy.second->getEnemyId());
-			editor->addSensor(transform.position, glm::vec3(0, 0, 1), view.radius, transform.rotation + 50, 1);
-			if (enemy.second->getPathSize() > 0) {
-				for (auto& path : enemy.second->getPath()) {
-					editor->addBox(glm::vec2(path.x, path.y), glm::vec2(0.2f, 0.2f), glm::vec3(1, 0, 0), 0, 1);
+			Health health = entitymanager.getHealthComponent(enemy.second->getEnemyId());
+			if (health.currentHealth <= 0) {
+				entitymanager.deleteEntity(enemy.second->getEnemyId());
+				deleteEnemies.push_back(enemy.first);
+			}
+			else {
+				editor->addSensor(transform.position, glm::vec3(0, 0, 1), view.radius, transform.rotation + 50, 1);
+				if (enemy.second->getPathSize() > 0) {
+					for (auto& path : enemy.second->getPath()) {
+						editor->addBox(glm::vec2(path.x, path.y), glm::vec2(0.2f, 0.2f), glm::vec3(1, 0, 0), 0, 1);
+					}
 				}
 			}
-
+		}
+		for (auto& enemyId : deleteEnemies) {
+			enemies.erase(enemyId);
 		}
 		physicsmanager.update(deltaTime);
 	}
-
-
-
-
-
-	//UPDATES TO RENDERING
-	if (entitymanager.hasUpdate()) {
-		for (int i = 0; i < entitymanager.getEntityNum(); i++) {
-			Entity ent = entitymanager.getEntity(i);
-			if (ent.compMask > 0 && ent.id > -1) {
-				if ((ent.compMask & 4) == 4) {//check for rigidbody
-					if ((ent.compMask & 8) == 8 || (ent.compMask & 16) == 16) {//check for boxcollider or circlecollider			
-						physicsmanager.addEntity(ent.id);
-					}
-				}
-				// only sprites that have not been added to the renderer previously will be set to 0		
-				//transform dirtyflag for render index is by default set to -1 when first created
-				if (entitymanager.getVertexStatus(ent.id) == -1) {
-					rendermanager->addSpriteToBatch(ent.id);
-				}
-				//if there has been any updates the dirty flag in transform component will be set to 1
-				else if (entitymanager.getUpdateStatus(ent.id) == 1) {
-					rendermanager->updateSprite(ent.id);
-				}
-			}
-		}
-		//manager->endFrame();			
-	}
+	renderScene();
 	animationManager->update(deltaTime);
 	mouse->endFrame();
 	keyboard->endFrame();
 	entitymanager.endFrame();
-	render("../../../../Game/assets/shaders/VertexShaderDefault.glsl");
+	render(*(camera), "../../../../Game/assets/shaders/VertexShaderDefault.glsl");
 	editor->render(*(camera));
+
+
 	//DEBUG DRAWING FOR PHYSICS
 	/*if (displayColliders && activatedEntity > -1) {
 		Entity colliderEntity = entitymanager.getEntity(activatedEntity);
@@ -226,9 +207,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 }
 
 
-void geProject::LevelEditorScene::render(std::string shaderPath) {	
-	rendermanager->render(*(camera), shaderPath);
-}
+
 
 void geProject::LevelEditorScene::setActiveEntity(int entityId) {
 	activatedEntity = entityId;
@@ -411,7 +390,7 @@ void geProject::LevelEditorScene::setPicking() {
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT);
 	selectionTextures->bindPicking();	
-	render("../../../../Game/assets/shaders/SelectionVertexShader.glsl");	
+	render(*(camera), "../../../../Game/assets/shaders/SelectionVertexShader.glsl");	
 	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();
