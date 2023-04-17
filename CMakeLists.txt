@@ -12,6 +12,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE ge_cpp_engine)
 #add_subdirectory(Game)
 add_subdirectory(Engine)
 
+if(MSVC)
+    add_compile_options(
+        $<$<CONFIG:>:/MT> #---------|
+        $<$<CONFIG:Debug>:/MTd> #---|-- Statically link the runtime libraries
+        $<$<CONFIG:Release>:/MT> #--|
+    )
+endif()
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib
                       ARCHIVE DESTINATION lib
