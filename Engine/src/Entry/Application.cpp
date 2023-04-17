@@ -68,10 +68,8 @@ namespace geProject {
 			gameClock->updateTime();
 			deltaTime = gameClock->getTime();
 			timePerSec += deltaTime;
-			loopCount++;
-			//std::cout << "Frame time: " << deltaTime << std::endl;
-			if (timePerSec > 1) {
-				//std::cout << "FPS1: " << loopCount << std::endl;
+			loopCount++;	
+			if (timePerSec > 1) {	
 				//std::cout << "FPS2: " << 1 / deltaTime << std::endl;
 				timePerSec = 0;
 				loopCount = 0;
@@ -87,10 +85,10 @@ namespace geProject {
 
 	void geProject::Application::startGamePlay(GameStartEvent* start) {
 		if (start->getType() == Type::gameStart) {
-			std::cout << "starting play" << std::endl;
+	
 			auto scene = sceneManager->getCurrentScene();
 			scene->serialize(scene->getFilePath());
-			scene->serialize("../../../../Game/assets/levels/levelEditor.json");
+			scene->serialize("Engine/Game/assets/levels/levelEditor.json");
 			scene->setPhysics(true);
 			eventSystem.setContext(GameplayContext);
 			scene->setActiveEntity(-1);
@@ -98,8 +96,7 @@ namespace geProject {
 	}
 
 	void geProject::Application::stopGamePlay(GameStopEvent* stop) {
-		if (stop->getType() == Type::gameStop) {
-			std::cout << "stopping play" << std::endl;
+		if (stop->getType() == Type::gameStop) {	
 			auto scene = sceneManager->getCurrentScene();
 			scene->reloadLevel();
 			scene->setPhysics(false);
@@ -112,8 +109,7 @@ namespace geProject {
 	}
 
 	void geProject::Application::loadGame(GameLoadEvent* load) {
-		if (load->getType() == Type::gameLoad) {
-			std::cout << "GAME LOADED" << std::endl;
+		if (load->getType() == Type::gameLoad) {	
 			if (load->sceneId == -1) {
 				running = false;
 			}
@@ -132,7 +128,6 @@ namespace geProject {
 
 }
 int main(int argc, char** argv) {
-	std::cout << "Test" << std::endl;
 	geProject::Application* game = new geProject::Application();
 	game->Startup();
 	return 0;

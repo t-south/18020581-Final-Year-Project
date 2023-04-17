@@ -17,7 +17,6 @@ void geProject::LevelEditorScene::init() {
 	eventSystem.subscribe(this, &LevelEditorScene::deleteEntity);
 	eventSystem.subscribe(this, &LevelEditorScene::updateCopy);
 	eventSystem.subscribe(this, &LevelEditorScene::editorKeyEvent);
-	std::cout << "Editor Scene!" << std::endl;
 	//entitymanager = new EntityManager(10000);
 	entitymanager.startUp();
 	animationManager = new AnimationManager(/**entitymanager*/);
@@ -103,16 +102,13 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		else {
 			transform.position[0] = mouse->getCameraMouseX();
 			transform.position[1] = mouse->getCameraMouseY();
-		}
-
-		//std::cout << "Pos x: " << mouse->getCameraMouseX() << " Pos Y: " << mouse->getCameraMouseY() << " scroll: " << scroll << " gridwidth: " << gridWidth << " gridheight: " << gridHeight << std::endl;
+		}				
 		entitymanager.assignTransform(activatedEntity, transform);
 		if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT) && entityDrag == true) {
 			entityDrag = false;
 			mouse->releaseMouseButton(GLFW_MOUSE_BUTTON_LEFT);
 		}
 	}
-	//std::cout << activatedEntity << std::endl;
 	if (physicsEnabled == true) {
 		if (player != nullptr) {
 			Command* command = controlManager->action(deltaTime);
@@ -394,8 +390,7 @@ void geProject::LevelEditorScene::setPicking() {
 	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();
-		int entityId = selectionTextures->getPixel(x, y);		
-		//std::cout << "entity: " << entityId << std::endl;	
+		int entityId = selectionTextures->getPixel(x, y);	
 		if (entityId == -1 && mouse->checkMouseBoundaries()) {
 			entityDrag = false;
 			entityClicked = false;

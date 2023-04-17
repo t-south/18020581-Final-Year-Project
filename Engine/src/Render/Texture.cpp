@@ -30,16 +30,17 @@ geProject::Texture::Texture(const char* filePath): filePath(filePath), textureHe
 	unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
 	if (data != NULL) {
 		textureWidth = width;
-		textureHeight = height;
-		
+		textureHeight = height;		
 		if (nrChannels == 4) {			
-			//std::cout << nrChannels << " " << textureWidth << " " << textureHeight << std::endl;
+			//check if RGBA
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
-		else if(nrChannels == 3)
+		else if (nrChannels == 3) {
+			//check if RGB
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
+		}
 	}
 	else {
 		std::cout << "TEXTURE ERROR: file not read" << std::endl;

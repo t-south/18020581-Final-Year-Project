@@ -60,7 +60,6 @@ void geProject::EnemyController::rotateTo(float desiredDirection, float currentD
 	float newangle = currentDirection + std::min(anglechange, std::max(-anglechange, rotation));
 	
 	physicsmanager.applyRotation(entityId, newangle);
-	//std::cout << rotate << std::endl;
 }
 
 void geProject::EnemyController::update(float deltaTime){

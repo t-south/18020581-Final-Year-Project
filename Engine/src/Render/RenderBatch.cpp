@@ -72,7 +72,6 @@ void geProject::RenderBatch::addSprite(int entityId, int count) {
 	if (spriteNum <= maxBatch && sprite.zIndex == zIndex) {
 		int index = spriteNum * 4 * vertSize;
 		int test = index;
-		//std::cout << index << std::endl;
 		if (vertices[static_cast<std::vector<float, std::allocator<float>>::size_type>(index) + 9] != 0.0f) { // get the index where the object id is stored
 			index = getUnusedRenderSection();
 		}	

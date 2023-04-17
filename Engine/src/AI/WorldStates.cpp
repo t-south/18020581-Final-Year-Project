@@ -83,9 +83,8 @@ std::vector<geProject::pathNode> geProject::WorldState::planPath(float originX, 
 				expandedNode.x = expandedNode.x / 4;
 				expandedNode.y = expandedNode.y / 4;
 				path.insert(path.begin(), expandedNode);
-				expandedNode = *expandedNode.parent;
-			}
-			//std::cout  << "A* " << track << std::endl;
+				expandedNode = *expandedNode.parent;			}
+		
 			return path;
 		}
 		openList.erase(openList.begin() + index);
@@ -205,7 +204,6 @@ geProject::Transform geProject::WorldState::getRandomPoint(float posx, float pos
 			randdir = (randdir + 1) % 8;
 		}
 	}
-	//std::cout << "X: " << newPosX <<  " Y: " << newPosY << std::endl;
 	return Transform{.id = 1, .position = glm::vec2(newPosX, newPosY)};
 }
 

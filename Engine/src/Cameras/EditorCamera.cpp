@@ -59,8 +59,7 @@ void geProject::EditorCamera::cameraMouseButton(MouseButtonEvent* mouse){
 }
 
 
-void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {
-	//std::cout << "Mouse X: " << drag << std::endl;	
+void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {	
 	if (mouse->contextCheck(Context::EditorContext)) {
 		if (mouseDown && mouse->contextCheck(Context::EditorContext)) {
 			if (prevClick[0] == 0 && prevClick[1] == 0) {
@@ -74,8 +73,7 @@ void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {
 			//interpolate between origin of drag and the new camera position
 			prevClick[0] = prevClick[0] * (1.0 - deltaTime) + (mouse->posX * deltaTime);
 			prevClick[1] = prevClick[1] * (1.0 - deltaTime) + (mouse->posY * deltaTime);
-			setPosition(cameraPos);
-			//std::cout << "cameraPosX : " << cameraPos[0] << " cameraPosY: " << cameraPos[1] << std::endl;
+			setPosition(cameraPos);	
 			if (drag <= 0 && !mouseDown) {
 				drag = 0.1f;
 			}

@@ -59,10 +59,8 @@ int geProject::FrameBuffer::getPixel(int x, int y) {
 	bind();
 	glReadBuffer(GL_COLOR_ATTACHMENT0);
 	float pixel[3];
-
 	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &pixel);	
-
-	//std::cout << pixel << std::endl;
+	//READ FRAMEBUFFER TO DETERMINE ENTITYID ASSIGNED TO OBJECT
 	return (int)pixel[0] - 1;
 
 

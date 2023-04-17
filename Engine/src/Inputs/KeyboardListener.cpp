@@ -21,8 +21,7 @@ void geProject::KeyboardListener::key_callback(GLFWwindow* window, int key, int 
     Context currentContext = eventSystem.getContext();
     
     if (action == GLFW_PRESS) {            
-        if (key == GLFW_KEY_C ) {
-            std::cout << "C pressed " << std::endl;
+        if (key == GLFW_KEY_C ) { 
             eventSystem.publishImmediately(new KeyPressedEvent(EditorContext | ImGuiContext, key, 0));           
         }
         else if (key == GLFW_KEY_DELETE) {

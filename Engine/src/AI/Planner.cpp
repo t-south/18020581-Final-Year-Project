@@ -33,15 +33,12 @@ std::vector<geProject::Action*> geProject::Planner::createPlan(Goal& goal, int a
 		}		
 		//check both bools for current state and goal state are the same		
 		//if both are the same then we have found the optimal path
-		//std::cout << (expandedNode->goalState) << std::endl;
-		//std::cout << (expandedNode->goalState & expandedNode->currentState) << std::endl;
 		if ((expandedNode->goalState & expandedNode->currentState) == expandedNode->goalState) {
 			//create the action plan by following the nodes parents back to the origin node
 			while (expandedNode->parent != nullptr) {
 				actionPlan.push_back(expandedNode->actionTaken);
 				expandedNode = expandedNode->parent;
 			}
-			//std::cout << "action A*: " << track << std::endl;
 			return actionPlan;
 		}
 		openList.erase(openList.begin() + index);

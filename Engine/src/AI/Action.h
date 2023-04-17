@@ -61,7 +61,7 @@ namespace geProject {
 	public:
 		DodgeAction(int id) { actiontype = COMBAT; agentId = id; cost = 1; };
 		void executeAction(float posx, float posy) { 
-			//std::cout << "Dodge Action" << std::endl; 
+
 	
 		};
 		int setEffect(int state) {
@@ -107,7 +107,7 @@ namespace geProject {
 			if (agent.energy > 10) {
 				updateEffect(true, HAS_ENERGY);
 			}
-			//std::cout << "Recover Action" << std::endl;
+	
 		};
 
 		int setEffect(int state) {
@@ -150,7 +150,7 @@ namespace geProject {
 			
 			float distance = worldstate.calculateEuclidean(posx, posy, target.position.x, target.position.y);
 			cost = cost * 10 * distance;
-			//std::cout << "Investigate Action" << std::endl; 
+		
 		};
 
 		int setEffect(int state) {
@@ -216,8 +216,7 @@ namespace geProject {
 	public:
 		WaitAction(int id) {actiontype = LIFESTYLE; agentId = id; cost = 1;
 		};
-		void executeAction(float posx, float posy) { 
-			//std::cout << "Wait Action" << std::endl; 
+		void executeAction(float posx, float posy) { 	
 			updateAgentEnergy(-cost);};
 
 		int setEffect(int state) {
@@ -236,8 +235,7 @@ namespace geProject {
 		GoHomeAction(float posX, float posY, int id) {actiontype = LIFESTYLE;target = Transform{ .position = glm::vec2(posX, posY) }; agentId = id;	cost = 1;
 		};
 
-		void executeAction(float posx, float posy) {
-			//std::cout << "GoHome Action" << std::endl;			
+		void executeAction(float posx, float posy) {					
 			if (inRange || (posx == target.position.x  && posy == target.position.y)) {
 				updateEffect(true, AT_HOME);
 				updateEffect(false, ~PATROLLED);
@@ -324,8 +322,7 @@ namespace geProject {
 		void executeAction(float posx, float posy) {
 			attack = true;
 			attackType = dmgTypes::WATER;
-			completed = true;
-			//std::cout << "Water Attack Action" << std::endl;
+			completed = true;		
 			updateEffect(true, COOLDOWN);
 			updateAgentEnergy(-cost);
 			//updateEffect(true, ENEMY_DEAD);
@@ -374,8 +371,7 @@ namespace geProject {
 			attackType = dmgTypes::LIGHTNING;			
 			completed = true;
 			updateEffect(true, COOLDOWN);
-			//updateEffect(true, ENEMY_DEAD);
-			//std::cout << "Wind Attack Action" << std::endl;
+			//updateEffect(true, ENEMY_DEAD);	
 			updateAgentEnergy(-cost);
 		};
 
@@ -425,7 +421,6 @@ namespace geProject {
 			completed = true;
 			updateEffect(true, COOLDOWN);
 			//updateEffect(true, ENEMY_DEAD);
-			//std::cout << "Earth Attack Action" << std::endl;
 			updateAgentEnergy(-cost);
 		};
 

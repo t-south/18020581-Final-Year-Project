@@ -45,7 +45,6 @@ glm::vec2 geProject::Camera::getPosition() {
 
 void geProject::Camera::setPosition(glm::vec2 pos) { 
 	position -= glm::vec3(pos , 0);	 
-	std::cout <<"positionX: " << position.x << " positionY: " << position.y << std::endl;
 	projectionUpdate();
 }
 
@@ -60,8 +59,7 @@ float geProject::Camera::getScroll() {
 }
 
 void geProject::Camera::cameraMouseScrolled(MouseScrollEvent* scroll) {
-	if (scroll->contextCheck(Context::GameplayContext) || scroll->contextCheck(Context::EditorContext)) {
-		//std::cout << "Context: " << scroll->getContexts() << " Type: " << scroll->getType() << std::endl;
+	if (scroll->contextCheck(Context::GameplayContext) || scroll->contextCheck(Context::EditorContext)) {	
 		auto scrollval = scroll->yScroll;
 		if (scroll->yScroll != 0.0f && (scroll->screenX >= 0.0f && scroll->screenX <= 1920.0f) && (scroll->screenY >= 0.0f && scroll->screenY <= 1080.0f)) {
 			int signum = (0 < scrollval) - (scrollval < 0);

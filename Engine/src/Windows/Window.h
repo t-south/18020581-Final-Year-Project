@@ -10,8 +10,7 @@ namespace geProject {
 	{
 	public:
 		Window(const char* m_title, int m_width, int m_height);
-		~Window();
-		//void loop();		
+		~Window();		
 		GLFWwindow* getWindow();
 		int getWidth();
 		int getHeight();
@@ -20,12 +19,7 @@ namespace geProject {
 	private:
 		int width, height;
 		const char* title;
-		GLFWwindow* window;			
-		//MouseListener* mouse;
-		//KeyboardListener* keyboard;
-		//SceneStates* sceneManager;
-		//std::shared_ptr<geProject::Scene> getScene();
-		//Time* clock;
+		GLFWwindow* window;	
 		static void glfwError(int id, const char* description);
 	};
 }

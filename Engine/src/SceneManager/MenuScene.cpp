@@ -18,13 +18,10 @@ void geProject::MenuScene::update(float deltaTime){
 	render(*(camera), "Engine/assets/shaders/VertexShaderDefault.glsl");
 }
 
-void geProject::MenuScene::init()
-{
-	std::cout << "Editor Scene!" << std::endl;
-	//entitymanager = new EntityManager(10000);
+void geProject::MenuScene::init(){		
 	camera = new LevelCamera(glm::vec2(0.0f, 0.0f));
 	entitymanager.startUp();
-	animationManager = new AnimationManager(/**entitymanager*/);
+	animationManager = new AnimationManager();
 	rendermanager = new Renderer();
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
 	resourcemanager.loadShader("Engine/assets/shaders/VertexShaderDefault.glsl", "Engine/assets/shaders/FragmentShaderDefault.glsl");
@@ -86,9 +83,7 @@ void geProject::MenuScene::setPicking()
 	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();
-		int entityId = selectionTextures->getPixel(x, y);	
-		std::cout << entityId << std::endl;
-		
+		int entityId = selectionTextures->getPixel(x, y);			
 		switch (entityId) {
 		case 0:
 			eventSystem.publish(new GameLoadEvent(MenuContext, 2, true));

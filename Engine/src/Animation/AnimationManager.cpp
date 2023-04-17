@@ -19,13 +19,11 @@ void geProject::AnimationManager::update(float deltaTime){
 			if (animation.currentFrame >= frameList.size()) {
 				animation.currentFrame = 0;
 			}			
-			//std::cout << deltaTime << std::endl;
 			Frame& currentFrame = frameList[animation.currentFrame];
 			auto playerSprites = resourcemanager.requestSpriteSheet(sprite.textureId);
 			auto& newSprite = playerSprites->getSprite(frameList[animation.currentFrame].sprite);
 			entitymanager.assignSpriteRender(i->id, newSprite);
-			currentFrame.time += deltaTime;
-			//entitymanager.assignSpriteRender(i->id, newSprite);
+			currentFrame.time += deltaTime;		
 			if (currentFrame.time >= animation.speed) {
 				animation.currentFrame++;
 				currentFrame.time = 0.0f;
@@ -48,7 +46,6 @@ void geProject::AnimationManager::changeState(int entityId, std::string newState
 void geProject::AnimationManager::serializeAnimations(){
 	oFile.open(filePath.c_str());
 	if (oFile.is_open(), std::ofstream::out | std::ofstream::trunc) {
-		//std::cout << "File is open" << std::endl;
 		//serialize each entity into json
 		json animationData;
 		for (auto& state : animationList) {			

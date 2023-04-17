@@ -96,29 +96,22 @@ void geProject::Renderer::updateSprite(int entityId) {
 
 
 
-void geProject::Renderer::render(Camera& camera, std::string shaderPath) {
-	//std::cout << "number of batches" << renderList.size() << std::endl;
-	//iterate backward through list to allow layers with lower z index to be towards the front
-	
+void geProject::Renderer::render(Camera& camera, std::string shaderPath) {	
+	//iterate backward through list to allow layers with lower z index to be towards the front	
 	for (int i = renderList.size() - 1; i >= 0; i--) {
-
 		if (renderList[i].getSpriteNum() > 0 && renderList[i].getZindex() < 10) {
 			renderList[i].render(camera, shaderPath);			
 		}
 		else if (renderList[i].getZindex() == 10 && shaderPath != "../../assets/shaders/SelectionVertexShader.glsl") {
 			//offloading tile map into layer 10 of the renderer, also prevents selection of these textures
 			renderList[i].render(camera, shaderPath);
-		}
-
-	
+		}	
 	}
 }
 
 void geProject::Renderer::clear() {	
-	//std::cout << "number of batches" << renderList.size() << std::endl;
 	if (renderList[0].getSpriteNum() > 0) {
 		renderList.clear();
-		//renderList.push_back(RenderBatch(maxBatch, 0, *resourceManager));
 	}
 }
 

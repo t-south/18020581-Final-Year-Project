@@ -153,8 +153,7 @@ void geProject::MouseListener::updateViewPort(ViewPortEvent* e) {
     MouseListener::getInstance()->viewPos.y = e->windowPosY;
     MouseListener::getInstance()->viewSize.x = e->windowSizeX;
     MouseListener::getInstance()->viewSize.y = e->windowSizeY;
-    delete(e);
-    //std::cout << "ViewPos: " << viewPos.x << " " << viewPos.y << " ViewSize: " << viewSize.x << " " << viewSize.y << std::endl;
+    delete(e);    
 }
 
 
@@ -162,5 +161,4 @@ void geProject::MouseListener::updateProjection(ProjectionEvent* e) {
     MouseListener::getInstance()->projectionInv = e->projInv;
     MouseListener::getInstance()->viewInv = e->viewInv;
     delete(e);
-    //std::cout << "ViewPos: " << viewPos.x << " " << viewPos.y << " ViewSize: " << viewSize.x << " " << viewSize.y << std::endl;
 }
