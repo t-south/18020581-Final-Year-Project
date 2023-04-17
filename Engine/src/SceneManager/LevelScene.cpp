@@ -7,7 +7,7 @@ geProject::LevelScene::~LevelScene(){}
 
 void geProject::LevelScene::init() {
 	camera = new LevelCamera(glm::vec2(0.0f, 0.0f));
-	filePath = "../../../../Game/assets/levels/level1.json";
+	filePath = "Engine/assets/levels/level1.json";
 	std::shared_ptr<SpriteSheet> mapDims = resourcemanager.requestLevelMap(1);
 	int worldWidth = mapDims->getSpriteSheetWidth();
 	int worldHeight = mapDims->getSpriteSheetHeight();
@@ -86,7 +86,7 @@ void geProject::LevelScene::update(float deltaTime){
 	mouse->endFrame();
 	keyboard->endFrame();
 	entitymanager.endFrame();
-	render(*(camera), "../../../../Game/assets/shaders/VertexShaderDefault.glsl");
+	render(*(camera), "Engine/assets/shaders/VertexShaderDefault.glsl");
 }
 
 

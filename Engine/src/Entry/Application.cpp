@@ -131,3 +131,9 @@ namespace geProject {
 
 
 }
+int main(int argc, char** argv) {
+	std::cout << "Test" << std::endl;
+	geProject::Application* game = new geProject::Application();
+	game->Startup();
+	return 0;
+}

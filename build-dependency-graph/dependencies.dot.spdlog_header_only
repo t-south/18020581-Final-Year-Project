@@ -1,8 +1,0 @@
-digraph "spdlog_header_only" {
-node [
-  fontsize = "12"
-];
-    "node13" [ label = "spdlog_header_only\n(spdlog::spdlog_header_only)", shape = pentagon ];
-    "node6" [ label = "Threads::Threads", shape = pentagon ];
-    "node13" -> "node6" [ style = dashed ] // spdlog_header_only -> Threads::Threads
-}

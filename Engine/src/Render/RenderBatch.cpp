@@ -191,9 +191,6 @@ std::vector<unsigned int> geProject::RenderBatch::createIndexes() {
 void geProject::RenderBatch::render(Camera& camera, std::string shaderPath) {	
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-	//if (shaderPath == "../../../../Game/assets/shaders/SelectionVertexShader.glsl") {
-	//	glClear(GL_COLOR_BUFFER_BIT);
-	//}
 	auto shader = resourcemanager.requestShader(shaderPath);
 	camera.projectionUpdate();
 	shader->setMat4f("uProjMat", camera.getProjection());

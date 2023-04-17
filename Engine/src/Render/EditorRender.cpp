@@ -146,7 +146,7 @@ void geProject::EditorRender::render(Camera& camera){
 	createVertices();
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), &vertices[0]);
-	auto shader = resourcemanager.requestShader("../../../../Game/assets/shaders/LineVertexShader.glsl");
+	auto shader = resourcemanager.requestShader("Engine/assets/shaders/LineVertexShader.glsl");
 	shader->setMat4f("uProjMat", camera.getProjection());
 	shader->setMat4f("uViewMat", camera.getViewMatrix());
 	glBindVertexArray(vao);

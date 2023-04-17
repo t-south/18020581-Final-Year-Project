@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+
 #include <ge_engine/Components.h>
 #include <ge_engine/Core.h>
 #include <ge_engine/json.hpp>
-//#include "../EntityManager/EntityManager.h"
+
 #include <ge_engine/Managers.h>
 
 using json = nlohmann::json;
@@ -30,8 +31,7 @@ namespace geProject {
 		void deserializeAnimations();
 		void to_json(json& data, std::string state);
 		void from_json(json& data, Frame& comp);
-		std::string filePath{ "../../../../Game/assets/levels/animations.json" };
+		std::string filePath{ "Engine/assets/levels/animations.json" };
 		std::ofstream oFile;
-		//EntityManager* entitymanager;
 	};
 }

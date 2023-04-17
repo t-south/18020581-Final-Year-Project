@@ -10,7 +10,7 @@ geProject::ImguiWindow::ImguiWindow(GLFWwindow* m_window, int windowWidth, int w
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard ;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;	
-	io.IniFilename = "../../../gui_default_layout.ini";		
+	io.IniFilename = "Engine/gui_default_layout.ini";		
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 450");
 

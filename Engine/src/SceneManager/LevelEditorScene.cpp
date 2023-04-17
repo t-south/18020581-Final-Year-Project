@@ -24,7 +24,7 @@ void geProject::LevelEditorScene::init() {
 	rendermanager = new Renderer();
 	camera = new EditorCamera(glm::vec2(0.0f, 0.0f));
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
-	filePath = "../../../../Game/assets/levels/levelEditor.json";
+	filePath = "Engine/assets/levels/levelEditor.json";
 	editor = new EditorRender();
 
 	std::shared_ptr<SpriteSheet> mapDims = resourcemanager.requestLevelMap(1);	
@@ -82,7 +82,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 		}
 		else {
 
-			eventSystem.setContext(ImGuiContext);
+			eventSystem.setContext(EditorContext);
 		}
 	}
 
@@ -151,7 +151,7 @@ void geProject::LevelEditorScene::update(float deltaTime) {
 	mouse->endFrame();
 	keyboard->endFrame();
 	entitymanager.endFrame();
-	render(*(camera), "../../../../Game/assets/shaders/VertexShaderDefault.glsl");
+	render(*(camera), "Engine/assets/shaders/VertexShaderDefault.glsl");
 	editor->render(*(camera));
 
 
@@ -329,11 +329,11 @@ unsigned int geProject::LevelEditorScene::createEnvironmentBlock(SpriteRender* s
 unsigned int geProject::LevelEditorScene::createCharacterBlock(SpriteRender* sprite, float sizeX, float sizeY, entityTypes type){
 	unsigned int entity = entitymanager.addEntity(type);
 	
-	if (type == entityTypes::player) {
+	if ((type & entityTypes::player )== entityTypes::player) {
 		player = new PlayerController(*camera);
 		entitymanager.assignController(entity, Controls());
 	}	
-	if (type == entityTypes::enemy) {
+	if ((type & entityTypes::enemy) == entityTypes::enemy) {
 		animationManager->assignEntityAnimation(entity, "Idle");
 	}
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
@@ -390,7 +390,7 @@ void geProject::LevelEditorScene::setPicking() {
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT);
 	selectionTextures->bindPicking();	
-	render(*(camera), "../../../../Game/assets/shaders/SelectionVertexShader.glsl");	
+	render(*(camera), "Engine/assets/shaders/SelectionVertexShader.glsl");	
 	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();

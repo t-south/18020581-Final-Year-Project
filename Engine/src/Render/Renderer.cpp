@@ -105,7 +105,7 @@ void geProject::Renderer::render(Camera& camera, std::string shaderPath) {
 		if (renderList[i].getSpriteNum() > 0 && renderList[i].getZindex() < 10) {
 			renderList[i].render(camera, shaderPath);			
 		}
-		else if (renderList[i].getZindex() == 10 && shaderPath != "../../../../Game/assets/shaders/SelectionVertexShader.glsl") {
+		else if (renderList[i].getZindex() == 10 && shaderPath != "../../assets/shaders/SelectionVertexShader.glsl") {
 			//offloading tile map into layer 10 of the renderer, also prevents selection of these textures
 			renderList[i].render(camera, shaderPath);
 		}

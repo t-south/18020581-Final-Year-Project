@@ -15,7 +15,7 @@ void geProject::MenuScene::update(float deltaTime){
 	mouse->endFrame();
 	keyboard->endFrame();
 	entitymanager.endFrame();
-	render(*(camera), "../../../../Game/assets/shaders/VertexShaderDefault.glsl");
+	render(*(camera), "Engine/assets/shaders/VertexShaderDefault.glsl");
 }
 
 void geProject::MenuScene::init()
@@ -27,15 +27,15 @@ void geProject::MenuScene::init()
 	animationManager = new AnimationManager(/**entitymanager*/);
 	rendermanager = new Renderer();
 	mouse->setInverses(camera->getProjectionInverse(), camera->getViewMatrixInverse());
-	resourcemanager.loadShader("../../../../Game/assets/shaders/VertexShaderDefault.glsl", "../../../../Game/assets/shaders/FragmentShaderDefault.glsl");
-	resourcemanager.loadShader("../../../../Game/assets/shaders/LineVertexShader.glsl", "../../../../Game/assets/shaders/LineFragmentShader.glsl");
-	resourcemanager.loadShader("../../../../Game/assets/shaders/SelectionVertexShader.glsl", "../../../../Game/assets/shaders/SelectionFragmentShader.glsl");
-	filePath = "../../../../Game/assets/levels/menu.json";
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/environment.png", 15, 16, 16, 0, 0);
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/player.png", 26, 16, 16, 0, 0);
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/enemies.png", 26, 16, 16, 0, 0);
-	resourcemanager.loadMap("../../../../Game/assets/images/spritesheets/level1.png", 9476, 16, 16, 0, 0);
-	resourcemanager.loadSpriteSheet("../../../../Game/assets/images/spritesheets/menu1.png", 4, 64, 32, 0, 0);
+	resourcemanager.loadShader("Engine/assets/shaders/VertexShaderDefault.glsl", "Engine/assets/shaders/FragmentShaderDefault.glsl");
+	resourcemanager.loadShader("Engine/assets/shaders/LineVertexShader.glsl", "Engine/assets/shaders/LineFragmentShader.glsl");
+	resourcemanager.loadShader("Engine/assets/shaders/SelectionVertexShader.glsl", "Engine/assets/shaders/SelectionFragmentShader.glsl");
+	filePath = "Engine/assets/levels/menu.json";
+	resourcemanager.loadSpriteSheet("Engine/assets/images/spritesheets/environment.png", 15, 16, 16, 0, 0);
+	resourcemanager.loadSpriteSheet("Engine/assets/images/spritesheets/player.png", 26, 16, 16, 0, 0);
+	resourcemanager.loadSpriteSheet("Engine/assets/images/spritesheets/enemies.png", 26, 16, 16, 0, 0);
+	resourcemanager.loadMap("Engine/assets/images/spritesheets/level1.png", 9476, 16, 16, 0, 0);
+	resourcemanager.loadSpriteSheet("Engine/assets/images/spritesheets/menu1.png", 4, 64, 32, 0, 0);
 	selectionTextures = new FrameBuffer(1920, 1080, true);
 	eventSystem.setContext(MenuContext);	
 	geProject::Scene::deserialize(filePath);
@@ -82,7 +82,7 @@ void geProject::MenuScene::setPicking()
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT);
 	selectionTextures->bindPicking();
-	render(*(camera),"../../../../Game/assets/shaders/SelectionVertexShader.glsl");
+	render(*(camera),"Engine/assets/shaders/SelectionVertexShader.glsl");
 	if (mouse->mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
 		int x = (int)mouse->getScreenXpos();
 		int y = (int)mouse->getScreenYpos();
@@ -98,7 +98,7 @@ void geProject::MenuScene::setPicking()
 			
 			break;
 		case 2:
-			eventSystem.publish(new GameLoadEvent(MenuContext, 3, true));
+			//eventSystem.publish(new GameLoadEvent(MenuContext, 3, true));
 			break;
 		case 3:
 			eventSystem.publish(new GameLoadEvent(MenuContext, -1 , true));

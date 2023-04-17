@@ -1,8 +1,0 @@
-digraph "unit_test" {
-node [
-  fontsize = "12"
-];
-    "node15" [ label = "unit_test", shape = egg ];
-    "node1" [ label = "box2d", shape = octagon ];
-    "node15" -> "node1" [ style = dotted ] // unit_test -> box2d
-}

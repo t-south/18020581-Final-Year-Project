@@ -46,7 +46,7 @@ void geProject::AnimationManager::changeState(int entityId, std::string newState
 }
 
 void geProject::AnimationManager::serializeAnimations(){
-	oFile.open(filePath);
+	oFile.open(filePath.c_str());
 	if (oFile.is_open(), std::ofstream::out | std::ofstream::trunc) {
 		//std::cout << "File is open" << std::endl;
 		//serialize each entity into json
