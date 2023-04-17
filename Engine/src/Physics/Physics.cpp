@@ -89,6 +89,9 @@ void geProject::Physics::addBoxCollider(BoxCollider box, int entityId) {
 	if ((entity.type & environment) == environment) {
 		colliders |= playerprojectile | enemy | player | completion | enemyprojectile ;
 	}
+	if ((entity.type & completion) == completion) {
+		colliders |= environment | playerprojectile | player ;
+	}
 	b2PolygonShape shape = b2PolygonShape();	
 	b2Body& body = *bodies[entityId];
 	b2FixtureDef shapeFixture;

@@ -78,15 +78,16 @@ void geProject::ImguiWindow::gameViewWindow() {
 			windowRunning = false;
 		}
 		if (ImGui::Button("Save")) {
-			eventSystem.publish(new GameSaveEvent(ImGuiContext));
+			eventSystem.publish(new GameSaveEvent(EditorContext));
 		}
 		if (ImGui::MenuItem("Editor", "", loadLevel, !loadLevel)) {
 			eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1, true));
 			loadLevel = false;
 		}
 	}
+
 	if (ImGui::MenuItem("Main Menu", "", loadLevel, !loadLevel)) {
-		eventSystem.publishImmediately(new GameLoadEvent(GameplayContext, 1, true));
+		eventSystem.publishImmediately(new GameLoadEvent(GameplayContext | EditorContext, 1, true));
 		loadLevel = false;
 	}
 	ImGui::EndMainMenuBar();

@@ -238,6 +238,7 @@ void geProject::EntityManager::assignCircleCollider(int entityId, CircleCollider
 
 void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) {
 	if (entityId < maxEntities && entityId >= 0) {
+
 		box.entityAssigned = entityId;	
 		componentBoxCollider[entityId].push_back(box);
 		if ((entities[entityId]->compMask & BoxColliderType) != BoxColliderType) {

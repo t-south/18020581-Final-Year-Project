@@ -93,7 +93,7 @@ void geProject::MenuScene::setPicking()
 			
 			break;
 		case 2:
-			//eventSystem.publish(new GameLoadEvent(MenuContext, 3, true));
+			eventSystem.publish(new GameLoadEvent(MenuContext, 3, true));
 			break;
 		case 3:
 			eventSystem.publish(new GameLoadEvent(MenuContext, -1 , true));

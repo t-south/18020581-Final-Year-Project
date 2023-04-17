@@ -20,6 +20,7 @@ geProject::Window::Window(const char* m_title, int m_width, int m_height): title
 	//current context
 	glfwMakeContextCurrent(window);
 	//v-sync enabled
+
 	glfwSwapInterval(1);
 	glfwShowWindow(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){

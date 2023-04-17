@@ -43,6 +43,10 @@ namespace geProject {
 		float timePerSec = 0;
 		int loopCount = 0;
 		float deltaTime = 0;
+
+
+
+
 		//SceneSerialize serial = SceneSerialize(sceneManager->getCurrentScene());
 		//serial.deserialize("jsonTest.json");
 		while (running &&  !glfwWindowShouldClose(gameWindow->getWindow())) {
@@ -62,9 +66,9 @@ namespace geProject {
 			//IMGUI UPDATES
 
 			imguiWindow->update(deltaTime, scene);
-
+			glfwSwapBuffers(gameWindow->getWindow());           
+			
 			//imguiwindow->render(width, height);
-			glfwSwapBuffers(gameWindow->getWindow());
 			gameClock->updateTime();
 			deltaTime = gameClock->getTime();
 			timePerSec += deltaTime;

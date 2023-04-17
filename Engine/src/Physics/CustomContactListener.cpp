@@ -15,19 +15,20 @@ void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
 	bool deadly = false;
 	Entity* firstData = (Entity*)contact->GetFixtureA()->GetBody()->GetUserData().pointer;
 	Entity* secondData = (Entity*)contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-	if (firstData->type == completion) {
-		if (secondData->type == player || secondData->type == playerprojectile) {
+	
+	if ((firstData->type & completion )== completion) {
+		if ((secondData->type & player) == player || (secondData->type & playerprojectile)== playerprojectile) {
 			eventSystem.publish(new GameLoadEvent(GameplayContext | ImGuiContext, 1, true));
 		}
 	}
 	switch (firstData->type) {
 	case environment:
-		if(secondData->type == playerprojectile || secondData->type == enemyprojectile){
+		if ((secondData->type & playerprojectile) == playerprojectile || (secondData->type & enemyprojectile) == enemyprojectile){
 			secondData->lifeTime = 1;
 		}
 		break;
 	case enemy:
-		if (secondData->type == playerprojectile || secondData->type == enemyprojectile) {
+		if ((secondData->type & playerprojectile) == playerprojectile || (secondData->type & enemyprojectile) == enemyprojectile) {
 			if (contact->GetFixtureA()->IsSensor()) {
 
 			}
@@ -39,7 +40,7 @@ void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
 		}
 		break;
 	case player:
-		if (secondData->type == playerprojectile || secondData->type == enemyprojectile) {
+		if ((secondData->type & playerprojectile) == playerprojectile || (secondData->type & enemyprojectile) == enemyprojectile) {
 			secondData->lifeTime = 1;
 			deadly = true;
 		}
@@ -49,7 +50,7 @@ void geProject::CustomContactListener::BeginContact(b2Contact* contact) {
 
 
 
-	if ((firstData->type == enemy && secondData->type == player) || (firstData->type == enemy && secondData->type == playerprojectile)) {
+	if ((firstData->type & enemy )== enemy && (secondData->type & player)== player || ((firstData->type & enemy) == enemy && (secondData->type & playerprojectile) == playerprojectile)) {
 		RayCastCallback raycast;
 		Transform enemyPoint = entitymanager.getTransformComponent(firstData->id);
 		Transform playerPoint = entitymanager.getTransformComponent(secondData->id);
