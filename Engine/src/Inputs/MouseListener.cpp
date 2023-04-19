@@ -14,6 +14,7 @@ geProject::MouseListener::~MouseListener()
 }
 
 geProject::MouseListener* geProject::MouseListener::getInstance() {
+    //PRE: IF THERE IS A SINGLETON INSTANCE AVAILABLE
     if (instance == NULL)
     {
         instance = new MouseListener();
@@ -36,6 +37,7 @@ void geProject::MouseListener::cursor_position_callback(GLFWwindow* window, doub
 }
 
 void geProject::MouseListener::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    //PRE: IF THERE IS A VALID BUTTON PRESS
     Context currentContext = eventSystem.getContext();
     if (action == GLFW_PRESS) {
         eventSystem.publish(new MouseButtonEvent(currentContext, button, GLFW_PRESS, MouseListener::getInstance()->getCameraMouseX(), MouseListener::getInstance()->getCameraMouseY()));
@@ -120,6 +122,7 @@ float geProject::MouseListener::getViewYsize() { return (float)geProject::MouseL
 bool geProject::MouseListener::checkMouseBoundaries() {
     float x = MouseListener::getInstance()->getScreenXpos();
     float y = MouseListener::getInstance()->getScreenYpos();
+    
     if (x >= 0.0f && x <= 1920.0f && y >= 0.0f && y <= 1080.0f) {
         return true;
     }

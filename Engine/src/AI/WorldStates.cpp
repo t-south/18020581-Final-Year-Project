@@ -21,7 +21,7 @@ void geProject::WorldState::testWorldMap()
 
 bool geProject::WorldState::getTile(float x, float y)
 {
-
+	//PRE: TILE IS WITHIN THE MAP RANGE
 	if (x < 0 || y < 0  || y >= worldHeight || x >= worldWidth) {
 		return false;
 	}

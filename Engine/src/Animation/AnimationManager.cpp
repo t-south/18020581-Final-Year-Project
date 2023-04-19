@@ -11,6 +11,7 @@ geProject::AnimationManager::~AnimationManager(){
 }
 
 void geProject::AnimationManager::update(float deltaTime){
+	//PRE : ENTITY ID > 1 AND THE ENTITY HAS A ANIMATION COMPONENT
 	for (const auto& i : entitymanager.getEntities()) {
 		if ((i->compMask & 32) == 32 && i->id > -1) {					//check there is an animation assigned to entity, if so retrieve sprite and animation data
 			SpriteRender sprite = entitymanager.getSpriteComponent(i->id);
@@ -45,6 +46,7 @@ void geProject::AnimationManager::changeState(int entityId, std::string newState
 
 void geProject::AnimationManager::serializeAnimations(){
 	oFile.open(filePath.c_str());
+	//PRE : IF FILE IS OPEN
 	if (oFile.is_open(), std::ofstream::out | std::ofstream::trunc) {
 		//serialize each entity into json
 		json animationData;
@@ -61,6 +63,7 @@ void geProject::AnimationManager::serializeAnimations(){
 
 void geProject::AnimationManager::deserializeAnimations(){
 	std::ifstream iFile(filePath);
+	//PRE: IF FILE IS OPEN
 	try {
 		if (iFile.is_open()) {
 			json data = json::parse(iFile);
@@ -97,6 +100,7 @@ void geProject::AnimationManager::from_json(json& data, Frame& comp){
 }
 
 void geProject::AnimationManager::assignEntityAnimation(int entityId, std::string state){
+	//PRE: IF ENTITY HAS AN ANIMATION COMPONENT
 	Entity entity = entitymanager.getEntity(entityId);
 	if ((entity.compMask & 32) != 32) {
 		entitymanager.assignAnimation(entity.id, Animation{.state = {state}});

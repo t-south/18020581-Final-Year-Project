@@ -14,6 +14,7 @@ namespace geProject {
 		template<class T>
 		void publish(T* event) {
 			std::list<FunctionWrapper*>* observers = events[event->getType()];
+			//PRE : IF THERE ARE OBSERVERS AVAILABLE
 			if (observers != nullptr) {
 				for (auto& observer : *observers) {
 					if (event->contextCheck(currentContext)) {
@@ -38,6 +39,7 @@ namespace geProject {
 		template<class T>
 		void publishImmediately(T* event) {
 			std::list<FunctionWrapper*>* observers = events[event->getType()];
+			//PRE : IF THERE ARE OBSERVERS AVAILABLE
 			if (observers != nullptr) {
 				for (auto& observer : *observers) {
 					if (event->contextCheck(currentContext)) {
@@ -57,6 +59,7 @@ namespace geProject {
 		void handleEvents(Type eventType){	
 			std::list<FunctionWrapper*>* observers = events[eventType];
 			int count = 0;
+			//PRE : IF THERE ARE OBSERVERS AVAILABLE
 			if (observers != nullptr) {
 				for (auto& observer : *observers) {
 					count++;

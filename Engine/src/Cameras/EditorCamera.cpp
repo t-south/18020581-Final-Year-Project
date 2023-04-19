@@ -14,7 +14,8 @@ geProject::EditorCamera::EditorCamera(glm::vec2 pos){
 
 
 
-void geProject::EditorCamera::updateKeyPress(KeyPressedEvent* e){		
+void geProject::EditorCamera::updateKeyPress(KeyPressedEvent* e){	
+	//PRE : IF EVENT IS WITHIN THE CORRECT CONTEXT
 	if (e->contextCheck(EditorContext)) {
 		glm::vec2 newPos(0,0);
 		float modifier = 0.1f;
@@ -48,6 +49,7 @@ void geProject::EditorCamera::updateKeyPress(KeyPressedEvent* e){
 
 
 void geProject::EditorCamera::cameraMouseButton(MouseButtonEvent* mouse){	
+	//PRE: IF EVENT IS WITHIN THE CORRECT CONTEXT
 	if (mouse->contextCheck(Context::EditorContext)) {
 		if (mouse->mouseButton == GLFW_MOUSE_BUTTON_MIDDLE && mouse->mouseButtonDown == GLFW_PRESS) {
 			mouseDown = true;
@@ -59,7 +61,8 @@ void geProject::EditorCamera::cameraMouseButton(MouseButtonEvent* mouse){
 }
 
 
-void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {	
+void geProject::EditorCamera::mouseMoved(MouseMoveEvent* mouse) {
+	//PRE: IF EVENT IS WITHIN THE CORRECT CONTEXT
 	if (mouse->contextCheck(Context::EditorContext)) {
 		if (mouseDown && mouse->contextCheck(Context::EditorContext)) {
 			if (prevClick[0] == 0 && prevClick[1] == 0) {

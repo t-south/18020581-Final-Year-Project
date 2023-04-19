@@ -7,6 +7,7 @@ geProject::Clock::Clock() {
 }
 
 geProject::Clock* geProject::Clock::getInstance() {
+    //PRE: IF SINGLETON INSTANCE IS ACTIVE
     if (instance == NULL)
     {
         instance = new Clock();
@@ -29,6 +30,7 @@ float geProject::Clock::getTime() {
 }
 
 void geProject::Clock::updateTime(){
+    // PRE: IF START TIME IS 0
     if (startTime == 0)
         startTime = GetTicks();
     else {

@@ -14,6 +14,7 @@ void geProject::PlayerController::dash(){
 
 void geProject::PlayerController::attack(){
 	Damage dmg = entitymanager.getDamageComponent(entityId);
+	
 	if (dmg.coolDown == 0){
 		physicsmanager.createProjectile(entityId);
 		switch (dmg.dmgType) {
@@ -81,6 +82,7 @@ void geProject::PlayerController::moveTo(float x, float y, float dt){
 }
 
 void geProject::PlayerController::rotateToCursor(MouseMoveEvent* mouseMove){
+	// PRE: IF EVENT IS WITHIN CONTEXT
 	if (mouseMove->contextCheck(GameplayContext)) {
 		//PI / 2 = 1.571 Rad
 		Transform trans = entitymanager.getTransformComponent(entityId);
@@ -95,6 +97,7 @@ void geProject::PlayerController::rotateTo(float desiredDirection, float current
 
 
 void geProject::PlayerController::update(){	
+	// PRE: IF EVENT IS WITHIN CONTEXT
 	if (entityId == -1) {
 		entityId = entitymanager.getPlayerId();
 	}

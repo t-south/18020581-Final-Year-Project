@@ -18,7 +18,7 @@ std::string geProject::Scene::getFilePath()
 }
 
 void geProject::Scene::serialize(std::string filepath) {
-	oFile.open(filepath);
+	oFile.open(filepath.c_str());
 	if (oFile.is_open(), std::ofstream::out | std::ofstream::trunc) {
 		//serialize each entity into json
 		json sceneData;
@@ -69,6 +69,7 @@ void geProject::Scene::renderScene()
 
 json geProject::Scene::serializeEntity(Entity& entity) {
 	//go through each of the components 
+
 	if (oFile.is_open() && entity.id > -1) {
 		json entityjson = json::object();
 		json entityType = json{ "entityType", entity.type };
@@ -195,7 +196,7 @@ json geProject::Scene::serializeEntity(Entity& entity) {
 
 
 void geProject::Scene::deserialize(std::string filepath) {
-	std::ifstream iFile(filepath);
+	std::ifstream iFile(filepath.c_str());
 	try {
 		if (iFile.is_open()) {
 			json data = json::parse(iFile);

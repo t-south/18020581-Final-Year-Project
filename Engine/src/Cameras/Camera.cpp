@@ -59,6 +59,7 @@ float geProject::Camera::getScroll() {
 }
 
 void geProject::Camera::cameraMouseScrolled(MouseScrollEvent* scroll) {
+	// PRE: IF MOUSE SCROLL EVENT IS ASSIGNED TO THE CORRECT CONTEXT
 	if (scroll->contextCheck(Context::GameplayContext) || scroll->contextCheck(Context::EditorContext)) {	
 		auto scrollval = scroll->yScroll;
 		if (scroll->yScroll != 0.0f && (scroll->screenX >= 0.0f && scroll->screenX <= 1920.0f) && (scroll->screenY >= 0.0f && scroll->screenY <= 1080.0f)) {

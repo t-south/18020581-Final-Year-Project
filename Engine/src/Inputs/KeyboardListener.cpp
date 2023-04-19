@@ -4,6 +4,7 @@ geProject::KeyboardListener* geProject::KeyboardListener::instance = nullptr;
 
 
 geProject::KeyboardListener* geProject::KeyboardListener::getInstance() {
+    //PRE: IF THERE IS A SINGLETON INSTANCE AVAILABLE
     if (instance == NULL)
     {
         instance = new KeyboardListener();

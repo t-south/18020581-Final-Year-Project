@@ -92,6 +92,7 @@ void geProject::Enemy::update(float deltaTime) {
 	if (currentState == ACTION) {
 		if (!aiActive) {
 			cooldown--;
+			//IF PLAYER IS IN RANGE AND THE ATTACK IS OFF COOLDOWN
 			if (agent.playerInRange && cooldown == 0) {				
 				AttackCommand* atk = new AttackCommand();
 				entitymanager.assignDamage(entityId, Damage());
@@ -241,6 +242,7 @@ void geProject::Enemy::update(float deltaTime) {
 
 void geProject::Enemy::chooseGoal(int agentState){	
 	updateActionCost(agentState);
+	//PRE: CURRENT GOAL EXISTS AND VALID
 	if (currentGoal != nullptr && !currentGoal->checkValid(agentState)) {
 		currentGoal = nullptr;		
 		path.clear();

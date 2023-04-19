@@ -78,7 +78,8 @@ geProject::Command* geProject::Receiver::action(float deltaTime){
 	return nullptr;
 }
 
-bool geProject::Receiver::buttonPressed(int button){	
+bool geProject::Receiver::buttonPressed(int button){
+	
 	if (buttonevents[button] == true) {			
 		return true;
 	}	
@@ -86,6 +87,7 @@ bool geProject::Receiver::buttonPressed(int button){
 }
 
 void geProject::Receiver::updateMouseButtonPress(MouseButtonEvent* mouseevent) {
+	//PRE: IF EVENT IS IN CORRECT CONTEXT
 	if (mouseevent->contextCheck(GameplayContext)) {
 		mouseevent->mouseButtonDown;
 		switch (mouseevent->mouseButton) {
@@ -102,6 +104,7 @@ void geProject::Receiver::updateMouseButtonPress(MouseButtonEvent* mouseevent) {
 }
 
 void geProject::Receiver::updateKeyButtonPress(KeyPressedEvent* keyevent) {
+	//PRE: IF EVENT IS IN CORRECT CONTEXT
 	if (keyevent->contextCheck(GameplayContext) || (keyevent->contextCheck(ImGuiContext))) {
 		switch (keyevent->keycode) {
 			case 340: //LEFT SHIFT
@@ -132,6 +135,7 @@ void geProject::Receiver::updateKeyButtonPress(KeyPressedEvent* keyevent) {
 }
 
 void geProject::Receiver::updateKeyButtonRelease(KeyReleasedEvent* keyevent){
+	//PRE: IF EVENT IS IN CORRECT CONTEXT
 	if (keyevent->contextCheck(GameplayContext) || (keyevent->contextCheck(ImGuiContext))) {
 		switch (keyevent->keycode) {
 		case 340:			 //SHIFT

@@ -70,11 +70,11 @@ void geProject::ImguiWindow::gameViewWindow() {
 	ImGui::BeginMainMenuBar();
 	if (eventSystem.getContext() == EditorContext) {
 		if (ImGui::MenuItem("Play", "", windowRunning, !windowRunning)) {
-			eventSystem.publish(new GameStartEvent(ImGuiContext));
+			eventSystem.publish(new GameStartEvent(EditorContext));
 			windowRunning = true;
 		}
 		if (ImGui::MenuItem("Stop", "", !windowRunning, windowRunning)) {
-			eventSystem.publish(new GameStopEvent(ImGuiContext));
+			eventSystem.publish(new GameStopEvent(EditorContext));
 			windowRunning = false;
 		}
 		if (ImGui::Button("Save")) {

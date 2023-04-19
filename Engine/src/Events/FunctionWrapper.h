@@ -26,7 +26,7 @@ namespace geProject {
 		CallBackFunction callback;
 		bool functionAssigned{ false };
 		virtual void callFunction() override { 
-
+			//PRE: IF THE FUNCTION HAS BEEN ASSIGNED 
 			if (functionAssigned) { 
 				(instance->*callback)(static_cast<U*>(eventClass)); functionAssigned = false; 
 			}

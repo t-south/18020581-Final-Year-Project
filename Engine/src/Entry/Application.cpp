@@ -88,6 +88,7 @@ namespace geProject {
 	}
 
 	void geProject::Application::startGamePlay(GameStartEvent* start) {
+		//PRE: IF EVENT IS IN CORRECT CONTEXT
 		if (start->getType() == Type::gameStart) {
 	
 			auto scene = sceneManager->getCurrentScene();
@@ -100,6 +101,7 @@ namespace geProject {
 	}
 
 	void geProject::Application::stopGamePlay(GameStopEvent* stop) {
+		//PRE: IF EVENT IS IN CORRECT CONTEXT
 		if (stop->getType() == Type::gameStop) {	
 			auto scene = sceneManager->getCurrentScene();
 			scene->reloadLevel();
@@ -113,6 +115,7 @@ namespace geProject {
 	}
 
 	void geProject::Application::loadGame(GameLoadEvent* load) {
+		//PRE: IF EVENT IS IN CORRECT CONTEXT
 		if (load->getType() == Type::gameLoad) {	
 			if (load->sceneId == -1) {
 				running = false;

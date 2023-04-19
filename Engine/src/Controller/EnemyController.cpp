@@ -31,6 +31,7 @@ void geProject::EnemyController::switchAbility(){
 }
 
 void geProject::EnemyController::moveTo(float x, float y, float dt){
+
 	if (x == 0 && y == 0) {
 		physicsmanager.applyLinearImpulse(entityId, x, y);
 	}

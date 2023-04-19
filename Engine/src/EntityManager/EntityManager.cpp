@@ -167,6 +167,7 @@ bool geProject::EntityManager::hasUpdate() {
 }
 
 void geProject::EntityManager::assignTransform(int entityId, Transform transform) {
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		if (componentTransforms[entityId]->id > 0) {
 			transform.dirtyFlag[1] = componentTransforms[entityId]->dirtyFlag[1];
@@ -194,6 +195,7 @@ void geProject::EntityManager::assignTransform(int entityId, Transform transform
 
 
 void geProject::EntityManager::assignSpriteRender(int entityId, SpriteRender sprite) {
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {	
 		sprite.entityId = entityId;	
 		std::memcpy(componentSpriteRender[entityId], &sprite, sizeof(SpriteRender));	
@@ -207,6 +209,7 @@ void geProject::EntityManager::assignSpriteRender(int entityId, SpriteRender spr
 
 
 void geProject::EntityManager::assignRigidBody(int entityId, Rigidbody rbody) {
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentRigidBody[entityId], &rbody, sizeof(Rigidbody));
 		entities[entityId]->compMask = entities[entityId]->compMask | rbody.id;
@@ -219,6 +222,7 @@ void geProject::EntityManager::assignRigidBody(int entityId, Rigidbody rbody) {
 }
 
 void geProject::EntityManager::assignCircleCollider(int entityId, CircleCollider circle) {
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		circle.entityAssigned = entityId;
 		if ((entities[entityId]->type & player) == player) {
@@ -237,6 +241,7 @@ void geProject::EntityManager::assignCircleCollider(int entityId, CircleCollider
 }
 
 void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) {
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 
 		box.entityAssigned = entityId;	
@@ -252,7 +257,7 @@ void geProject::EntityManager::assignBoxCollider(int entityId, BoxCollider box) 
 
 
 void geProject::EntityManager::assignAnimation(int entityId, Animation animate) {
-
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentAnimation[entityId], &animate, sizeof(Animation));	
 		entities[entityId]->compMask = entities[entityId]->compMask | animate.id;
@@ -263,6 +268,7 @@ void geProject::EntityManager::assignAnimation(int entityId, Animation animate) 
 }
 
 void geProject::EntityManager::assignController(int entityId, Controls control){
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentController[entityId], &control, sizeof(Controls));
 		entities[entityId]->compMask = entities[entityId]->compMask | control.id;
@@ -274,6 +280,7 @@ void geProject::EntityManager::assignController(int entityId, Controls control){
 }
 
 void geProject::EntityManager::assignHealth(int entityId, Health health){
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		
 		std::memcpy(componentHealth[entityId], &health, sizeof(Health));
@@ -285,6 +292,7 @@ void geProject::EntityManager::assignHealth(int entityId, Health health){
 }
 
 void geProject::EntityManager::assignDamage(int entityId, Damage dmg){
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentDamage[entityId], &dmg, sizeof(Damage));
 		entities[entityId]->compMask = entities[entityId]->compMask | dmg.id;
@@ -295,6 +303,7 @@ void geProject::EntityManager::assignDamage(int entityId, Damage dmg){
 }
 
 void geProject::EntityManager::assignView(int entityId, ViewCollider view){
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentView[entityId], &view, sizeof(ViewCollider));
 		entities[entityId]->compMask = entities[entityId]->compMask | view.id;
@@ -306,6 +315,7 @@ void geProject::EntityManager::assignView(int entityId, ViewCollider view){
 }
 
 void geProject::EntityManager::assignAgent(int entityId, Agent agent){
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if (entityId < maxEntities && entityId >= 0) {
 		std::memcpy(componentAgent[entityId], &agent, sizeof(Agent));
 		entities[entityId]->compMask = entities[entityId]->compMask | agent.id;
@@ -317,6 +327,7 @@ void geProject::EntityManager::assignAgent(int entityId, Agent agent){
 
 
 void geProject::EntityManager::deleteComponent(int entityId, uInt componentId) {
+	//PRE : IF ENTITY IS WITHIN RANGE OF ENTITIES AND THE ID IS A VALID ENTITY
 	if(entityId < maxEntities && entityId >= 0){
 		switch (componentId) {
 		case 0x0001:
@@ -377,7 +388,8 @@ int geProject::EntityManager::getZindex(int entityId){
 	return componentSpriteRender[entityId]->zIndex;
 }
 
-geProject::Entity geProject::EntityManager::getEntity(int entityId) {	
+geProject::Entity geProject::EntityManager::getEntity(int entityId) {
+	//PRE: IF THERE ARE ENTITIES WITH LIST
 	if (entities.size() > 0) {			
 		return *entities[entityId];
 	}
@@ -497,6 +509,7 @@ void geProject::EntityManager::updateCircleCollider(CircleColliderEvent* event) 
 
 //PHYSICS EVENT LISTENERS
 void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
+	//PRE : IF EVENT IS WITHIN CORRECT CONTEXT AND IS AN AVAILABLE TYPE
 	switch (event->entityA->type) {
 	case entityTypes::player:
 		if ((event->entityB->type & enemyprojectile) == enemyprojectile) {
@@ -554,6 +567,7 @@ void geProject::EntityManager::BeginContact(BeginContactEvent* event) {
 }
 
 void geProject::EntityManager::EndContact(EndContactEvent* event){
+	//PRE : IF EVENT IS WITHIN CORRECT CONTEXT AND IS AN AVAILABLE TYPE
 	switch (event->entityA->type) {
 	case entityTypes::player:
 		break;
@@ -622,6 +636,7 @@ std::vector<geProject::Entity*> geProject::EntityManager::getEntities() {
 }
 
 void geProject::EntityManager::endFrame() {
+	//PRE : IF EVENT SYSTEM IS IN THE CORRECT CONTEXT
 	if(eventSystem.getContext() == EditorContext){
 		int count = 0;
 		for (auto const& i : entities) {
@@ -639,6 +654,7 @@ void geProject::EntityManager::endFrame() {
 
 //IMGUI
 void geProject::EntityManager::updateImgui(int entityId) {	
+	//PRE: IF ENTITY IS A VALID ID
 	if (entityId > -1) {
 		Entity entity = getEntity(entityId);
 		SpriteRender* sprite = componentSpriteRender[entityId];

@@ -16,6 +16,7 @@ PoolAllocator::PoolAllocator(size_t elNumber, size_t elSize) : element_number(el
 PoolAllocator::~PoolAllocator() {
 }
 void* PoolAllocator::allocate(size_t size) {
+	//PRE: CHECK FOR NULLPTR
 	if (head->next != nullptr) {
 		//got to next pointer and return the previous address
 		Node* elem_address = head;
